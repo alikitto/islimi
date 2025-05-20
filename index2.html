@@ -12,10 +12,6 @@
       --accent: #d4af37;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -23,43 +19,14 @@
       color: var(--text-color);
     }
 
-    header {
-      padding: 20px;
+    header, footer {
       text-align: center;
-      position: relative;
+      padding: 20px;
     }
 
     .logo {
       max-width: 300px;
       width: 70%;
-    }
-
-    nav {
-      background-color: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      padding: 10px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .menu {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .menu a {
-      color: var(--text-color);
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .burger {
-      display: none;
-      font-size: 24px;
-      cursor: pointer;
     }
 
     .info-glass {
@@ -75,11 +42,25 @@
       margin-right: auto;
     }
 
-    .section-title {
+    .category-header {
+      max-width: 1200px;
+      margin: 50px auto 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .category-title {
       font-size: 20px;
       font-weight: bold;
-      margin: 40px auto 20px;
-      text-align: center;
+    }
+
+    .view-all {
+      font-size: 14px;
+      text-decoration: none;
+      color: var(--accent);
+      font-weight: bold;
     }
 
     .catalog {
@@ -104,7 +85,7 @@
     video {
       width: 100%;
       border-radius: 12px;
-      background: #eaeaea;
+      cursor: pointer;
     }
 
     .code-row {
@@ -122,12 +103,6 @@
 
     .wa-link img {
       width: 22px;
-      height: 22px;
-      transition: transform 0.2s ease;
-    }
-
-    .wa-link img:hover {
-      transform: scale(1.15);
     }
 
     .category {
@@ -147,29 +122,34 @@
       font-weight: bold;
       padding: 4px 10px;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
     footer {
-      margin-top: 40px;
-      padding: 20px;
-      text-align: center;
       font-size: 14px;
       color: #666;
+      margin-top: 40px;
     }
 
-    @media (max-width: 768px) {
-      .menu {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-      }
-      .menu.active {
-        display: flex;
-      }
-      .burger {
-        display: block;
-      }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal video {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 8px;
+    }
+
+    .modal.active {
+      display: flex;
     }
   </style>
 </head>
@@ -178,25 +158,20 @@
     <img src="https://karal.az/islimilogo2.png" alt="Karal Logo" class="logo" />
     <div class="info-glass">
       <p>Zərgərlik kolleksiyamızın yeni parıltısına nəzər salın ✨</p>
-      <p class="update-date">Yeniləndi: 20 May, 2025</p>
+      <p>Yeniləndi: 20 May, 2025</p>
     </div>
   </header>
-
-  <nav>
-    <div class="burger" onclick="document.querySelector('.menu').classList.toggle('active')">☰</div>
-    <div class="menu">
-      <a href="#new">Yeni</a>
-      <a href="#üzük">Üzüklər</a>
-      <a href="#qolbaq">Qolbaqlar</a>
-      <a href="#boyunbağı">Boyunbağlar</a>
-    </div>
-  </nav>
 
   <div id="content"></div>
 
   <footer>
-    © 2025 Karal | Hazırlayan: Sizin komandanız 💎
+    © 2025 Karal | Bütün hüquqlar qorunur
   </footer>
+
+  <!-- Modal for enlarged video -->
+  <div class="modal" id="videoModal" onclick="this.classList.remove('active')">
+    <video id="modalVideo" controls autoplay></video>
+  </div>
 
   <script>
     const data = [
@@ -223,8 +198,13 @@
       video.setAttribute('muted', '');
       video.setAttribute('loop', '');
       video.setAttribute('preload', 'none');
-      video.muted = true;
       video.dataset.src = item.videoUrl;
+      video.muted = true;
+
+      video.addEventListener('click', () => {
+        document.getElementById('modalVideo').src = item.videoUrl;
+        document.getElementById('videoModal').classList.add('active');
+      });
 
       const codeRow = document.createElement('div');
       codeRow.className = 'code-row';
@@ -265,11 +245,23 @@
     };
 
     categories.forEach(cat => {
+      const section = document.createElement('div');
       const sectionId = cat.toLowerCase();
-      const sectionTitle = document.createElement('div');
-      sectionTitle.className = 'section-title';
-      sectionTitle.id = sectionId;
-      sectionTitle.textContent = cat === "Yeni" ? "Yeni məhsullar" : cat + "lər";
+
+      const sectionHeader = document.createElement('div');
+      sectionHeader.className = 'category-header';
+
+      const title = document.createElement('div');
+      title.className = 'category-title';
+      title.textContent = cat === "Yeni" ? "Yeni məhsullar" : `${cat}lər`;
+
+      const viewAll = document.createElement('a');
+      viewAll.className = 'view-all';
+      viewAll.href = "#";
+      viewAll.textContent = "Hamısına bax →";
+
+      sectionHeader.appendChild(title);
+      sectionHeader.appendChild(viewAll);
 
       const grid = document.createElement('div');
       grid.className = 'catalog';
@@ -283,8 +275,9 @@
         grid.appendChild(card);
       });
 
-      content.appendChild(sectionTitle);
-      content.appendChild(grid);
+      section.appendChild(sectionHeader);
+      section.appendChild(grid);
+      content.appendChild(section);
     });
 
     const observer = new IntersectionObserver(entries => {
@@ -297,9 +290,7 @@
           video.pause();
         }
       });
-    }, {
-      threshold: 0.5
-    });
+    }, { threshold: 0.5 });
 
     setTimeout(() => {
       document.querySelectorAll('video').forEach(video => observer.observe(video));
