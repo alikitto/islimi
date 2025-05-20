@@ -12,26 +12,54 @@
       --accent: #d4af37;
     }
 
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      padding: 40px 20px;
       font-family: 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
     header {
-      margin-bottom: 30px;
+      padding: 20px;
       text-align: center;
+      position: relative;
     }
 
     .logo {
-      width: 70%;
       max-width: 300px;
-      height: auto;
+      width: 70%;
+    }
+
+    nav {
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .menu {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .menu a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .burger {
+      display: none;
+      font-size: 24px;
+      cursor: pointer;
     }
 
     .info-glass {
@@ -41,67 +69,36 @@
       background: rgba(255, 255, 255, 0.25);
       border-radius: 16px;
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #000;
-      font-size: 12px;
       text-align: center;
-    }
-
-    .update-date {
       font-size: 12px;
-      color: #444;
-      margin-top: 10px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .section-title {
       font-size: 20px;
       font-weight: bold;
-      margin: 40px 0 20px;
-      text-align: left;
-      width: 100%;
-      max-width: 1200px;
+      margin: 40px auto 20px;
+      text-align: center;
     }
 
     .catalog {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 30px;
-      width: 100%;
       max-width: 1200px;
-    }
-
-    .slider {
-      display: flex;
-      gap: 20px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      scroll-snap-type: x mandatory;
-    }
-
-    .slider::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    .slider::-webkit-scrollbar-thumb {
-      background: var(--accent);
-      border-radius: 4px;
+      margin: 0 auto;
+      padding: 0 20px;
     }
 
     .item {
-      flex: 0 0 300px;
-      scroll-snap-align: start;
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
       overflow: hidden;
       padding: 20px;
       text-align: center;
-      transition: transform 0.2s ease;
       position: relative;
-    }
-
-    .item:hover {
-      transform: translateY(-5px);
     }
 
     video {
@@ -123,13 +120,6 @@
       color: var(--accent);
     }
 
-    .category {
-      font-size: 14px;
-      margin-top: 6px;
-      color: #888;
-      font-style: italic;
-    }
-
     .wa-link img {
       width: 22px;
       height: 22px;
@@ -138,6 +128,13 @@
 
     .wa-link img:hover {
       transform: scale(1.15);
+    }
+
+    .category {
+      font-size: 14px;
+      margin-top: 6px;
+      color: #888;
+      font-style: italic;
     }
 
     .badge-new {
@@ -153,20 +150,27 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
-    .view-all {
-      margin: 10px 0 30px;
-      text-align: right;
-      max-width: 1200px;
-      width: 100%;
-    }
-
-    .view-all a {
-      color: var(--accent);
+    footer {
+      margin-top: 40px;
+      padding: 20px;
+      text-align: center;
       font-size: 14px;
-      text-decoration: none;
-      font-weight: bold;
+      color: #666;
     }
 
+    @media (max-width: 768px) {
+      .menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+      }
+      .menu.active {
+        display: flex;
+      }
+      .burger {
+        display: block;
+      }
+    }
   </style>
 </head>
 <body>
@@ -178,12 +182,21 @@
     </div>
   </header>
 
-  <div class="section-title">Yeni məhsullar</div>
-  <div class="catalog" id="newItems"></div>
+  <nav>
+    <div class="burger" onclick="document.querySelector('.menu').classList.toggle('active')">☰</div>
+    <div class="menu">
+      <a href="#new">Yeni</a>
+      <a href="#üzük">Üzüklər</a>
+      <a href="#qolbaq">Qolbaqlar</a>
+      <a href="#boyunbağı">Boyunbağlar</a>
+    </div>
+  </nav>
 
-  <div class="section-title">Üzüklər</div>
-  <div class="slider" id="ringsSlider"></div>
-  <div class="view-all"><a href="#">Hamısına bax →</a></div>
+  <div id="content"></div>
+
+  <footer>
+    © 2025 Karal | Hazırlayan: Sizin komandanız 💎
+  </footer>
 
   <script>
     const data = [
@@ -192,14 +205,16 @@
       { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "XYZ-333", category: "Üzük" },
       { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-001", category: "Boyunbağı" },
       { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-002", category: "Üzük" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-003", category: "Üzük" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-004", category: "Üzük" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-005", category: "Qolbaq" }
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-003", category: "Qolbaq" },
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-004", category: "Boyunbağı" },
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-005", category: "Üzük" }
     ];
 
+    const categories = ["Yeni", "Üzük", "Qolbaq", "Boyunbağı"];
     const whatsappNumber = "994702920323";
+    const content = document.getElementById('content');
 
-    const renderItem = (item, index, target) => {
+    const createCard = (item, index) => {
       const wrapper = document.createElement('div');
       wrapper.className = 'item';
 
@@ -207,9 +222,9 @@
       video.setAttribute('playsinline', '');
       video.setAttribute('muted', '');
       video.setAttribute('loop', '');
-      video.setAttribute('autoplay', '');
+      video.setAttribute('preload', 'none');
       video.muted = true;
-      video.src = item.videoUrl;
+      video.dataset.src = item.videoUrl;
 
       const codeRow = document.createElement('div');
       codeRow.className = 'code-row';
@@ -246,14 +261,49 @@
         wrapper.appendChild(badge);
       }
 
-      target.appendChild(wrapper);
+      return wrapper;
     };
 
-    const newItems = data.slice(0, 6);
-    const rings = data.filter(item => item.category.toLowerCase() === 'üzük');
+    categories.forEach(cat => {
+      const sectionId = cat.toLowerCase();
+      const sectionTitle = document.createElement('div');
+      sectionTitle.className = 'section-title';
+      sectionTitle.id = sectionId;
+      sectionTitle.textContent = cat === "Yeni" ? "Yeni məhsullar" : cat + "lər";
 
-    newItems.forEach((item, i) => renderItem(item, i, document.getElementById('newItems')));
-    rings.forEach((item, i) => renderItem(item, i, document.getElementById('ringsSlider')));
+      const grid = document.createElement('div');
+      grid.className = 'catalog';
+
+      const items = cat === "Yeni"
+        ? data.slice(0, 4)
+        : data.filter(i => i.category.toLowerCase() === cat.toLowerCase()).slice(0, 4);
+
+      items.forEach((item, idx) => {
+        const card = createCard(item, idx);
+        grid.appendChild(card);
+      });
+
+      content.appendChild(sectionTitle);
+      content.appendChild(grid);
+    });
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting && !video.src) {
+          video.src = video.dataset.src;
+          video.play().catch(() => {});
+        } else if (!entry.isIntersecting) {
+          video.pause();
+        }
+      });
+    }, {
+      threshold: 0.5
+    });
+
+    setTimeout(() => {
+      document.querySelectorAll('video').forEach(video => observer.observe(video));
+    }, 300);
   </script>
 </body>
 </html>
