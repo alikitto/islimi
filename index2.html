@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kataloq</title>
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --accent: #d4af37;
+    }
+
+    body {
+      margin: 0;
+      padding: 40px 20px;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 70%;
+      max-width: 300px;
+      height: auto;
+    }
+
+    .info-glass {
+      margin-top: 10px;
+      padding: 10px;
+      max-width: 520px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #000;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .update-date {
+      font-size: 12px;
+      color: #444;
+      margin-top: 10px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 40px 0 20px;
+      text-align: left;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .slider {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .slider::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .slider::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 4px;
+    }
+
+    .item {
+      flex: 0 0 300px;
+      scroll-snap-align: start;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s ease;
+      position: relative;
+    }
+
+    .item:hover {
+      transform: translateY(-5px);
+    }
+
+    video {
+      width: 100%;
+      border-radius: 12px;
+      background: #eaeaea;
+    }
+
+    .code-row {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .code-text {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .category {
+      font-size: 14px;
+      margin-top: 6px;
+      color: #888;
+      font-style: italic;
+    }
+
+    .wa-link img {
+      width: 22px;
+      height: 22px;
+      transition: transform 0.2s ease;
+    }
+
+    .wa-link img:hover {
+      transform: scale(1.15);
+    }
+
+    .badge-new {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .view-all {
+      margin: 10px 0 30px;
+      text-align: right;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .view-all a {
+      color: var(--accent);
+      font-size: 14px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://karal.az/islimilogo2.png" alt="Karal Logo" class="logo" />
+    <div class="info-glass">
+      <p>Zərgərlik kolleksiyamızın yeni parıltısına nəzər salın ✨</p>
+      <p class="update-date">Yeniləndi: 20 May, 2025</p>
+    </div>
+  </header>
+
+  <div class="section-title">Yeni məhsullar</div>
+  <div class="catalog" id="newItems"></div>
+
+  <div class="section-title">Üzüklər</div>
+  <div class="slider" id="ringsSlider"></div>
+  <div class="view-all"><a href="#">Hamısına bax →</a></div>
+
+  <script>
+    const data = [
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "AUR-102", category: "Qolbaq" },
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "BRL-557", category: "Üzük" },
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "XYZ-333", category: "Üzük" },
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-001", category: "Boyunbağı" },
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-002", category: "Üzük" },
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-003", category: "Üzük" },
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-004", category: "Üzük" },
+      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-005", category: "Qolbaq" }
+    ];
+
+    const whatsappNumber = "994702920323";
+
+    const renderItem = (item, index, target) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'item';
+
+      const video = document.createElement('video');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('muted', '');
+      video.setAttribute('loop', '');
+      video.setAttribute('autoplay', '');
+      video.muted = true;
+      video.src = item.videoUrl;
+
+      const codeRow = document.createElement('div');
+      codeRow.className = 'code-row';
+
+      const codeText = document.createElement('span');
+      codeText.className = 'code-text';
+      codeText.textContent = `Kod: ${item.productCode}`;
+
+      const waLink = document.createElement('a');
+      waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+      waLink.target = '_blank';
+      waLink.className = 'wa-link';
+
+      const waIcon = document.createElement('img');
+      waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+      waIcon.alt = 'WhatsApp';
+      waLink.appendChild(waIcon);
+
+      codeRow.appendChild(codeText);
+      codeRow.appendChild(waLink);
+
+      const category = document.createElement('div');
+      category.className = 'category';
+      category.textContent = item.category;
+
+      wrapper.appendChild(video);
+      wrapper.appendChild(codeRow);
+      wrapper.appendChild(category);
+
+      if (index < 10) {
+        const badge = document.createElement('div');
+        badge.className = 'badge-new';
+        badge.textContent = 'NEW';
+        wrapper.appendChild(badge);
+      }
+
+      target.appendChild(wrapper);
+    };
+
+    const newItems = data.slice(0, 6);
+    const rings = data.filter(item => item.category.toLowerCase() === 'üzük');
+
+    newItems.forEach((item, i) => renderItem(item, i, document.getElementById('newItems')));
+    rings.forEach((item, i) => renderItem(item, i, document.getElementById('ringsSlider')));
+  </script>
+</body>
+</html>
