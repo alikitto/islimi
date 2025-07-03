@@ -5,12 +5,145 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Üzüklər - Kataloq</title>
   <style>
-    /* Скопируй сюда стили из главной страницы */
+    :root {
+      --bg: #f4f4f4;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --accent: #d4af37;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-color);
+    }
+    header, footer {
+      text-align: center;
+      padding: 20px;
+    }
+    .logo {
+      max-width: 300px;
+      width: 70%;
+      margin-bottom: 10px;
+    }
+    .info-glass {
+      margin-top: 10px;
+      padding: 10px;
+      max-width: 520px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      text-align: center;
+      font-size: 12px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .nav {
+      background: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .nav a {
+      text-decoration: none;
+      font-weight: bold;
+      color: var(--text-color);
+      font-size: 16px;
+    }
+    .nav a:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+    }
+    @media (max-width: 600px) {
+      .catalog {
+        grid-template-columns: 1fr;
+      }
+    }
+    .item {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    video {
+      width: 100%;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .code-row {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .code-text {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+    .wa-link img {
+      width: 22px;
+    }
+    .category {
+      font-size: 14px;
+      margin-top: 6px;
+      color: #888;
+      font-style: italic;
+    }
+    .badge-new {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+    footer {
+      font-size: 14px;
+      color: #666;
+      margin-top: 40px;
+      margin-bottom: 30px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal video {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 8px;
+    }
+    .modal.active {
+      display: flex;
+    }
   </style>
 </head>
 <body>
   <header>
-    <img src="https://karal.az/islimilogo2.png" alt="Islimi" class="logo" />
+    <img src="https://karal.az/islimilogo2.png" alt="Karal Logo" class="logo" />
     <div class="info-glass">
       <p>Üzüklər Kataloqu</p>
       <p>Yeniləndi: <span id="lastUpdated"></span></p>
@@ -18,8 +151,8 @@
   </header>
 
   <nav class="nav" id="navMenu">
-    <a href="index.html">Yeni</a>
-    <a href="yuzukler.html">Üzüklər</a>
+    <a href="index.html">Ana səhifə</a>
+    <a href="uzukler.html">Üzüklər</a>
     <a href="qolbaq.html">Qolbaqlar</a>
     <a href="boyunbag.html">Boyunbağlar</a>
   </nav>
@@ -29,7 +162,7 @@
   </main>
 
   <footer>
-    © 2025 Islimi | Bütün huquqlar qorunur
+    © 2025 Karal | Bütün huquqlar qorunur
   </footer>
 
   <div class="modal" id="videoModal" onclick="this.classList.remove('active')">
@@ -37,7 +170,7 @@
   </div>
 
 <script>
-  const CATEGORY = "Üzüklər";  // Текущая категория, меняй для каждой страницы
+  const CATEGORY = "Üzük";  // Текущая категория, поменяй на странице
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
   const whatsappNumber = "994702920323";
 
