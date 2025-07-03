@@ -47,36 +47,40 @@
 <button onclick="upload()">Yüklə</button>
 <p id="status"></p>
 
+<input type="file" id="fileInput" />
+<button onclick="upload()">Yüklə</button>
+<p id="status"></p>
+
 <script>
 async function upload() {
-  const file = document.getElementById('fileInput').files[0];
+  const fileInput = document.getElementById('fileInput');
   const status = document.getElementById('status');
 
-  if (!file) {
+  if (!fileInput.files.length) {
     status.textContent = "Fayl seçilməyib";
     return;
   }
 
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('file', fileInput.files[0]);
 
   status.textContent = "Yüklənir...";
 
   try {
-    const res = await fetch('https://video.islimi.az', {
+    const response = await fetch('https://video.islimi.az', {
       method: 'POST',
       body: formData,
-      headers: {
-        // Не добавляй 'Content-Type', чтобы browser сам выставил multipart/form-data
-      },
     });
 
-    if (!res.ok) throw new Error('Yükləmə uğursuz oldu');
+    const json = await response.json();
 
-    const data = await res.json();
-    status.innerHTML = `✅ <a href="${data.url}" target="_blank">Fayl yükləndi</a>`;
-  } catch (e) {
-    status.textContent = `❌ Xəta: ${e.message}`;
+    if (json.success) {
+      status.innerHTML = `✅ <a href="${json.url}" target="_blank">Fayl yükləndi</a>`;
+    } else {
+      status.textContent = `❌ Xəta: ${json.message}`;
+    }
+  } catch (error) {
+    status.textContent = `❌ Yükləmə alınmadı: ${error.message}`;
   }
 }
 </script>
