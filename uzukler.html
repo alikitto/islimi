@@ -41,26 +41,25 @@
     }
 
     /* Меню */
-    .nav {
-      background: white;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      margin: 0 auto 30px;
-      font-weight: 600;
-      font-size: 17px;
-      user-select: none;
+.nav {
+  background: white;
+  padding: 16px 30px; /* было 12px 20px */
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  margin-bottom: 40px;
+  font-weight: 600;
+  font-size: 17px;
+  user-select: none;
 
-      display: flex;
-      justify-content: center;
-      gap: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
 
-      position: static;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 999;
-      transition: box-shadow 0.3s ease;
-    }
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
 
     /* Фикс меню при скролле на мобилах */
     .nav.fixed {
@@ -274,18 +273,19 @@
       font-size: 28px;
       user-select: none;
     }
-    .whatsapp-button {
+.whatsapp-button {
   position: fixed;
   bottom: 80px;
   right: 20px;
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   background-color: #25D366;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 4px; /* добавлено */
   z-index: 1001;
   transition: transform 0.2s ease;
 }
