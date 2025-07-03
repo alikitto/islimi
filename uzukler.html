@@ -293,6 +293,78 @@
       border-radius: 8px;
       cursor: pointer;
     }
+    .footer {
+  background-color: #222;
+  color: #fff;
+  padding: 40px 20px 20px;
+  font-size: 14px;
+  margin-top: 60px;
+}
+
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto 20px;
+  gap: 30px;
+}
+
+.footer-column {
+  flex: 1 1 200px;
+  min-width: 180px;
+}
+
+.footer-column h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 6px;
+}
+
+.footer-column a {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-column a:hover {
+  color: var(--accent);
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid #444;
+  padding-top: 12px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.social-icons a {
+  margin-right: 10px;
+  display: inline-block;
+}
+
+.social-icons img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+  transition: transform 0.3s ease;
+}
+
+.social-icons a:hover img {
+  transform: scale(1.2);
+  filter: brightness(0) invert(75%) sepia(100%) saturate(500%) hue-rotate(20deg);
+}
   </style>
 </head>
 <body>
@@ -322,9 +394,37 @@
     <button id="loadMoreBtn">Daha çox göstər</button>
   </main>
 
-  <footer>
-    © 2025 Islimi Jewelry | Bütün huquqlar qorunur
-  </footer>
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-column">
+      <h4>Bizimlə əlaqə</h4>
+      <p>+994 70 292 03 23</p>
+      <p><a href="mailto:support@islimi.az">support@islimi.az</a></p>
+    </div>
+
+    <div class="footer-column">
+      <h4>Kateqoriyalar</h4>
+      <ul>
+        <li><a href="uzukler">Üzüklər</a></li>
+        <li><a href="qolbaq.html">Qolbaqlar</a></li>
+        <li><a href="boyunbag.html">Boyunbağlar</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-column">
+      <h4>Sosial Şəbəkələr</h4>
+      <div class="social-icons">
+        <a href="#"><img src="icons/instagram.svg" alt="Instagram"></a>
+        <a href="#"><img src="icons/facebook.svg" alt="Facebook"></a>
+        <a href="#"><img src="icons/tiktok.svg" alt="TikTok"></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 Islimi Jewelry | Bütün hüquqlar qorunur</p>
+  </div>
+</footer>
 
   <div class="modal" id="videoModal" onclick="this.classList.remove('active')">
     <video id="modalVideo" controls autoplay></video>
