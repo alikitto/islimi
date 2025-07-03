@@ -12,12 +12,17 @@
       --card-bg: #ffffff;
       --text-color: #333;
       --accent: #d4af37;
+      --accent-hover: #b18d27;
+      --btn-bg: #d4af37;
+      --btn-bg-hover: #b18d27;
+      --btn-text: white;
     }
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text-color);
+      scroll-behavior: smooth;
     }
     header, footer {
       text-align: center;
@@ -42,20 +47,34 @@
     .nav {
       background: white;
       padding: 10px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
     }
     .nav .menu {
       display: flex;
-      gap: 15px;
+      gap: 20px;
       flex-wrap: wrap;
+      max-width: 1200px;
+      width: 100%;
+      justify-content: center;
     }
     .nav .menu a {
       text-decoration: none;
-      font-weight: bold;
-      color: var(--text-color);
+      font-weight: 600;
+      color: var(--accent);
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: rgba(212, 175, 55, 0.1);
+      transition: background-color 0.3s, color 0.3s;
+      cursor: pointer;
+    }
+    .nav .menu a:hover {
+      background-color: var(--accent-hover);
+      color: var(--btn-text);
     }
     .category-header {
       max-width: 1200px;
@@ -67,12 +86,6 @@
     }
     .category-title {
       font-size: 20px;
-      font-weight: bold;
-    }
-    .view-all {
-      font-size: 14px;
-      text-decoration: none;
-      color: var(--accent);
       font-weight: bold;
     }
     .catalog {
@@ -156,6 +169,33 @@
     .modal.active {
       display: flex;
     }
+    /* Pagination styles */
+    .pagination {
+      margin: 40px auto 60px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      max-width: 300px;
+    }
+    .pagination button {
+      background-color: var(--btn-bg);
+      border: none;
+      padding: 8px 14px;
+      color: var(--btn-text);
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      min-width: 36px;
+    }
+    .pagination button:hover:not(.active) {
+      background-color: var(--btn-bg-hover);
+    }
+    .pagination button.active {
+      background-color: var(--accent-hover);
+      cursor: default;
+    }
   </style>
 </head>
 <body>
@@ -168,7 +208,10 @@
   </header>
 
   <div class="nav">
-    <div class="menu" id="navMenu"></div>
+    <div class="menu" id="navMenu">
+      <!-- Меню можно оставить пустым, т.к. на главной только новые товары -->
+      <a href="#new-products" class="active">Yeni Məhsullar</a>
+    </div>
   </div>
 
   <div id="content"></div>
@@ -183,131 +226,147 @@
 
   <script>
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
+    const whatsappNumber = "994702920323";
+    const ITEMS_PER_PAGE = 5;
+
+    let currentPage = 1;
+    let latestItems = [];
+
+    document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
 
     fetch(SHEET_URL)
       .then(res => res.text())
       .then(tsv => {
         const rows = tsv.trim().split("\n").slice(1);
-        const data = rows.map(row => {
+        latestItems = rows.map(row => {
           const [code, videoUrl, category] = row.split("\t");
           return {
             productCode: code?.trim(),
             videoUrl: videoUrl?.trim(),
             category: category?.trim()
           };
-        });
-        document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
-        renderCatalog(data);
+        }).slice(-20).reverse();
+        renderPage(currentPage);
       });
 
-    function renderCatalog(data) {
-      const whatsappNumber = "994702920323";
+    function renderPage(page) {
       const content = document.getElementById('content');
-      const navMenu = document.getElementById('navMenu');
       content.innerHTML = '';
-      navMenu.innerHTML = '';
 
-      // NEW block
-      const latest = data.slice(-20).reverse();
-      renderSection("Yeni", latest);
+      const start = (page - 1) * ITEMS_PER_PAGE;
+      const end = start + ITEMS_PER_PAGE;
+      const itemsToShow = latestItems.slice(start, end);
 
-      // Categories
-      const categoriesMap = {};
-      data.forEach(item => {
-        if (!categoriesMap[item.category]) categoriesMap[item.category] = [];
-        categoriesMap[item.category].push(item);
-      });
+      renderSection("Yeni Məhsullar", itemsToShow);
 
-      Object.entries(categoriesMap).forEach(([cat, items]) => {
-        navMenu.innerHTML += `<a href="#${cat.toLowerCase()}">${cat}</a>`;
-        renderSection(cat, items.slice(0, 4), true);
-      });
+      renderPagination(page, Math.ceil(latestItems.length / ITEMS_PER_PAGE));
+    }
 
-      function renderSection(title, items, showLink = false) {
-        const section = document.createElement('div');
-        section.id = title.toLowerCase();
+    function renderSection(title, items) {
+      const section = document.createElement('div');
+      section.id = "new-products";
 
-        const sectionHeader = document.createElement('div');
-        sectionHeader.className = 'category-header';
+      const sectionHeader = document.createElement('div');
+      sectionHeader.className = 'category-header';
 
-        const titleEl = document.createElement('div');
-        titleEl.className = 'category-title';
-        titleEl.textContent = title === "Yeni" ? "NEW" : title;
+      const titleEl = document.createElement('div');
+      titleEl.className = 'category-title';
+      titleEl.textContent = title;
 
-        sectionHeader.appendChild(titleEl);
+      sectionHeader.appendChild(titleEl);
+      section.appendChild(sectionHeader);
 
-        if (showLink) {
-          const viewAll = document.createElement('a');
-          viewAll.className = 'view-all';
-          viewAll.href = `${title.toLowerCase()}.html`;
-          viewAll.textContent = "Hamısına bax →";
-          sectionHeader.appendChild(viewAll);
-        }
+      const grid = document.createElement('div');
+      grid.className = 'catalog';
 
-        const grid = document.createElement('div');
-        grid.className = 'catalog';
+      items.forEach((item) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'item';
 
-        items.forEach((item, idx) => {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'item';
+        const video = document.createElement('video');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('muted', '');
+        video.setAttribute('loop', '');
+        video.setAttribute('autoplay', '');
+        video.setAttribute('preload', 'none');
+        video.dataset.src = item.videoUrl;
+        video.muted = true;
 
-          const video = document.createElement('video');
-          video.setAttribute('playsinline', '');
-          video.setAttribute('muted', '');
-          video.setAttribute('loop', '');
-          video.setAttribute('autoplay', '');
-          video.setAttribute('preload', 'none');
-          video.dataset.src = item.videoUrl;
-          video.muted = true;
-
-          video.addEventListener('click', () => {
-            document.getElementById('modalVideo').src = item.videoUrl;
-            document.getElementById('videoModal').classList.add('active');
-          });
-
-          const codeRow = document.createElement('div');
-          codeRow.className = 'code-row';
-
-          const codeText = document.createElement('span');
-          codeText.className = 'code-text';
-          codeText.textContent = `Kod: ${item.productCode}`;
-
-          const waLink = document.createElement('a');
-          waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
-          waLink.target = '_blank';
-          waLink.className = 'wa-link';
-
-          const waIcon = document.createElement('img');
-          waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
-          waIcon.alt = 'WhatsApp';
-          waLink.appendChild(waIcon);
-
-          codeRow.appendChild(codeText);
-          codeRow.appendChild(waLink);
-
-          const category = document.createElement('div');
-          category.className = 'category';
-          category.textContent = item.category;
-
-          wrapper.appendChild(video);
-          wrapper.appendChild(codeRow);
-          wrapper.appendChild(category);
-
-          if (title === "Yeni") {
-            const badge = document.createElement('div');
-            badge.className = 'badge-new';
-            badge.textContent = 'NEW';
-            wrapper.appendChild(badge);
-          }
-
-          grid.appendChild(wrapper);
+        video.addEventListener('click', () => {
+          document.getElementById('modalVideo').src = item.videoUrl;
+          document.getElementById('videoModal').classList.add('active');
         });
 
-        section.appendChild(sectionHeader);
-        section.appendChild(grid);
-        content.appendChild(section);
+        const codeRow = document.createElement('div');
+        codeRow.className = 'code-row';
+
+        const codeText = document.createElement('span');
+        codeText.className = 'code-text';
+        codeText.textContent = `Kod: ${item.productCode}`;
+
+        const waLink = document.createElement('a');
+        waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+        waLink.target = '_blank';
+        waLink.className = 'wa-link';
+
+        const waIcon = document.createElement('img');
+        waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+        waIcon.alt = 'WhatsApp';
+        waLink.appendChild(waIcon);
+
+        codeRow.appendChild(codeText);
+        codeRow.appendChild(waLink);
+
+        const category = document.createElement('div');
+        category.className = 'category';
+        category.textContent = item.category;
+
+        wrapper.appendChild(video);
+        wrapper.appendChild(codeRow);
+        wrapper.appendChild(category);
+
+        const badge = document.createElement('div');
+        badge.className = 'badge-new';
+        badge.textContent = 'NEW';
+        wrapper.appendChild(badge);
+
+        grid.appendChild(wrapper);
+      });
+
+      section.appendChild(grid);
+      content.appendChild(section);
+
+      setupVideoObserver();
+    }
+
+    function renderPagination(current, totalPages) {
+      const content = document.getElementById('content');
+
+      // Удалим старую пагинацию если есть
+      const oldPagination = document.querySelector('.pagination');
+      if (oldPagination) oldPagination.remove();
+
+      if (totalPages <= 1) return; // Пагинация не нужна
+
+      const pagination = document.createElement('div');
+      pagination.className = 'pagination';
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        if (i === current) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+          currentPage = i;
+          renderPage(i);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        pagination.appendChild(btn);
       }
 
+      content.appendChild(pagination);
+    }
+
+    function setupVideoObserver() {
       const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
           const video = entry.target;
