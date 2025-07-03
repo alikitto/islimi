@@ -2,17 +2,16 @@
 <html lang="az">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta property="og:title" content="Islimi Jewelry" />
   <meta property="og:image" content="https://karal.az/islimilogo2.png" />
   <title>Kataloq</title>
   <style>
     :root {
       --bg: #f4f4f4;
-      --card-bg: #fff;
+      --card-bg: #ffffff;
       --text-color: #333;
       --accent: #d4af37;
-      --accent-dark: #b8932c;
     }
     body {
       margin: 0;
@@ -40,35 +39,23 @@
       margin-left: auto;
       margin-right: auto;
     }
-    nav.nav {
+    .nav {
       background: white;
       padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: center;
     }
-    nav.nav .menu {
+    .nav .menu {
       display: flex;
-      gap: 25px;
+      gap: 15px;
       flex-wrap: wrap;
-      font-weight: bold;
-      font-size: 16px;
     }
-    nav.nav .menu a {
+    .nav .menu a {
       text-decoration: none;
+      font-weight: bold;
       color: var(--text-color);
-      padding-bottom: 3px;
-      border-bottom: 3px solid transparent;
-      transition: border-color 0.3s ease, color 0.3s ease;
-      cursor: pointer;
-    }
-    nav.nav .menu a:hover,
-    nav.nav .menu a.active {
-      color: var(--accent-dark);
-      border-color: var(--accent);
     }
     .category-header {
       max-width: 1200px;
@@ -93,7 +80,7 @@
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 30px;
       max-width: 1200px;
-      margin: 0 auto 50px;
+      margin: 0 auto;
       padding: 0 20px;
     }
     @media (max-width: 600px) {
@@ -150,7 +137,6 @@
       font-size: 14px;
       color: #666;
       margin-top: 40px;
-      padding-bottom: 40px;
     }
     .modal {
       display: none;
@@ -181,9 +167,9 @@
     </div>
   </header>
 
-  <nav class="nav">
+  <div class="nav">
     <div class="menu" id="navMenu"></div>
-  </nav>
+  </div>
 
   <div id="content"></div>
 
@@ -233,10 +219,8 @@
       });
 
       Object.entries(categoriesMap).forEach(([cat, items]) => {
-        const link = document.createElement('a');
-        link.href = `#${cat.toLowerCase()}`;
-        link.textContent = cat;
-        navMenu.appendChild(link);
+        navMenu.innerHTML += <a href="#${cat.toLowerCase()}">${cat}</a>;
+        renderSection(cat, items.slice(0, 4), true);
       });
 
       function renderSection(title, items, showLink = false) {
@@ -255,7 +239,7 @@
         if (showLink) {
           const viewAll = document.createElement('a');
           viewAll.className = 'view-all';
-          viewAll.href = `${title.toLowerCase()}.html`;
+          viewAll.href = ${title.toLowerCase()}.html;
           viewAll.textContent = "Hamısına bax →";
           sectionHeader.appendChild(viewAll);
         }
@@ -286,10 +270,10 @@
 
           const codeText = document.createElement('span');
           codeText.className = 'code-text';
-          codeText.textContent = `Kod: ${item.productCode}`;
+          codeText.textContent = Kod: ${item.productCode};
 
           const waLink = document.createElement('a');
-          waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+          waLink.href = https://wa.me/${whatsappNumber}?text=${encodeURIComponent(Kod ${item.productCode})};
           waLink.target = '_blank';
           waLink.className = 'wa-link';
 
