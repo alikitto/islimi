@@ -5,273 +5,295 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Üzüklər - Kataloq | Islimi Jewelry</title>
   <style>
-    :root {
-      --bg: #f4f4f4;
-      --card-bg: #ffffff;
-      --text-color: #333;
-      --accent: #d4af37;
-    }
+:root {
+  --bg: #f4f4f4;
+  --card-bg: #ffffff;
+  --text-color: #333;
+  --accent: #d4af37;
+}
 
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg);
-      color: var(--text-color);
-    }
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg);
+  color: var(--text-color);
+  padding-top: 100px;
+}
 
-    @media (min-width: 601px) {
-      body {
-        padding-top: 100px;
-      }
-    }
+header, footer {
+  text-align: center;
+  padding: 20px;
+}
 
-    header, footer {
-      text-align: center;
-      padding: 20px;
-    }
+.logo {
+  max-width: 300px;
+  width: 70%;
+  margin-bottom: 10px;
+}
 
-    .logo {
-      max-width: 300px;
-      width: 70%;
-      margin-bottom: 10px;
-    }
+.info-glass {
+  margin-top: 10px;
+  padding: 10px;
+  max-width: 520px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  text-align: center;
+  font-size: 12px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-    .info-glass {
-      margin-top: 10px;
-      padding: 10px;
-      max-width: 520px;
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 16px;
-      backdrop-filter: blur(12px);
-      text-align: center;
-      font-size: 12px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+/* Базовое меню */
+.nav {
+  background: white;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  font-weight: 600;
+  font-size: 17px;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  transition: box-shadow 0.3s ease;
+}
 
-    /* Меню */
-    .nav {
-      background: white;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      font-weight: 600;
-      font-size: 17px;
-      user-select: none;
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      transition: box-shadow 0.3s ease;
-    }
+/* Ссылки в меню */
+.nav a {
+  text-decoration: none;
+  color: var(--text-color);
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  white-space: nowrap;
+  text-align: center;
+  flex-shrink: 0;
+}
+.nav a:hover {
+  color: var(--accent);
+  background-color: #f9f5d7;
+}
+.nav a.active {
+  color: white;
+  background-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
 
-    @media (min-width: 601px) {
-      .nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        padding: 12px 20px;
-        border-radius: 0;
-        z-index: 999;
-      }
-    }
+/* Стили для бургер-меню на мобилках */
+@media (max-width: 600px) {
+  body {
+    padding-top: 100px;
+  }
 
-    .nav a {
-      text-decoration: none;
-      color: var(--text-color);
-      padding: 8px 16px;
-      border-radius: 6px;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      white-space: nowrap;
-      text-align: center;
-      flex-shrink: 0;
-    }
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 0 10px;
+    height: 60px;
+    overflow: hidden;
+    z-index: 999;
+  }
 
-    .nav a:hover {
-      color: var(--accent);
-      background-color: #f9f5d7;
-    }
+  .nav.fixed {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
 
-    .nav a.active {
-      color: white;
-      background-color: var(--accent);
-      box-shadow: 0 0 10px var(--accent);
-    }
+  .nav .menu-links {
+    display: none;
+    flex-direction: column;
+    background: white;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    padding: 10px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
 
-    /* Мобильный бургер */
-    @media (max-width: 600px) {
-      body {
-        padding-top: 100px;
-      }
+  .nav.open .menu-links {
+    display: flex;
+  }
 
-      .nav {
-        position: fixed;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-        gap: 0;
-        padding: 0 10px;
-        height: 60px;
-        overflow: hidden;
-      }
+  .nav a {
+    padding: 12px 20px;
+    font-size: 18px;
+    border-radius: 0;
+    border-bottom: 1px solid #eee;
+    white-space: normal;
+  }
 
-      .nav.fixed {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      }
+  .burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0 16px;
+    font-size: 20px;
+    user-select: none;
+  }
 
-      .nav .menu-links {
-        display: none;
-        flex-direction: column;
-        background: white;
-        position: fixed;
-        top: 60px;
-        left: 0;
-        right: 0;
-        padding: 10px 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-      }
+  .burger svg {
+    width: 28px;
+    height: 28px;
+    fill: var(--text-color);
+  }
+}
 
-      .nav.open .menu-links {
-        display: flex;
-      }
+/* ПК-режим: фиксированное меню, бургер скрыт */
+@media (min-width: 601px) {
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 20px;
+    z-index: 999;
+    border-radius: 0;
+  }
 
-      .nav a {
-        padding: 12px 20px;
-        font-size: 18px;
-        border-radius: 0;
-        border-bottom: 1px solid #eee;
-        white-space: normal;
-      }
+  .burger {
+    display: none !important;
+  }
 
-      .burger {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        padding: 0 16px;
-        font-size: 20px;
-        user-select: none;
-      }
+  .menu-links {
+    display: flex !important;
+    flex-direction: row !important;
+    position: static !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
 
-      .burger svg {
-        width: 28px;
-        height: 28px;
-        fill: var(--text-color);
-      }
-    }
+  .nav a {
+    font-size: 17px !important;
+    border: none !important;
+  }
 
-    .catalog {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px;
-      max-width: 1200px;
-      margin: 0 auto 40px;
-      padding: 0 20px;
-    }
+  body {
+    padding-top: 100px;
+  }
+}
 
-    @media (max-width: 600px) {
-      .catalog {
-        grid-template-columns: 1fr;
-      }
-    }
+/* Каталог */
+.catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0 20px;
+}
+@media (max-width: 600px) {
+  .catalog {
+    grid-template-columns: 1fr;
+  }
+}
 
-    .item {
-      background: var(--card-bg);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-      overflow: hidden;
-      padding: 20px;
-      text-align: center;
-      position: relative;
-    }
+.item {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+}
 
-    video {
-      width: 100%;
-      border-radius: 12px;
-      cursor: pointer;
-    }
+video {
+  width: 100%;
+  border-radius: 12px;
+  cursor: pointer;
+}
 
-    .code-row {
-      margin-top: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.code-row {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .code-text {
-      font-size: 17px;
-      font-weight: 500;
-      color: var(--accent);
-    }
+.code-text {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--accent);
+}
 
-    .wa-link img {
-      width: 22px;
-    }
+.wa-link img {
+  width: 22px;
+}
 
-    .category {
-      font-size: 14px;
-      margin-top: 6px;
-      color: #888;
-      font-style: italic;
-    }
+.category {
+  font-size: 14px;
+  margin-top: 6px;
+  color: #888;
+  font-style: italic;
+}
 
-    .badge-new {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: var(--accent);
-      color: white;
-      font-size: 12px;
-      font-weight: bold;
-      padding: 4px 10px;
-      border-radius: 12px;
-    }
+.badge-new {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
 
-    footer {
-      font-size: 14px;
-      color: #666;
-      margin-top: 40px;
-      margin-bottom: 30px;
-    }
+footer {
+  font-size: 14px;
+  color: #666;
+  margin-top: 40px;
+  margin-bottom: 30px;
+}
 
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-    .modal video {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 8px;
-    }
+.modal video {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+}
 
-    .modal.active {
-      display: flex;
-    }
+.modal.active {
+  display: flex;
+}
 
-    #btnTop {
-      position: fixed;
-      bottom: 160px;
-      right: 20px;
-      background-color: var(--accent);
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      cursor: pointer;
-      z-index: 10000;
-      color: white;
-      font-size: 28px;
-      user-select: none;
-    }
+/* Кнопка Наверх */
+#btnTop {
+  position: fixed;
+  bottom: 160px;
+  right: 20px;
+  background-color: var(--accent);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 10000;
+  color: white;
+  font-size: 28px;
+  user-select: none;
+}
   </style>
 </head>
 <body>
