@@ -51,33 +51,48 @@
 </form>
 <div id="result" style="margin-top:20px;"></div>
 
+<input type="file" id="fileInput" />
+<button onclick="upload()">Yüklə</button>
+<p id="status"></p>
+
 <script>
-  const form = document.getElementById('uploadForm');
-  const result = document.getElementById('result');
+const R2_BUCKET = "video";
+const ACCOUNT_ID = "ТВОЙ_ACCOUNT_ID";
+const API_TOKEN = "ТВОЙ_API_TOKEN";
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
+async function upload() {
+  const file = document.getElementById("fileInput").files[0];
+  const status = document.getElementById("status");
 
-    try {
-      const res = await fetch('https://video.islimi.az', {
-        method: 'POST',
-        body: formData,
-      });
+  if (!file) {
+    status.textContent = "Fayl seçilməyib";
+    return;
+  }
 
-      const json = await res.json();
+  const fileName = `${Date.now()}-${file.name}`;
 
-      if (json.success) {
-        result.innerHTML = `<p>Uğurla yükləndi:</p>
-          <a href="${json.url}" target="_blank">${json.url}</a>`;
-      } else {
-        result.innerHTML = `<p>Yükləmə alınmadı: ${json.message}</p>`;
-      }
-    } catch (err) {
-      result.innerHTML = `<p>Yükləmə alınmadı. ${err.message}</p>`;
-      console.error(err);
-    }
+  const url = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/objects/${fileName}`;
+
+  status.textContent = "Yüklənir...";
+
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${API_TOKEN}`,
+      "Content-Type": file.type
+    },
+    body: file
   });
+
+  const link = `https://${R2_BUCKET}.${ACCOUNT_ID}.r2.cloudflarestorage.com/${fileName}`;
+
+  if (res.ok) {
+    status.innerHTML = `✅ <a href="${link}" target="_blank">Fayl yükləndi</a>`;
+  } else {
+    const err = await res.json();
+    status.textContent = "❌ Xəta: " + (err?.errors?.[0]?.message || "naməlum");
+  }
+}
 </script>
 </body>
 </html>
