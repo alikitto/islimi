@@ -40,24 +40,38 @@
     }
 .nav {
   background: white;
-  padding: 12px 30px;
-  display: flex;
-  justify-content: center;
-  gap: 40px;
+  padding: 12px 20px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.1);
   border-radius: 8px;
   margin-bottom: 30px;
   font-weight: 600;
   font-size: 17px;
   user-select: none;
+
+  display: flex;
+  gap: 40px;
+  overflow-x: auto;       /* Включаем горизонтальный скролл */
+  -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+  scrollbar-width: thin;   /* Тонкий скролл в Firefox */
+}
+
+.nav::-webkit-scrollbar {
+  height: 6px;             /* Высота горизонтального скролла */
+}
+
+.nav::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
 }
 
 .nav a {
+  flex: 0 0 auto;         /* Чтобы элементы не сжимались и не переносились */
   text-decoration: none;
   color: var(--text-color);
   padding: 8px 15px;
   border-radius: 6px;
   transition: background-color 0.3s ease, color 0.3s ease;
+  white-space: nowrap;
 }
 
 .nav a:hover {
@@ -70,6 +84,12 @@
   background-color: var(--accent);
   box-shadow: 0 0 10px var(--accent);
 }
+
+/* Убираем переносы и скролл на больших экранах */
+@media (min-width: 601px) {
+  .nav {
+    overflow-x: visible;
+  }
     .catalog {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
