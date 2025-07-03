@@ -5,295 +5,294 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Üzüklər - Kataloq | Islimi Jewelry</title>
   <style>
-:root {
-  --bg: #f4f4f4;
-  --card-bg: #ffffff;
-  --text-color: #333;
-  --accent: #d4af37;
-}
+    :root {
+      --bg: #f4f4f4;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --accent: #d4af37;
+    }
 
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: var(--bg);
-  color: var(--text-color);
-  padding-top: 100px;
-}
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-color);
+      padding-top: 100px;
+    }
 
-header, footer {
-  text-align: center;
-  padding: 20px;
-}
+    header, footer {
+      text-align: center;
+      padding: 20px;
+    }
 
-.logo {
-  max-width: 300px;
-  width: 70%;
-  margin-bottom: 10px;
-}
+    .logo {
+      max-width: 300px;
+      width: 70%;
+      margin-bottom: 10px;
+    }
 
-.info-glass {
-  margin-top: 10px;
-  padding: 10px;
-  max-width: 520px;
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  text-align: center;
-  font-size: 12px;
-  margin-left: auto;
-  margin-right: auto;
-}
+    .info-glass {
+      margin-top: 10px;
+      padding: 10px;
+      max-width: 520px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      text-align: center;
+      font-size: 12px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-/* Базовое меню */
-.nav {
-  background: white;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  font-weight: 600;
-  font-size: 17px;
-  user-select: none;
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  transition: box-shadow 0.3s ease;
-}
+    .nav {
+      background: white;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      font-weight: 600;
+      font-size: 17px;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      transition: box-shadow 0.3s ease;
+    }
 
-/* Ссылки в меню */
-.nav a {
-  text-decoration: none;
-  color: var(--text-color);
-  padding: 8px 16px;
-  border-radius: 6px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  white-space: nowrap;
-  text-align: center;
-  flex-shrink: 0;
-}
-.nav a:hover {
-  color: var(--accent);
-  background-color: #f9f5d7;
-}
-.nav a.active {
-  color: white;
-  background-color: var(--accent);
-  box-shadow: 0 0 10px var(--accent);
-}
+    .nav a {
+      text-decoration: none;
+      color: var(--text-color);
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      white-space: nowrap;
+      text-align: center;
+      flex-shrink: 0;
+    }
 
-/* Стили для бургер-меню на мобилках */
-@media (max-width: 600px) {
-  body {
-    padding-top: 100px;
-  }
+    .nav a:hover {
+      color: var(--accent);
+      background-color: #f9f5d7;
+    }
 
-  .nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    gap: 0;
-    padding: 0 10px;
-    height: 60px;
-    overflow: hidden;
-    z-index: 999;
-  }
+    .nav a.active {
+      color: white;
+      background-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
 
-  .nav.fixed {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  }
+    @media (max-width: 600px) {
+      body {
+        padding-top: 100px;
+      }
 
-  .nav .menu-links {
-    display: none;
-    flex-direction: column;
-    background: white;
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    padding: 10px 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-  }
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 0;
+        padding: 0 10px;
+        height: 60px;
+        overflow: hidden;
+        z-index: 999;
+      }
 
-  .nav.open .menu-links {
-    display: flex;
-  }
+      .nav .menu-links {
+        display: none;
+        flex-direction: column;
+        background: white;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        padding: 10px 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
 
-  .nav a {
-    padding: 12px 20px;
-    font-size: 18px;
-    border-radius: 0;
-    border-bottom: 1px solid #eee;
-    white-space: normal;
-  }
+      .nav.open .menu-links {
+        display: flex;
+      }
 
-  .burger {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0 16px;
-    font-size: 20px;
-    user-select: none;
-  }
+      .nav a {
+        padding: 12px 20px;
+        font-size: 18px;
+        border-radius: 0;
+        border-bottom: 1px solid #eee;
+        white-space: normal;
+      }
 
-  .burger svg {
-    width: 28px;
-    height: 28px;
-    fill: var(--text-color);
-  }
-}
+      .burger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0 16px;
+        font-size: 20px;
+        user-select: none;
+      }
 
-/* ПК-режим: фиксированное меню, бургер скрыт */
-@media (min-width: 601px) {
-  .nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 12px 20px;
-    z-index: 999;
-    border-radius: 0;
-  }
+      .burger svg {
+        width: 28px;
+        height: 28px;
+        fill: var(--text-color);
+      }
+    }
 
-  .burger {
-    display: none !important;
-  }
+    @media (min-width: 601px) {
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 12px 20px;
+        z-index: 999;
+        border-radius: 0;
+      }
 
-  .menu-links {
-    display: flex !important;
-    flex-direction: row !important;
-    position: static !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-  }
+      .burger {
+        display: none !important;
+      }
 
-  .nav a {
-    font-size: 17px !important;
-    border: none !important;
-  }
+      .menu-links {
+        display: flex !important;
+        flex-direction: row !important;
+        position: static !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
 
-  body {
-    padding-top: 100px;
-  }
-}
+      .nav a {
+        font-size: 17px !important;
+        border: none !important;
+      }
 
-/* Каталог */
-.catalog {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
-  max-width: 1200px;
-  margin: 0 auto 40px;
-  padding: 0 20px;
-}
-@media (max-width: 600px) {
-  .catalog {
-    grid-template-columns: 1fr;
-  }
-}
+      body {
+        padding-top: 100px;
+      }
+    }
 
-.item {
-  background: var(--card-bg);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-  padding: 20px;
-  text-align: center;
-  position: relative;
-}
+    .catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+    }
 
-video {
-  width: 100%;
-  border-radius: 12px;
-  cursor: pointer;
-}
+    .item {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
 
-.code-row {
-  margin-top: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    video {
+      width: 100%;
+      border-radius: 12px;
+      cursor: pointer;
+    }
 
-.code-text {
-  font-size: 17px;
-  font-weight: 500;
-  color: var(--accent);
-}
+    .code-row {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.wa-link img {
-  width: 22px;
-}
+    .code-text {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--accent);
+    }
 
-.category {
-  font-size: 14px;
-  margin-top: 6px;
-  color: #888;
-  font-style: italic;
-}
+    .wa-link img {
+      width: 22px;
+    }
 
-.badge-new {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: var(--accent);
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 4px 10px;
-  border-radius: 12px;
-}
+    .category {
+      font-size: 14px;
+      margin-top: 6px;
+      color: #888;
+      font-style: italic;
+    }
 
-footer {
-  font-size: 14px;
-  color: #666;
-  margin-top: 40px;
-  margin-bottom: 30px;
-}
+    .badge-new {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
 
-.modal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+    footer {
+      font-size: 14px;
+      color: #666;
+      margin-top: 40px;
+      margin-bottom: 30px;
+    }
 
-.modal video {
-  max-width: 90%;
-  max-height: 90%;
-  border-radius: 8px;
-}
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
 
-.modal.active {
-  display: flex;
-}
+    .modal video {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 8px;
+    }
 
-/* Кнопка Наверх */
-#btnTop {
-  position: fixed;
-  bottom: 160px;
-  right: 20px;
-  background-color: var(--accent);
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  cursor: pointer;
-  z-index: 10000;
-  color: white;
-  font-size: 28px;
-  user-select: none;
-}
+    .modal.active {
+      display: flex;
+    }
+
+    #btnTop {
+      position: fixed;
+      bottom: 160px;
+      right: 20px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 10000;
+      color: white;
+      font-size: 28px;
+      user-select: none;
+    }
+
+    #loadMoreBtn {
+      display: none;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -307,9 +306,7 @@ footer {
 
   <nav class="nav" id="navMenu">
     <div class="burger" id="burger" aria-label="Toggle menu" role="button" tabindex="0" aria-expanded="false">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       <span id="burgerText" style="margin-left:8px; font-weight:600; font-size:16px; display:none;">Kateqoriyalar</span>
     </div>
     <div class="menu-links" id="menuLinks">
@@ -322,6 +319,7 @@ footer {
 
   <main>
     <div class="catalog" id="catalog"></div>
+    <button id="loadMoreBtn">Daha çox göstər</button>
   </main>
 
   <footer>
@@ -335,149 +333,164 @@ footer {
   <button id="btnTop" title="Yuxarıya" aria-label="Scroll to top">&#8679;</button>
 
   <script>
-    const burger = document.getElementById('burger');
-    const nav = document.getElementById('navMenu');
-    const menuLinks = document.getElementById('menuLinks');
-    const burgerText = document.getElementById('burgerText');
+  const burger = document.getElementById('burger');
+  const nav = document.getElementById('navMenu');
+  const menuLinks = document.getElementById('menuLinks');
+  const burgerText = document.getElementById('burgerText');
 
-    burger.addEventListener('click', () => {
-      nav.classList.toggle('open');
-      menuLinks.classList.toggle('open');
-      const expanded = burger.getAttribute('aria-expanded') === 'true' || false;
-      burger.setAttribute('aria-expanded', !expanded);
-    });
+  burger.addEventListener('click', () => {
+    nav.classList.toggle('open');
+    menuLinks.classList.toggle('open');
+    const expanded = burger.getAttribute('aria-expanded') === 'true' || false;
+    burger.setAttribute('aria-expanded', !expanded);
+  });
 
-    function checkBurgerTextVisibility() {
-      if (window.innerWidth <= 600) {
-        burgerText.style.display = 'inline-block';
-      } else {
-        burgerText.style.display = 'none';
-        nav.classList.remove('open');
-        menuLinks.classList.remove('open');
-        burger.setAttribute('aria-expanded', false);
-      }
+  function checkBurgerTextVisibility() {
+    if (window.innerWidth <= 600) {
+      burgerText.style.display = 'inline-block';
+    } else {
+      burgerText.style.display = 'none';
+      nav.classList.remove('open');
+      menuLinks.classList.remove('open');
+      burger.setAttribute('aria-expanded', false);
     }
-    checkBurgerTextVisibility();
-    window.addEventListener('resize', checkBurgerTextVisibility);
+  }
 
-    const navLinks = document.querySelectorAll('.nav a');
-    const currentPath = window.location.pathname.toLowerCase();
-    navLinks.forEach(link => {
-      if (currentPath.includes(link.getAttribute('href').toLowerCase())) {
-        link.classList.add('active');
-      }
-    });
+  checkBurgerTextVisibility();
+  window.addEventListener('resize', checkBurgerTextVisibility);
 
-    const btnTop = document.getElementById('btnTop');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) {
-        btnTop.style.display = 'flex';
-      } else {
-        btnTop.style.display = 'none';
-      }
-    });
-    btnTop.addEventListener('click', () => {
-      window.scrollTo({top: 0, behavior: 'smooth'});
-    });
+  const navLinks = document.querySelectorAll('.nav a');
+  const currentPath = window.location.pathname.toLowerCase();
+  navLinks.forEach(link => {
+    if (currentPath.includes(link.getAttribute('href').toLowerCase())) {
+      link.classList.add('active');
+    }
+  });
 
-    function setupVideoObserver() {
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          const video = entry.target;
-          if (entry.isIntersecting) {
-            if (!video.src) {
-              video.src = video.dataset.src;
-              video.load();
-            }
-            video.play().catch(() => {});
-          } else {
-            video.pause();
+  const btnTop = document.getElementById('btnTop');
+  window.addEventListener('scroll', () => {
+    btnTop.style.display = window.scrollY > 300 ? 'flex' : 'none';
+  });
+
+  btnTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  function setupVideoObserver() {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          if (!video.src) {
+            video.src = video.dataset.src;
+            video.load();
           }
-        });
-      }, { threshold: 0.5 });
-      document.querySelectorAll('video').forEach(video => observer.observe(video));
-      document.addEventListener('touchstart', () => {
-        document.querySelectorAll('video').forEach(v => {
-          if (!v.paused && v.src) return;
-          v.play().catch(() => {});
-        });
-      }, { once: true });
-    }
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.5 });
 
-    const CATEGORY = "Üzüklər";
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
-    const whatsappNumber = "994702920323";
+    document.querySelectorAll('video').forEach(video => observer.observe(video));
 
-    document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
+    document.addEventListener('touchstart', () => {
+      document.querySelectorAll('video').forEach(v => {
+        if (!v.paused && v.src) return;
+        v.play().catch(() => {});
+      });
+    }, { once: true });
+  }
 
-    fetch(SHEET_URL)
-      .then(res => res.text())
-      .then(tsv => {
-        const rows = tsv.trim().split("\n").slice(1);
-        const items = rows.map(row => {
-          const [code, videoUrl, category] = row.split("\t");
-          return {
-            productCode: code?.trim(),
-            videoUrl: videoUrl?.trim(),
-            category: category?.trim()
-          };
-        });
-        const filtered = items.filter(i => i.category === CATEGORY);
-        renderItems(filtered);
-        setupVideoObserver();
+  const CATEGORY = "Üzüklər";
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
+  const whatsappNumber = "994702920323";
+
+  document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
+
+  let allItems = [];
+  let visibleCount = 10;
+
+  fetch(SHEET_URL)
+    .then(res => res.text())
+    .then(tsv => {
+      const rows = tsv.trim().split("\n").slice(1);
+      const items = rows.map(row => {
+        const [code, videoUrl, category] = row.split("\t");
+        return {
+          productCode: code?.trim(),
+          videoUrl: videoUrl?.trim(),
+          category: category?.trim()
+        };
+      });
+      allItems = items.filter(i => i.category === CATEGORY);
+      renderItemsLimited();
+    });
+
+  function renderItemsLimited() {
+    const catalog = document.getElementById('catalog');
+    catalog.innerHTML = '';
+    const visibleItems = allItems.slice(0, visibleCount);
+
+    visibleItems.forEach(item => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'item';
+
+      const video = document.createElement('video');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('muted', '');
+      video.setAttribute('loop', '');
+      video.setAttribute('autoplay', '');
+      video.setAttribute('preload', 'none');
+      video.dataset.src = item.videoUrl;
+      video.muted = true;
+
+      video.addEventListener('click', () => {
+        document.getElementById('modalVideo').src = item.videoUrl;
+        document.getElementById('videoModal').classList.add('active');
       });
 
-    function renderItems(items) {
-      const catalog = document.getElementById('catalog');
-      catalog.innerHTML = '';
-      items.forEach(item => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'item';
+      const codeRow = document.createElement('div');
+      codeRow.className = 'code-row';
 
-        const video = document.createElement('video');
-        video.setAttribute('playsinline', '');
-        video.setAttribute('muted', '');
-        video.setAttribute('loop', '');
-        video.setAttribute('autoplay', '');
-        video.setAttribute('preload', 'none');
-        video.dataset.src = item.videoUrl;
-        video.muted = true;
+      const codeText = document.createElement('span');
+      codeText.className = 'code-text';
+      codeText.textContent = `Kod: ${item.productCode}`;
 
-        video.addEventListener('click', () => {
-          document.getElementById('modalVideo').src = item.videoUrl;
-          document.getElementById('videoModal').classList.add('active');
-        });
+      const waLink = document.createElement('a');
+      waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+      waLink.target = '_blank';
+      waLink.className = 'wa-link';
 
-        const codeRow = document.createElement('div');
-        codeRow.className = 'code-row';
+      const waIcon = document.createElement('img');
+      waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+      waIcon.alt = 'WhatsApp';
+      waLink.appendChild(waIcon);
 
-        const codeText = document.createElement('span');
-        codeText.className = 'code-text';
-        codeText.textContent = `Kod: ${item.productCode}`;
+      codeRow.appendChild(codeText);
+      codeRow.appendChild(waLink);
 
-        const waLink = document.createElement('a');
-        waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
-        waLink.target = '_blank';
-        waLink.className = 'wa-link';
+      const category = document.createElement('div');
+      category.className = 'category';
+      category.textContent = item.category;
 
-        const waIcon = document.createElement('img');
-        waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
-        waIcon.alt = 'WhatsApp';
-        waLink.appendChild(waIcon);
+      wrapper.appendChild(video);
+      wrapper.appendChild(codeRow);
+      wrapper.appendChild(category);
+      catalog.appendChild(wrapper);
+    });
 
-        codeRow.appendChild(codeText);
-        codeRow.appendChild(waLink);
+    document.getElementById('loadMoreBtn').style.display =
+      visibleCount >= allItems.length ? 'none' : 'block';
 
-        const category = document.createElement('div');
-        category.className = 'category';
-        category.textContent = item.category;
+    setupVideoObserver();
+  }
 
-        wrapper.appendChild(video);
-        wrapper.appendChild(codeRow);
-        wrapper.appendChild(category);
-        catalog.appendChild(wrapper);
-      });
-    }
+  document.getElementById('loadMoreBtn').addEventListener('click', () => {
+    visibleCount += 10;
+    renderItemsLimited();
+  });
+</script>
   </script>
 </body>
 </html>
