@@ -43,45 +43,40 @@
     <p id="status"></p>
   </div>
 
-<script>
-const R2_BUCKET = "islimi"; // ← имя бакета
-const ACCOUNT_ID = "c341c05b086ff00698a603024af4e330"; // ← твой Account ID
-const API_TOKEN = "jAtw5UODcOFkWGlYGuaHwaxGVMhfDXo6YlFLew6_"; // ← сюда вставь сгенерированный токен
+<input type="file" id="fileInput" />
+<button onclick="upload()">Yüklə</button>
+<p id="status"></p>
 
+<script>
 async function upload() {
-  const file = document.getElementById("fileInput").files[0];
-  const status = document.getElementById("status");
+  const file = document.getElementById('fileInput').files[0];
+  const status = document.getElementById('status');
 
   if (!file) {
     status.textContent = "Fayl seçilməyib";
     return;
   }
 
-  const fileName = `${Date.now()}-${file.name}`;
-  const url = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/objects/${fileName}`;
+  const formData = new FormData();
+  formData.append('file', file);
 
-  status.textContent = "⏳ Yüklənir...";
+  status.textContent = "Yüklənir...";
 
   try {
-    const res = await fetch(url, {
-      method: "PUT",
+    const res = await fetch('https://video.islimi.az', {
+      method: 'POST',
+      body: formData,
       headers: {
-        "Authorization": `Bearer ${API_TOKEN}`,
-        "Content-Type": file.type
+        // Не добавляй 'Content-Type', чтобы browser сам выставил multipart/form-data
       },
-      body: file
     });
 
-    if (!res.ok) {
-      const err = await res.json();
-      status.textContent = "❌ Xəta: " + (err?.errors?.[0]?.message || "naməlum");
-      return;
-    }
+    if (!res.ok) throw new Error('Yükləmə uğursuz oldu');
 
-    const publicUrl = `https://${R2_BUCKET}.${ACCOUNT_ID}.r2.cloudflarestorage.com/${fileName}`;
-    status.innerHTML = `✅ <a href="${publicUrl}" target="_blank">Fayl yükləndi</a>`;
-  } catch (err) {
-    status.textContent = "❌ Xəta: " + err.message;
+    const data = await res.json();
+    status.innerHTML = `✅ <a href="${data.url}" target="_blank">Fayl yükləndi</a>`;
+  } catch (e) {
+    status.textContent = `❌ Xəta: ${e.message}`;
   }
 }
 </script>
