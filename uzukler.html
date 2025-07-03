@@ -11,12 +11,18 @@
       --text-color: #333;
       --accent: #d4af37;
     }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text-color);
-      padding-top: 100px; /* Больше отступа для фикс меню */
+    }
+
+    @media (min-width: 601px) {
+      body {
+        padding-top: 100px;
+      }
     }
 
     header, footer {
@@ -43,22 +49,29 @@
       margin-right: auto;
     }
 
+    /* Меню */
     .nav {
       background: white;
       box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      border-radius: 8px;
       font-weight: 600;
       font-size: 17px;
       user-select: none;
       display: flex;
       justify-content: center;
       gap: 30px;
-+     position: fixed;
-+     top: 0;
-+     left: 0;
-+     right: 0;
-+     z-index: 999;
-+     padding: 10px;
+      transition: box-shadow 0.3s ease;
+    }
+
+    @media (min-width: 601px) {
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 12px 20px;
+        border-radius: 0;
+        z-index: 999;
+      }
     }
 
     .nav a {
@@ -83,14 +96,24 @@
       box-shadow: 0 0 10px var(--accent);
     }
 
-    /* Мобильный гамбургер */
+    /* Мобильный бургер */
     @media (max-width: 600px) {
+      body {
+        padding-top: 100px;
+      }
+
       .nav {
+        position: fixed;
         flex-wrap: nowrap;
         justify-content: flex-start;
         gap: 0;
+        padding: 0 10px;
         height: 60px;
         overflow: hidden;
+      }
+
+      .nav.fixed {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       }
 
       .nav .menu-links {
@@ -231,29 +254,6 @@
       display: flex;
     }
 
--    /* Плавающая кнопка WhatsApp */
--    #btnWhatsApp {
--      position: fixed;
--      bottom: 90px;
--      right: 20px;
--      background-color: #25D366;
--      border-radius: 50%;
--      width: 56px;
--      height: 56px;
--      display: flex;
--      align-items: center;
--      justify-content: center;
--      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
--      cursor: pointer;
--      z-index: 10000;
--      text-decoration: none;
--    }
--    #btnWhatsApp svg {
--      width: 28px;
--      height: 28px;
--      fill: white;
--    }
-
     #btnTop {
       position: fixed;
       bottom: 160px;
@@ -310,14 +310,152 @@
     <video id="modalVideo" controls autoplay></video>
   </div>
 
-- <!-- Плавающие кнопки -->
-- <a href="https://wa.me/994702920323" target="_blank" id="btnWhatsApp" title="WhatsApp">
--   <!-- ... -->
-- </a>
-
   <button id="btnTop" title="Yuxarıya" aria-label="Scroll to top">&#8679;</button>
 
-  <!-- Скрипты остаются без изменений -->
-  <!-- ... -->
+  <script>
+    const burger = document.getElementById('burger');
+    const nav = document.getElementById('navMenu');
+    const menuLinks = document.getElementById('menuLinks');
+    const burgerText = document.getElementById('burgerText');
+
+    burger.addEventListener('click', () => {
+      nav.classList.toggle('open');
+      menuLinks.classList.toggle('open');
+      const expanded = burger.getAttribute('aria-expanded') === 'true' || false;
+      burger.setAttribute('aria-expanded', !expanded);
+    });
+
+    function checkBurgerTextVisibility() {
+      if (window.innerWidth <= 600) {
+        burgerText.style.display = 'inline-block';
+      } else {
+        burgerText.style.display = 'none';
+        nav.classList.remove('open');
+        menuLinks.classList.remove('open');
+        burger.setAttribute('aria-expanded', false);
+      }
+    }
+    checkBurgerTextVisibility();
+    window.addEventListener('resize', checkBurgerTextVisibility);
+
+    const navLinks = document.querySelectorAll('.nav a');
+    const currentPath = window.location.pathname.toLowerCase();
+    navLinks.forEach(link => {
+      if (currentPath.includes(link.getAttribute('href').toLowerCase())) {
+        link.classList.add('active');
+      }
+    });
+
+    const btnTop = document.getElementById('btnTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        btnTop.style.display = 'flex';
+      } else {
+        btnTop.style.display = 'none';
+      }
+    });
+    btnTop.addEventListener('click', () => {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+
+    function setupVideoObserver() {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          const video = entry.target;
+          if (entry.isIntersecting) {
+            if (!video.src) {
+              video.src = video.dataset.src;
+              video.load();
+            }
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      }, { threshold: 0.5 });
+      document.querySelectorAll('video').forEach(video => observer.observe(video));
+      document.addEventListener('touchstart', () => {
+        document.querySelectorAll('video').forEach(v => {
+          if (!v.paused && v.src) return;
+          v.play().catch(() => {});
+        });
+      }, { once: true });
+    }
+
+    const CATEGORY = "Üzüklər";
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
+    const whatsappNumber = "994702920323";
+
+    document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
+
+    fetch(SHEET_URL)
+      .then(res => res.text())
+      .then(tsv => {
+        const rows = tsv.trim().split("\n").slice(1);
+        const items = rows.map(row => {
+          const [code, videoUrl, category] = row.split("\t");
+          return {
+            productCode: code?.trim(),
+            videoUrl: videoUrl?.trim(),
+            category: category?.trim()
+          };
+        });
+        const filtered = items.filter(i => i.category === CATEGORY);
+        renderItems(filtered);
+        setupVideoObserver();
+      });
+
+    function renderItems(items) {
+      const catalog = document.getElementById('catalog');
+      catalog.innerHTML = '';
+      items.forEach(item => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'item';
+
+        const video = document.createElement('video');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('muted', '');
+        video.setAttribute('loop', '');
+        video.setAttribute('autoplay', '');
+        video.setAttribute('preload', 'none');
+        video.dataset.src = item.videoUrl;
+        video.muted = true;
+
+        video.addEventListener('click', () => {
+          document.getElementById('modalVideo').src = item.videoUrl;
+          document.getElementById('videoModal').classList.add('active');
+        });
+
+        const codeRow = document.createElement('div');
+        codeRow.className = 'code-row';
+
+        const codeText = document.createElement('span');
+        codeText.className = 'code-text';
+        codeText.textContent = `Kod: ${item.productCode}`;
+
+        const waLink = document.createElement('a');
+        waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+        waLink.target = '_blank';
+        waLink.className = 'wa-link';
+
+        const waIcon = document.createElement('img');
+        waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+        waIcon.alt = 'WhatsApp';
+        waLink.appendChild(waIcon);
+
+        codeRow.appendChild(codeText);
+        codeRow.appendChild(waLink);
+
+        const category = document.createElement('div');
+        category.className = 'category';
+        category.textContent = item.category;
+
+        wrapper.appendChild(video);
+        wrapper.appendChild(codeRow);
+        wrapper.appendChild(category);
+        catalog.appendChild(wrapper);
+      });
+    }
+  </script>
 </body>
 </html>
