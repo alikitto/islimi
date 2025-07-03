@@ -2,14 +2,14 @@
 <html lang="az">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta property="og:title" content="Islimi Jewelry" />
   <meta property="og:image" content="https://karal.az/islimilogo2.png" />
   <title>Kataloq</title>
   <style>
     :root {
       --bg: #f4f4f4;
-      --card-bg: #ffffff;
+      --card-bg: #fff;
       --text-color: #333;
       --accent: #d4af37;
       --accent-dark: #b8932c;
@@ -40,25 +40,24 @@
       margin-left: auto;
       margin-right: auto;
     }
-    .nav {
+    nav.nav {
       background: white;
       padding: 10px 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       position: sticky;
       top: 0;
       z-index: 100;
+      display: flex;
+      justify-content: center;
     }
-    .nav .menu {
+    nav.nav .menu {
       display: flex;
       gap: 25px;
       flex-wrap: wrap;
       font-weight: bold;
       font-size: 16px;
     }
-    .nav .menu a {
+    nav.nav .menu a {
       text-decoration: none;
       color: var(--text-color);
       padding-bottom: 3px;
@@ -66,12 +65,111 @@
       transition: border-color 0.3s ease, color 0.3s ease;
       cursor: pointer;
     }
-    .nav .menu a:hover,
-    .nav .menu a.active {
+    nav.nav .menu a:hover,
+    nav.nav .menu a.active {
       color: var(--accent-dark);
       border-color: var(--accent);
     }
-    /* остальные стили без изменений */
+    .category-header {
+      max-width: 1200px;
+      margin: 50px auto 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+    .category-title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .view-all {
+      font-size: 14px;
+      text-decoration: none;
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto 50px;
+      padding: 0 20px;
+    }
+    @media (max-width: 600px) {
+      .catalog {
+        grid-template-columns: 1fr;
+      }
+    }
+    .item {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    video {
+      width: 100%;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .code-row {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .code-text {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+    .wa-link img {
+      width: 22px;
+    }
+    .category {
+      font-size: 14px;
+      margin-top: 6px;
+      color: #888;
+      font-style: italic;
+    }
+    .badge-new {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+    footer {
+      font-size: 14px;
+      color: #666;
+      margin-top: 40px;
+      padding-bottom: 40px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal video {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 8px;
+    }
+    .modal.active {
+      display: flex;
+    }
   </style>
 </head>
 <body>
@@ -249,21 +347,6 @@
           v.play().catch(() => {});
         });
       }, { once: true });
-
-      // Обработка хеша URL для подсветки активного пункта меню
-      function highlightActiveMenu() {
-        const hash = window.location.hash.toLowerCase();
-        const links = navMenu.querySelectorAll('a');
-        links.forEach(link => {
-          if (link.getAttribute('href') === hash) {
-            link.classList.add('active');
-          } else {
-            link.classList.remove('active');
-          }
-        });
-      }
-      highlightActiveMenu();
-      window.addEventListener('hashchange', highlightActiveMenu);
     }
   </script>
 </body>
