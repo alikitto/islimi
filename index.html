@@ -219,7 +219,7 @@
       });
 
       Object.entries(categoriesMap).forEach(([cat, items]) => {
-        navMenu.innerHTML += <a href="#${cat.toLowerCase()}">${cat}</a>;
+        navMenu.innerHTML += `<a href="#${cat.toLowerCase()}">${cat}</a>`;
         renderSection(cat, items.slice(0, 4), true);
       });
 
@@ -239,7 +239,7 @@
         if (showLink) {
           const viewAll = document.createElement('a');
           viewAll.className = 'view-all';
-          viewAll.href = ${title.toLowerCase()}.html;
+          viewAll.href = `${title.toLowerCase()}.html`;
           viewAll.textContent = "Hamısına bax →";
           sectionHeader.appendChild(viewAll);
         }
@@ -270,10 +270,10 @@
 
           const codeText = document.createElement('span');
           codeText.className = 'code-text';
-          codeText.textContent = Kod: ${item.productCode};
+          codeText.textContent = `Kod: ${item.productCode}`;
 
           const waLink = document.createElement('a');
-          waLink.href = https://wa.me/${whatsappNumber}?text=${encodeURIComponent(Kod ${item.productCode})};
+          waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
           waLink.target = '_blank';
           waLink.className = 'wa-link';
 
