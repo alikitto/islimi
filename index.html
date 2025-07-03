@@ -50,6 +50,7 @@
     .nav .menu {
       display: flex;
       gap: 15px;
+      flex-wrap: wrap;
     }
     .nav .menu a {
       text-decoration: none;
@@ -162,12 +163,7 @@
   </header>
 
   <div class="nav">
-    <div class="menu">
-      <a href="#yeni">Yeni</a>
-      <a href="#üzük">Üzüklər</a>
-      <a href="#qolbaq">Qolbaqlar</a>
-      <a href="#boyunbağı">Boyunbağllar</a>
-    </div>
+    <div class="menu" id="navMenu"></div>
   </div>
 
   <div id="content"></div>
@@ -200,74 +196,37 @@
       });
 
     function renderCatalog(data) {
-      const categories = ["Yeni", "Üzük", "Qolbaq", "Boyunbağı"];
       const whatsappNumber = "994702920323";
       const content = document.getElementById('content');
+      const navMenu = document.getElementById('navMenu');
       content.innerHTML = '';
+      navMenu.innerHTML = '';
 
-      const createCard = (item, index) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'item';
+      // группировка по категориям
+      const categoriesMap = {};
+      data.forEach(item => {
+        if (!categoriesMap[item.category]) categoriesMap[item.category] = [];
+        categoriesMap[item.category].push(item);
+      });
 
-        const video = document.createElement('video');
-        video.setAttribute('playsinline', '');
-        video.setAttribute('muted', '');
-        video.setAttribute('loop', '');
-        video.setAttribute('autoplay', '');
-        video.setAttribute('preload', 'none');
-        video.dataset.src = item.videoUrl;
-        video.muted = true;
+      const allCategories = Object.keys(categoriesMap);
 
-        video.addEventListener('click', () => {
-          document.getElementById('modalVideo').src = item.videoUrl;
-          document.getElementById('videoModal').classList.add('active');
-        });
+      allCategories.forEach(cat => {
+        // Меню-ссылка
+        const navLink = document.createElement('a');
+        navLink.href = `#${cat.toLowerCase()}`;
+        navLink.textContent = cat;
+        navMenu.appendChild(navLink);
 
-        const codeRow = document.createElement('div');
-        codeRow.className = 'code-row';
-
-        const codeText = document.createElement('span');
-        codeText.className = 'code-text';
-        codeText.textContent = `Kod: ${item.productCode}`;
-
-        const waLink = document.createElement('a');
-        waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
-        waLink.target = '_blank';
-        waLink.className = 'wa-link';
-
-        const waIcon = document.createElement('img');
-        waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
-        waIcon.alt = 'WhatsApp';
-        waLink.appendChild(waIcon);
-
-        codeRow.appendChild(codeText);
-        codeRow.appendChild(waLink);
-
-        const category = document.createElement('div');
-        category.className = 'category';
-        category.textContent = item.category;
-
-        wrapper.appendChild(video);
-        wrapper.appendChild(codeRow);
-        wrapper.appendChild(category);
-
-        const badge = document.createElement('div');
-        badge.className = 'badge-new';
-        badge.textContent = 'NEW';
-        wrapper.appendChild(badge);
-
-        return wrapper;
-      };
-
-      categories.forEach(cat => {
         const section = document.createElement('div');
+        section.id = cat.toLowerCase();
 
         const sectionHeader = document.createElement('div');
         sectionHeader.className = 'category-header';
 
         const title = document.createElement('div');
         title.className = 'category-title';
-        title.textContent = cat === "Yeni" ? "Yeni məhsullar" : `${cat}lər`;
+        title.textContent = cat;
 
         const viewAll = document.createElement('a');
         viewAll.className = 'view-all';
@@ -280,13 +239,60 @@
         const grid = document.createElement('div');
         grid.className = 'catalog';
 
-        const items = cat === "Yeni"
-          ? data.slice(0, 4)
-          : data.filter(i => i.category.toLowerCase() === cat.toLowerCase()).slice(0, 4);
+        const items = categoriesMap[cat].slice(0, 4);
 
         items.forEach((item, idx) => {
-          const card = createCard(item, idx);
-          grid.appendChild(card);
+          const wrapper = document.createElement('div');
+          wrapper.className = 'item';
+
+          const video = document.createElement('video');
+          video.setAttribute('playsinline', '');
+          video.setAttribute('muted', '');
+          video.setAttribute('loop', '');
+          video.setAttribute('autoplay', '');
+          video.setAttribute('preload', 'none');
+          video.dataset.src = item.videoUrl;
+          video.muted = true;
+
+          video.addEventListener('click', () => {
+            document.getElementById('modalVideo').src = item.videoUrl;
+            document.getElementById('videoModal').classList.add('active');
+          });
+
+          const codeRow = document.createElement('div');
+          codeRow.className = 'code-row';
+
+          const codeText = document.createElement('span');
+          codeText.className = 'code-text';
+          codeText.textContent = `Kod: ${item.productCode}`;
+
+          const waLink = document.createElement('a');
+          waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+          waLink.target = '_blank';
+          waLink.className = 'wa-link';
+
+          const waIcon = document.createElement('img');
+          waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+          waIcon.alt = 'WhatsApp';
+          waLink.appendChild(waIcon);
+
+          codeRow.appendChild(codeText);
+          codeRow.appendChild(waLink);
+
+          const categoryEl = document.createElement('div');
+          categoryEl.className = 'category';
+          categoryEl.textContent = item.category;
+
+          wrapper.appendChild(video);
+          wrapper.appendChild(codeRow);
+          wrapper.appendChild(categoryEl);
+
+          const badge = document.createElement('div');
+          badge.className = 'badge-new';
+          badge.textContent = 'NEW';
+          wrapper.appendChild(badge);
+
+          grid.appendChild(wrapper);
         });
 
         section.appendChild(sectionHeader);
