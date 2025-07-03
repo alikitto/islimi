@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="az">
 <head>
@@ -158,7 +157,7 @@
     <img src="https://karal.az/islimilogo2.png" alt="Karal Logo" class="logo" />
     <div class="info-glass">
       <p>Zərgərlik kolleksiyamızın yeni parıltısına nəzər salın ✨</p>
-      <p>Yeniləndi: 20 May, 2025</p>
+      <p>Yeniləndi: <span id="lastUpdated"></span></p>
     </div>
   </header>
 
@@ -182,140 +181,143 @@
   </div>
 
   <script>
-    const data = [
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "AUR-102", category: "Qolbaq" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "BRL-557", category: "Üzük" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "XYZ-333", category: "Üzük" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-001", category: "Boyunbağı" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-002", category: "Üzük" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-003", category: "Qolbaq" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-004", category: "Boyunbağı" },
-      { videoUrl: "https://video.karal.az/video2is.mp4", productCode: "NEW-005", category: "Üzük" }
-    ];
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
 
-    const categories = ["Yeni", "Üzük", "Qolbaq", "Boyunbağı"];
-    const whatsappNumber = "994702920323";
-    const content = document.getElementById('content');
-
-    const createCard = (item, index) => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'item';
-
-      const video = document.createElement('video');
-      video.setAttribute('playsinline', '');
-      video.setAttribute('muted', '');
-      video.setAttribute('loop', '');
-      video.setAttribute('autoplay', '');
-      video.setAttribute('preload', 'none');
-      video.dataset.src = item.videoUrl;
-      video.muted = true;
-
-      video.addEventListener('click', () => {
-        document.getElementById('modalVideo').src = item.videoUrl;
-        document.getElementById('videoModal').classList.add('active');
+    fetch(SHEET_URL)
+      .then(res => res.text())
+      .then(tsv => {
+        const rows = tsv.trim().split("\n").slice(1);
+        const data = rows.map(row => {
+          const [code, videoUrl, category] = row.split("\t");
+          return {
+            productCode: code?.trim(),
+            videoUrl: videoUrl?.trim(),
+            category: category?.trim()
+          };
+        });
+        document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
+        renderCatalog(data);
       });
 
-      const codeRow = document.createElement('div');
-      codeRow.className = 'code-row';
+    function renderCatalog(data) {
+      const categories = ["Yeni", "Üzük", "Qolbaq", "Boyunbağı"];
+      const whatsappNumber = "994702920323";
+      const content = document.getElementById('content');
+      content.innerHTML = '';
 
-      const codeText = document.createElement('span');
-      codeText.className = 'code-text';
-      codeText.textContent = `Kod: ${item.productCode}`;
+      const createCard = (item, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'item';
 
-      const waLink = document.createElement('a');
-      waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
-      waLink.target = '_blank';
-      waLink.className = 'wa-link';
+        const video = document.createElement('video');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('muted', '');
+        video.setAttribute('loop', '');
+        video.setAttribute('autoplay', '');
+        video.setAttribute('preload', 'none');
+        video.dataset.src = item.videoUrl;
+        video.muted = true;
 
-      const waIcon = document.createElement('img');
-      waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
-      waIcon.alt = 'WhatsApp';
-      waLink.appendChild(waIcon);
+        video.addEventListener('click', () => {
+          document.getElementById('modalVideo').src = item.videoUrl;
+          document.getElementById('videoModal').classList.add('active');
+        });
 
-      codeRow.appendChild(codeText);
-      codeRow.appendChild(waLink);
+        const codeRow = document.createElement('div');
+        codeRow.className = 'code-row';
 
-      const category = document.createElement('div');
-      category.className = 'category';
-      category.textContent = item.category;
+        const codeText = document.createElement('span');
+        codeText.className = 'code-text';
+        codeText.textContent = `Kod: ${item.productCode}`;
 
-      wrapper.appendChild(video);
-      wrapper.appendChild(codeRow);
-      wrapper.appendChild(category);
+        const waLink = document.createElement('a');
+        waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+        waLink.target = '_blank';
+        waLink.className = 'wa-link';
 
-      if (index < 10) {
+        const waIcon = document.createElement('img');
+        waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+        waIcon.alt = 'WhatsApp';
+        waLink.appendChild(waIcon);
+
+        codeRow.appendChild(codeText);
+        codeRow.appendChild(waLink);
+
+        const category = document.createElement('div');
+        category.className = 'category';
+        category.textContent = item.category;
+
+        wrapper.appendChild(video);
+        wrapper.appendChild(codeRow);
+        wrapper.appendChild(category);
+
         const badge = document.createElement('div');
         badge.className = 'badge-new';
         badge.textContent = 'NEW';
         wrapper.appendChild(badge);
-      }
 
-      return wrapper;
-    };
+        return wrapper;
+      };
 
-    categories.forEach(cat => {
-      const section = document.createElement('div');
-      const sectionId = cat.toLowerCase();
+      categories.forEach(cat => {
+        const section = document.createElement('div');
 
-      const sectionHeader = document.createElement('div');
-      sectionHeader.className = 'category-header';
+        const sectionHeader = document.createElement('div');
+        sectionHeader.className = 'category-header';
 
-      const title = document.createElement('div');
-      title.className = 'category-title';
-      title.textContent = cat === "Yeni" ? "Yeni məhsullar" : `${cat}lər`;
+        const title = document.createElement('div');
+        title.className = 'category-title';
+        title.textContent = cat === "Yeni" ? "Yeni məhsullar" : `${cat}lər`;
 
-      const viewAll = document.createElement('a');
-      viewAll.className = 'view-all';
-      viewAll.href = "#";
-      viewAll.textContent = "Hamısına bax →";
+        const viewAll = document.createElement('a');
+        viewAll.className = 'view-all';
+        viewAll.href = "#";
+        viewAll.textContent = "Hamısına bax →";
 
-      sectionHeader.appendChild(title);
-      sectionHeader.appendChild(viewAll);
+        sectionHeader.appendChild(title);
+        sectionHeader.appendChild(viewAll);
 
-      const grid = document.createElement('div');
-      grid.className = 'catalog';
+        const grid = document.createElement('div');
+        grid.className = 'catalog';
 
-      const items = cat === "Yeni"
-        ? data.slice(0, 4)
-        : data.filter(i => i.category.toLowerCase() === cat.toLowerCase()).slice(0, 4);
+        const items = cat === "Yeni"
+          ? data.slice(0, 4)
+          : data.filter(i => i.category.toLowerCase() === cat.toLowerCase()).slice(0, 4);
 
-      items.forEach((item, idx) => {
-        const card = createCard(item, idx);
-        grid.appendChild(card);
+        items.forEach((item, idx) => {
+          const card = createCard(item, idx);
+          grid.appendChild(card);
+        });
+
+        section.appendChild(sectionHeader);
+        section.appendChild(grid);
+        content.appendChild(section);
       });
 
-      section.appendChild(sectionHeader);
-      section.appendChild(grid);
-      content.appendChild(section);
-    });
-
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          if (!video.src) {
-            video.src = video.dataset.src;
-            video.load();
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          const video = entry.target;
+          if (entry.isIntersecting) {
+            if (!video.src) {
+              video.src = video.dataset.src;
+              video.load();
+            }
+            video.play().catch(() => {});
+          } else {
+            video.pause();
           }
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
-      });
-    }, { threshold: 0.5 });
+        });
+      }, { threshold: 0.5 });
 
-    document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('video').forEach(video => observer.observe(video));
-    });
-  
-    // Mobile autoplay fallback on first touch
-    document.addEventListener('touchstart', () => {
-      document.querySelectorAll('video').forEach(v => {
-        if (!v.paused && v.src) return;
-        v.play().catch(() => {});
-      });
-    }, { once: true });
-  </script>
 
+      document.addEventListener('touchstart', () => {
+        document.querySelectorAll('video').forEach(v => {
+          if (!v.paused && v.src) return;
+          v.play().catch(() => {});
+        });
+      }, { once: true });
+    }
+  </script>
 </body>
 </html>
