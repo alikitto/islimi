@@ -16,6 +16,8 @@
       font-family: 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text-color);
+      min-height: 100vh;
+      position: relative;
     }
     header, footer {
       text-align: center;
@@ -38,64 +40,118 @@
       margin-left: auto;
       margin-right: auto;
     }
-.nav {
-  background: white;
-  padding: 12px 20px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  border-radius: 8px;
-  margin-bottom: 30px;
-  font-weight: 600;
-  font-size: 17px;
-  user-select: none;
+    .nav {
+      background: white;
+      padding: 12px 20px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      margin-bottom: 30px;
+      font-weight: 600;
+      font-size: 17px;
+      user-select: none;
 
-  display: flex;
-  justify-content: center; /* Центрируем меню */
-  gap: 30px;
-  
-  overflow-x: auto;        /* Горизонтальный скролл */
-  -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
-  scrollbar-width: thin;    /* Тонкий скролл в Firefox */
-  scrollbar-color: var(--accent) transparent;
-}
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      position: relative;
+      z-index: 10;
+    }
 
-.nav::-webkit-scrollbar {
-  height: 6px;
-}
+    .nav a {
+      text-decoration: none;
+      color: var(--text-color);
+      padding: 8px 16px;
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-.nav::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 3px;
-}
+    .nav a:hover {
+      color: var(--accent);
+      background-color: #f9f5d7;
+    }
 
-.nav a {
-  flex: 0 0 auto;          /* Чтобы пункты не сжимались и не переносились */
-  text-decoration: none;
-  color: var(--text-color);
-  padding: 8px 16px;
-  border-radius: 6px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  white-space: nowrap;
-  text-align: center;
-}
+    .nav a.active {
+      color: white;
+      background-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
 
-.nav a:hover {
-  color: var(--accent);
-  background-color: #f9f5d7;
-}
+    /* Бургер кнопка */
+    .burger {
+      display: none;
+      cursor: pointer;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 30px;
+      height: 25px;
+      margin-left: auto;
+      transition: transform 0.3s ease;
+      z-index: 20;
+    }
 
-.nav a.active {
-  color: white;
-  background-color: var(--accent);
-  box-shadow: 0 0 10px var(--accent);
-}
+    .burger div {
+      width: 30px;
+      height: 3px;
+      background: var(--text-color);
+      border-radius: 3px;
+      transition: all 0.3s ease;
+      transform-origin: 1px;
+    }
 
-/* На десктопах убираем скролл и выравниваем меню по центру */
-@media (min-width: 601px) {
-  .nav {
-    overflow-x: visible;
-    justify-content: center;
-  }
-}
+    /* Анимация бургер-кнопки при активном состоянии */
+    .burger.open div:nth-child(1) {
+      transform: rotate(45deg);
+    }
+    .burger.open div:nth-child(2) {
+      opacity: 0;
+    }
+    .burger.open div:nth-child(3) {
+      transform: rotate(-45deg);
+    }
+
+    /* Мобильное меню */
+    @media (max-width: 600px) {
+      .nav {
+        justify-content: flex-start;
+        gap: 0;
+      }
+
+      .nav a {
+        position: absolute;
+        top: 55px;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        border-radius: 8px;
+        padding: 10px 0;
+        z-index: 9;
+
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      .nav a.show {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 15px;
+        white-space: normal;
+
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+
+      .burger {
+        display: flex;
+      }
+    }
+
     .catalog {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -178,9 +234,54 @@
     .modal.active {
       display: flex;
     }
+
+    /* Кнопка Наверх */
+    #btnTop {
+      position: fixed;
+      bottom: 50px;
+      right: 20px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-size: 20px;
+      display: none;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+    #btnTop:hover {
+      background-color: #b3871f;
+    }
+
+    /* Кнопка WhatsApp */
+    #btnWhatsApp {
+      position: fixed;
+      bottom: 110px;
+      right: 20px;
+      background-color: #25D366;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-size: 22px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+    }
+    #btnWhatsApp:hover {
+      background-color: #1ebe57;
+    }
   </style>
 </head>
 <body>
+
   <header>
     <img src="https://karal.az/islimilogo2.png" alt="Islimi" class="logo" />
     <div class="info-glass">
@@ -194,6 +295,11 @@
     <a href="uzukler.html">Üzüklər</a>
     <a href="qolbaq.html">Qolbaqlar</a>
     <a href="boyunbag.html">Boyunbağlar</a>
+    <div class="burger" id="burgerBtn" aria-label="Toggle menu" role="button" tabindex="0">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
   </nav>
 
   <main>
@@ -207,6 +313,14 @@
   <div class="modal" id="videoModal" onclick="this.classList.remove('active')">
     <video id="modalVideo" controls autoplay></video>
   </div>
+
+  <!-- Кнопка Наверх -->
+  <button id="btnTop" title="Yuxarı qalx">&#8679;</button>
+
+  <!-- Кнопка WhatsApp -->
+  <a href="https://wa.me/994702920323" target="_blank" id="btnWhatsApp" title="WhatsApp" aria-label="WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M20.52 3.48a11.86 11.86 0 00-16.79 0 11.92 11.92 0 00-3.49 8.44 12.13 12.13 0 001.9 5.82L.11 24l6.3-2.08a11.95 11.95 0 005.84 1.9c3.17 0 6.16-1.24 8.44-3.5a11.86 11.86 0 000-16.79zm-1.6 14.53c-1.54 1.54-3.58 2.38-5.72 2.38a8.01 8.01 0 01-4.39-1.31l-.31-.18-3.74 1.25 1.25-3.73-.18-.31A8.02 8.02 0 017.6 10a8.01 8.01 0 015.7 13.02zm-1.86-3.72c-.13-.2-.45-.32-.9-.56-.44-.25-2.58-1.27-2.98-1.42-.4-.15-.68-.21-.97.2-.3.41-1.14 1.4-1.4 1.69-.25.3-.5.34-.94.12-.44-.22-1.86-.69-3.54-2.19-1.31-1.17-2.19-2.61-2.44-3.05-.25-.44-.03-.68.21-.9.21-.2.45-.5.68-.75.23-.25.3-.41.45-.68.15-.25.07-.47-.03-.69-.1-.22-.9-2.15-1.23-2.93-.32-.77-.65-.67-.9-.68-.23 0-.5-.03-.76-.03s-.68.1-1.04.47c-.36.36-1.38 1.34-1.38 3.26s1.41 3.8 1.61 4.07c.2.25 2.78 4.25 6.74 5.96 4 .18 5.7-2.52 6.33-3.1.62-.57.98-1.16 1.11-1.28z"/></svg>
+  </a>
 
 <script>
   const CATEGORY = "Üzüklər";  // Текущая категория, поменяй на странице
@@ -314,18 +428,45 @@
     }, { once: true });
   }
 
-  // Подсвечиваем активный пункт меню, основываясь на URL
-const navLinks = document.querySelectorAll('.nav a');
-const currentPath = window.location.pathname.toLowerCase();
+  // Бургер меню
+  const burger = document.getElementById('burgerBtn');
+  const navLinks = document.querySelectorAll('.nav a');
 
-navLinks.forEach(link => {
-  // Если путь ссылки совпадает с текущим URL, ставим класс active
-  if (currentPath.includes(link.getAttribute('href').toLowerCase())) {
-    link.classList.add('active');
-  }
-});
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('open');
+    navLinks.forEach(link => link.classList.toggle('show'));
+  });
+
+  burger.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      burger.click();
+    }
+  });
+
+  // Подсветка активного пункта меню
+  const currentPath = window.location.pathname.toLowerCase();
+  navLinks.forEach(link => {
+    if (currentPath.includes(link.getAttribute('href').toLowerCase())) {
+      link.classList.add('active');
+    }
+  });
+
+  // Кнопка Наверх
+  const btnTop = document.getElementById('btnTop');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      btnTop.style.display = 'block';
+    } else {
+      btnTop.style.display = 'none';
+    }
+  });
+
+  btnTop.addEventListener('click', () => {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  });
 </script>
 
-  
 </body>
 </html>
