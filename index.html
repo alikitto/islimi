@@ -2,27 +2,20 @@
 <html lang="az">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta property="og:title" content="Islimi Jewelry" />
-  <meta property="og:image" content="https://karal.az/islimilogo2.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kataloq</title>
   <style>
     :root {
       --bg: #f4f4f4;
-      --card-bg: #ffffff;
+      --card-bg: #fff;
       --text-color: #333;
       --accent: #d4af37;
-      --accent-hover: #b18d27;
-      --btn-bg: #d4af37;
-      --btn-bg-hover: #b18d27;
-      --btn-text: white;
     }
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: var(--bg);
       color: var(--text-color);
-      scroll-behavior: smooth;
     }
     header, footer {
       text-align: center;
@@ -36,7 +29,7 @@
       margin-top: 10px;
       padding: 10px;
       max-width: 520px;
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(255,255,255,0.25);
       border-radius: 16px;
       backdrop-filter: blur(12px);
       text-align: center;
@@ -44,56 +37,12 @@
       margin-left: auto;
       margin-right: auto;
     }
-    .nav {
-      background: white;
-      padding: 10px 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: center;
-    }
-    .nav .menu {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      max-width: 1200px;
-      width: 100%;
-      justify-content: center;
-    }
-    .nav .menu a {
-      text-decoration: none;
-      font-weight: 600;
-      color: var(--accent);
-      padding: 8px 16px;
-      border-radius: 20px;
-      background: rgba(212, 175, 55, 0.1);
-      transition: background-color 0.3s, color 0.3s;
-      cursor: pointer;
-    }
-    .nav .menu a:hover {
-      background-color: var(--accent-hover);
-      color: var(--btn-text);
-    }
-    .category-header {
-      max-width: 1200px;
-      margin: 50px auto 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-    }
-    .category-title {
-      font-size: 20px;
-      font-weight: bold;
-    }
     .catalog {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 30px;
       max-width: 1200px;
-      margin: 0 auto;
+      margin: 40px auto 40px;
       padding: 0 20px;
     }
     @media (max-width: 600px) {
@@ -104,8 +53,7 @@
     .item {
       background: var(--card-bg);
       border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
       padding: 20px;
       text-align: center;
       position: relative;
@@ -154,9 +102,9 @@
     .modal {
       display: none;
       position: fixed;
-      top: 0; left: 0;
+      top:0; left:0;
       width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0,0,0,0.7);
       justify-content: center;
       align-items: center;
       z-index: 1000;
@@ -169,33 +117,6 @@
     .modal.active {
       display: flex;
     }
-    /* Pagination styles */
-    .pagination {
-      margin: 40px auto 60px;
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      max-width: 300px;
-    }
-    .pagination button {
-      background-color: var(--btn-bg);
-      border: none;
-      padding: 8px 14px;
-      color: var(--btn-text);
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      min-width: 36px;
-    }
-    .pagination button:hover:not(.active) {
-      background-color: var(--btn-bg-hover);
-    }
-    .pagination button.active {
-      background-color: var(--accent-hover);
-      cursor: default;
-    }
   </style>
 </head>
 <body>
@@ -207,14 +128,9 @@
     </div>
   </header>
 
-  <div class="nav">
-    <div class="menu" id="navMenu">
-      <!-- Меню можно оставить пустым, т.к. на главной только новые товары -->
-      <a href="#new-products" class="active">Yeni Məhsullar</a>
-    </div>
+  <div id="content">
+    <div class="catalog" id="catalog"></div>
   </div>
-
-  <div id="content"></div>
 
   <footer>
     © 2025 Karal | Bütün huquqlar qorunur
@@ -224,173 +140,134 @@
     <video id="modalVideo" controls autoplay></video>
   </div>
 
-  <script>
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
-    const whatsappNumber = "994702920323";
-    const ITEMS_PER_PAGE = 20;
+<script>
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
+  const whatsappNumber = "994702920323";
+  const ITEMS_PER_BATCH = 20;
 
-    let currentPage = 1;
-    let latestItems = [];
+  let allItems = [];
+  let lastRenderedIndex = 0;
 
-    document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
+  document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
 
-    fetch(SHEET_URL)
-      .then(res => res.text())
-      .then(tsv => {
-        const rows = tsv.trim().split("\n").slice(1);
-        latestItems = rows.map(row => {
-          const [code, videoUrl, category] = row.split("\t");
-          return {
-            productCode: code?.trim(),
-            videoUrl: videoUrl?.trim(),
-            category: category?.trim()
-          };
-        }).slice(-20).reverse();
-        renderPage(currentPage);
+  fetch(SHEET_URL)
+    .then(res => res.text())
+    .then(tsv => {
+      const rows = tsv.trim().split("\n").slice(1);
+      allItems = rows.map(row => {
+        const [code, videoUrl, category] = row.split("\t");
+        return {
+          productCode: code?.trim(),
+          videoUrl: videoUrl?.trim(),
+          category: category?.trim()
+        };
+      }).slice(-100).reverse(); // берем последние 100 для примера
+      renderNextBatch();
+      setupScrollListener();
+    });
+
+  function renderNextBatch() {
+    const catalog = document.getElementById('catalog');
+    const batch = allItems.slice(lastRenderedIndex, lastRenderedIndex + ITEMS_PER_BATCH);
+
+    batch.forEach(item => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'item';
+
+      const video = document.createElement('video');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('muted', '');
+      video.setAttribute('loop', '');
+      video.setAttribute('autoplay', '');
+      video.setAttribute('preload', 'none');
+      video.dataset.src = item.videoUrl;
+      video.muted = true;
+
+      video.addEventListener('click', () => {
+        document.getElementById('modalVideo').src = item.videoUrl;
+        document.getElementById('videoModal').classList.add('active');
       });
 
-    function renderPage(page) {
-      const content = document.getElementById('content');
-      content.innerHTML = '';
+      const codeRow = document.createElement('div');
+      codeRow.className = 'code-row';
 
-      const start = (page - 1) * ITEMS_PER_PAGE;
-      const end = start + ITEMS_PER_PAGE;
-      const itemsToShow = latestItems.slice(start, end);
+      const codeText = document.createElement('span');
+      codeText.className = 'code-text';
+      codeText.textContent = `Kod: ${item.productCode}`;
 
-      renderSection("Yeni Məhsullar", itemsToShow);
+      const waLink = document.createElement('a');
+      waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+      waLink.target = '_blank';
+      waLink.className = 'wa-link';
 
-      renderPagination(page, Math.ceil(latestItems.length / ITEMS_PER_PAGE));
-    }
+      const waIcon = document.createElement('img');
+      waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+      waIcon.alt = 'WhatsApp';
+      waLink.appendChild(waIcon);
 
-    function renderSection(title, items) {
-      const section = document.createElement('div');
-      section.id = "new-products";
+      codeRow.appendChild(codeText);
+      codeRow.appendChild(waLink);
 
-      const sectionHeader = document.createElement('div');
-      sectionHeader.className = 'category-header';
+      const category = document.createElement('div');
+      category.className = 'category';
+      category.textContent = item.category;
 
-      const titleEl = document.createElement('div');
-      titleEl.className = 'category-title';
-      titleEl.textContent = title;
+      wrapper.appendChild(video);
+      wrapper.appendChild(codeRow);
+      wrapper.appendChild(category);
 
-      sectionHeader.appendChild(titleEl);
-      section.appendChild(sectionHeader);
+      const badge = document.createElement('div');
+      badge.className = 'badge-new';
+      badge.textContent = 'NEW';
+      wrapper.appendChild(badge);
 
-      const grid = document.createElement('div');
-      grid.className = 'catalog';
+      catalog.appendChild(wrapper);
+    });
 
-      items.forEach((item) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'item';
+    lastRenderedIndex += ITEMS_PER_BATCH;
+    setupVideoObserver();
+  }
 
-        const video = document.createElement('video');
-        video.setAttribute('playsinline', '');
-        video.setAttribute('muted', '');
-        video.setAttribute('loop', '');
-        video.setAttribute('autoplay', '');
-        video.setAttribute('preload', 'none');
-        video.dataset.src = item.videoUrl;
-        video.muted = true;
+  function setupScrollListener() {
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const fullHeight = document.documentElement.scrollHeight;
 
-        video.addEventListener('click', () => {
-          document.getElementById('modalVideo').src = item.videoUrl;
-          document.getElementById('videoModal').classList.add('active');
-        });
-
-        const codeRow = document.createElement('div');
-        codeRow.className = 'code-row';
-
-        const codeText = document.createElement('span');
-        codeText.className = 'code-text';
-        codeText.textContent = `Kod: ${item.productCode}`;
-
-        const waLink = document.createElement('a');
-        waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
-        waLink.target = '_blank';
-        waLink.className = 'wa-link';
-
-        const waIcon = document.createElement('img');
-        waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
-        waIcon.alt = 'WhatsApp';
-        waLink.appendChild(waIcon);
-
-        codeRow.appendChild(codeText);
-        codeRow.appendChild(waLink);
-
-        const category = document.createElement('div');
-        category.className = 'category';
-        category.textContent = item.category;
-
-        wrapper.appendChild(video);
-        wrapper.appendChild(codeRow);
-        wrapper.appendChild(category);
-
-        const badge = document.createElement('div');
-        badge.className = 'badge-new';
-        badge.textContent = 'NEW';
-        wrapper.appendChild(badge);
-
-        grid.appendChild(wrapper);
-      });
-
-      section.appendChild(grid);
-      content.appendChild(section);
-
-      setupVideoObserver();
-    }
-
-    function renderPagination(current, totalPages) {
-      const content = document.getElementById('content');
-
-      // Удалим старую пагинацию если есть
-      const oldPagination = document.querySelector('.pagination');
-      if (oldPagination) oldPagination.remove();
-
-      if (totalPages <= 1) return; // Пагинация не нужна
-
-      const pagination = document.createElement('div');
-      pagination.className = 'pagination';
-
-      for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = i;
-        if (i === current) btn.classList.add('active');
-        btn.addEventListener('click', () => {
-          currentPage = i;
-          renderPage(i);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-        pagination.appendChild(btn);
+      // Если пользователь почти докрутил до низа (+100px запас)
+      if (scrollTop + viewportHeight + 100 >= fullHeight) {
+        if (lastRenderedIndex < allItems.length) {
+          renderNextBatch();
+        }
       }
+    });
+  }
 
-      content.appendChild(pagination);
-    }
-
-    function setupVideoObserver() {
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          const video = entry.target;
-          if (entry.isIntersecting) {
-            if (!video.src) {
-              video.src = video.dataset.src;
-              video.load();
-            }
-            video.play().catch(() => {});
-          } else {
-            video.pause();
+  function setupVideoObserver() {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          if (!video.src) {
+            video.src = video.dataset.src;
+            video.load();
           }
-        });
-      }, { threshold: 0.5 });
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.5 });
 
-      document.querySelectorAll('video').forEach(video => observer.observe(video));
+    document.querySelectorAll('video').forEach(video => observer.observe(video));
 
-      document.addEventListener('touchstart', () => {
-        document.querySelectorAll('video').forEach(v => {
-          if (!v.paused && v.src) return;
-          v.play().catch(() => {});
-        });
-      }, { once: true });
-    }
-  </script>
+    document.addEventListener('touchstart', () => {
+      document.querySelectorAll('video').forEach(v => {
+        if (!v.paused && v.src) return;
+        v.play().catch(() => {});
+      });
+    }, { once: true });
+  }
+</script>
 </body>
 </html>
