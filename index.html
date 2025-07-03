@@ -12,6 +12,7 @@
       --card-bg: #ffffff;
       --text-color: #333;
       --accent: #d4af37;
+      --accent-dark: #b8932c;
     }
     body {
       margin: 0;
@@ -43,19 +44,32 @@
       background: white;
       padding: 10px 20px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     .nav .menu {
       display: flex;
-      gap: 15px;
+      gap: 25px;
       flex-wrap: wrap;
+      font-weight: bold;
+      font-size: 16px;
     }
     .nav .menu a {
       text-decoration: none;
-      font-weight: bold;
       color: var(--text-color);
+      padding-bottom: 3px;
+      border-bottom: 3px solid transparent;
+      transition: border-color 0.3s ease, color 0.3s ease;
+      cursor: pointer;
+    }
+    .nav .menu a:hover,
+    .nav .menu a.active {
+      color: var(--accent-dark);
+      border-color: var(--accent);
     }
     .category-header {
       max-width: 1200px;
@@ -137,6 +151,7 @@
       font-size: 14px;
       color: #666;
       margin-top: 40px;
+      padding-bottom: 40px;
     }
     .modal {
       display: none;
@@ -156,6 +171,36 @@
     .modal.active {
       display: flex;
     }
+    /* Пагинация */
+    .pagination {
+      max-width: 1200px;
+      margin: 30px auto 50px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 0 20px;
+    }
+    .pagination button {
+      background: white;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+      min-width: 40px;
+    }
+    .pagination button:hover {
+      background: var(--accent);
+      color: white;
+    }
+    .pagination button.active {
+      background: var(--accent);
+      color: white;
+      cursor: default;
+    }
   </style>
 </head>
 <body>
@@ -172,6 +217,8 @@
   </div>
 
   <div id="content"></div>
+
+  <div class="pagination" id="pagination"></div>
 
   <footer>
     © 2025 Karal | Bütün huquqlar qorunur
@@ -197,141 +244,186 @@
           };
         });
         document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
-        renderCatalog(data);
+        initPagination(data);
+        renderNavMenu(data);
       });
 
-    function renderCatalog(data) {
-      const whatsappNumber = "994702920323";
-      const content = document.getElementById('content');
-      const navMenu = document.getElementById('navMenu');
-      content.innerHTML = '';
+    const content = document.getElementById('content');
+    const navMenu = document.getElementById('navMenu');
+    const pagination = document.getElementById('pagination');
+
+    function renderNavMenu(data) {
+      // Получаем уникальные категории
+      const categories = [...new Set(data.map(item => item.category))];
       navMenu.innerHTML = '';
-
-      // NEW block
-      const latest = data.slice(-20).reverse();
-      renderSection("Yeni", latest);
-
-      // Categories
-      const categoriesMap = {};
-      data.forEach(item => {
-        if (!categoriesMap[item.category]) categoriesMap[item.category] = [];
-        categoriesMap[item.category].push(item);
+      categories.forEach(cat => {
+        const a = document.createElement('a');
+        a.href = `#${cat.toLowerCase()}`;
+        a.textContent = cat;
+        navMenu.appendChild(a);
       });
+    }
 
-      Object.entries(categoriesMap).forEach(([cat, items]) => {
-        navMenu.innerHTML += `<a href="#${cat.toLowerCase()}">${cat}</a>`;
-        renderSection(cat, items.slice(0, 4), true);
-      });
+    // Пагинация для "Yeni"
+    const ITEMS_PER_PAGE = 20;
+    let currentPage = 1;
+    let currentData = [];
 
-      function renderSection(title, items, showLink = false) {
-        const section = document.createElement('div');
-        section.id = title.toLowerCase();
+    function initPagination(data) {
+      currentData = data.slice(-ITEMS_PER_PAGE).reverse(); // последние 20
+      currentPage = 1;
+      renderPage(currentPage);
+      renderPaginationButtons();
+    }
 
-        const sectionHeader = document.createElement('div');
-        sectionHeader.className = 'category-header';
+    function renderPage(page) {
+      content.innerHTML = '';
 
-        const titleEl = document.createElement('div');
-        titleEl.className = 'category-title';
-        titleEl.textContent = title === "Yeni" ? "NEW" : title;
+      const start = (page - 1) * ITEMS_PER_PAGE;
+      const end = start + ITEMS_PER_PAGE;
+      const pageItems = currentData.slice(start, end);
 
-        sectionHeader.appendChild(titleEl);
+      renderSection("Yeni", pageItems);
+    }
 
-        if (showLink) {
-          const viewAll = document.createElement('a');
-          viewAll.className = 'view-all';
-          viewAll.href = `${title.toLowerCase()}.html`;
-          viewAll.textContent = "Hamısına bax →";
-          sectionHeader.appendChild(viewAll);
-        }
+    function renderPaginationButtons() {
+      pagination.innerHTML = '';
 
-        const grid = document.createElement('div');
-        grid.className = 'catalog';
+      const totalPages = Math.ceil(currentData.length / ITEMS_PER_PAGE);
 
-        items.forEach((item, idx) => {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'item';
+      if (totalPages <= 1) return;
 
-          const video = document.createElement('video');
-          video.setAttribute('playsinline', '');
-          video.setAttribute('muted', '');
-          video.setAttribute('loop', '');
-          video.setAttribute('autoplay', '');
-          video.setAttribute('preload', 'none');
-          video.dataset.src = item.videoUrl;
-          video.muted = true;
-
-          video.addEventListener('click', () => {
-            document.getElementById('modalVideo').src = item.videoUrl;
-            document.getElementById('videoModal').classList.add('active');
-          });
-
-          const codeRow = document.createElement('div');
-          codeRow.className = 'code-row';
-
-          const codeText = document.createElement('span');
-          codeText.className = 'code-text';
-          codeText.textContent = `Kod: ${item.productCode}`;
-
-          const waLink = document.createElement('a');
-          waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
-          waLink.target = '_blank';
-          waLink.className = 'wa-link';
-
-          const waIcon = document.createElement('img');
-          waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
-          waIcon.alt = 'WhatsApp';
-          waLink.appendChild(waIcon);
-
-          codeRow.appendChild(codeText);
-          codeRow.appendChild(waLink);
-
-          const category = document.createElement('div');
-          category.className = 'category';
-          category.textContent = item.category;
-
-          wrapper.appendChild(video);
-          wrapper.appendChild(codeRow);
-          wrapper.appendChild(category);
-
-          if (title === "Yeni") {
-            const badge = document.createElement('div');
-            badge.className = 'badge-new';
-            badge.textContent = 'NEW';
-            wrapper.appendChild(badge);
+      const createButton = (text, page, disabled = false, active = false) => {
+        const btn = document.createElement('button');
+        btn.textContent = text;
+        if (disabled) btn.disabled = true;
+        if (active) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+          if (!disabled) {
+            currentPage = page;
+            renderPage(page);
+            renderPaginationButtons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }
-
-          grid.appendChild(wrapper);
         });
+        return btn;
+      };
 
-        section.appendChild(sectionHeader);
-        section.appendChild(grid);
-        content.appendChild(section);
+      // Кнопка "Назад"
+      pagination.appendChild(createButton('«', currentPage - 1, currentPage === 1));
+
+      // Номера страниц
+      for (let i = 1; i <= totalPages; i++) {
+        pagination.appendChild(createButton(i, i, false, i === currentPage));
       }
 
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          const video = entry.target;
-          if (entry.isIntersecting) {
-            if (!video.src) {
-              video.src = video.dataset.src;
-              video.load();
-            }
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
-        });
-      }, { threshold: 0.5 });
-
-      document.querySelectorAll('video').forEach(video => observer.observe(video));
-
-      document.addEventListener('touchstart', () => {
-        document.querySelectorAll('video').forEach(v => {
-          if (!v.paused && v.src) return;
-          v.play().catch(() => {});
-        });
-      }, { once: true });
+      // Кнопка "Вперёд"
+      pagination.appendChild(createButton('»', currentPage + 1, currentPage === totalPages));
     }
+
+    function renderSection(title, items) {
+      const section = document.createElement('div');
+      section.id = title.toLowerCase();
+
+      const sectionHeader = document.createElement('div');
+      sectionHeader.className = 'category-header';
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'category-title';
+      titleEl.textContent = title === "Yeni" ? "NEW" : title;
+
+      sectionHeader.appendChild(titleEl);
+
+      const grid = document.createElement('div');
+      grid.className = 'catalog';
+
+      items.forEach((item, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'item';
+
+        const video = document.createElement('video');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('muted', '');
+        video.setAttribute('loop', '');
+        video.setAttribute('autoplay', '');
+        video.setAttribute('preload', 'none');
+        video.dataset.src = item.videoUrl;
+        video.muted = true;
+
+        video.addEventListener('click', () => {
+          document.getElementById('modalVideo').src = item.videoUrl;
+          document.getElementById('videoModal').classList.add('active');
+        });
+
+        const codeRow = document.createElement('div');
+        codeRow.className = 'code-row';
+
+        const codeText = document.createElement('span');
+        codeText.className = 'code-text';
+        codeText.textContent = `Kod: ${item.productCode}`;
+
+        const whatsappNumber = "994702920323";
+        const waLink = document.createElement('a');
+        waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+        waLink.target = '_blank';
+        waLink.className = 'wa-link';
+
+        const waIcon = document.createElement('img');
+        waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+        waIcon.alt = 'WhatsApp';
+        waLink.appendChild(waIcon);
+
+        codeRow.appendChild(codeText);
+        codeRow.appendChild(waLink);
+
+        const category = document.createElement('div');
+        category.className = 'category';
+        category.textContent = item.category;
+
+        wrapper.appendChild(video);
+        wrapper.appendChild(codeRow);
+        wrapper.appendChild(category);
+
+        if (title === "Yeni") {
+          const badge = document.createElement('div');
+          badge.className = 'badge-new';
+          badge.textContent = 'NEW';
+          wrapper.appendChild(badge);
+        }
+
+        grid.appendChild(wrapper);
+      });
+
+      section.appendChild(sectionHeader);
+      section.appendChild(grid);
+      content.appendChild(section);
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          if (!video.src) {
+            video.src = video.dataset.src;
+            video.load();
+          }
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('video').forEach(video => observer.observe(video));
+    });
+
+    document.addEventListener('touchstart', () => {
+      document.querySelectorAll('video').forEach(v => {
+        if (!v.paused && v.src) return;
+        v.play().catch(() => {});
+      });
+    }, { once: true });
   </script>
 </body>
 </html>
