@@ -409,7 +409,7 @@
   document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
 
   let allItems = [];
-  let visibleCount = 10;
+  let visibleCount = 8;
 
   fetch(SHEET_URL)
     .then(res => res.text())
