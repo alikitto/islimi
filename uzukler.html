@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Üzüklər - Kataloq</title>
+  <style>
+    /* Скопируй сюда стили из главной страницы */
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://karal.az/islimilogo2.png" alt="Islimi" class="logo" />
+    <div class="info-glass">
+      <p>Üzüklər Kataloqu</p>
+      <p>Yeniləndi: <span id="lastUpdated"></span></p>
+    </div>
+  </header>
+
+  <nav class="nav" id="navMenu">
+    <a href="index.html">Yeni</a>
+    <a href="yuzukler.html">Üzüklər</a>
+    <a href="qolbaq.html">Qolbaqlar</a>
+    <a href="boyunbag.html">Boyunbağlar</a>
+  </nav>
+
+  <main>
+    <div class="catalog" id="catalog"></div>
+  </main>
+
+  <footer>
+    © 2025 Islimi | Bütün huquqlar qorunur
+  </footer>
+
+  <div class="modal" id="videoModal" onclick="this.classList.remove('active')">
+    <video id="modalVideo" controls autoplay></video>
+  </div>
+
+<script>
+  const CATEGORY = "Üzük";  // Текущая категория, меняй для каждой страницы
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
+  const whatsappNumber = "994702920323";
+
+  document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
+
+  fetch(SHEET_URL)
+    .then(res => res.text())
+    .then(tsv => {
+      const rows = tsv.trim().split("\n").slice(1);
+      const items = rows.map(row => {
+        const [code, videoUrl, category] = row.split("\t");
+        return {
+          productCode: code?.trim(),
+          videoUrl: videoUrl?.trim(),
+          category: category?.trim()
+        };
+      });
+
+      const filtered = items.filter(i => i.category === CATEGORY);
+      renderItems(filtered);
+    });
+
+  function renderItems(items) {
+    const catalog = document.getElementById('catalog');
+    catalog.innerHTML = '';
+
+    items.forEach(item => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'item';
+
+      const video = document.createElement('video');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('muted', '');
+      video.setAttribute('loop', '');
+      video.setAttribute('autoplay', '');
+      video.setAttribute('preload', 'none');
+      video.dataset.src = item.videoUrl;
+      video.muted = true;
+
+      video.addEventListener('click', () => {
+        document.getElementById('modalVideo').src = item.videoUrl;
+        document.getElementById('videoModal').classList.add('active');
+      });
+
+      const codeRow = document.createElement('div');
+      codeRow.className = 'code-row';
+
+      const codeText = document.createElement('span');
+      codeText.className = 'code-text';
+      codeText.textContent = `Kod: ${item.productCode}`;
+
+      const waLink = document.createElement('a');
+      waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+      waLink.target = '_blank';
+      waLink.className = 'wa-link';
+
+      const waIcon = document.createElement('img');
+      waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+      waIcon.alt = 'WhatsApp';
+      waLink.appendChild(waIcon);
+
+      codeRow.appendChild(codeText);
+      codeRow.appendChild(waLink);
+
+      const category = document.createElement('div');
+      category.className = 'category';
+      category.textContent = item.category;
+
+      wrapper.appendChild(video);
+      wrapper.appendChild(codeRow);
+      wrapper.appendChild(category);
+
+      catalog.appendChild(wrapper);
+    });
+
+    setupVideoObserver();
+  }
+
+  function setupVideoObserver() {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          if (!video.src) {
+            video.src = video.dataset.src;
+            video.load();
+          }
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('video').forEach(video => observer.observe(video));
+
+    document.addEventListener('touchstart', () => {
+      document.querySelectorAll('video').forEach(v => {
+        if (!v.paused && v.src) return;
+        v.play().catch(() => {});
+      });
+    }, { once: true });
+  }
+</script>
+</body>
+</html>
