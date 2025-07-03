@@ -83,6 +83,11 @@
       margin: 0 auto;
       padding: 0 20px;
     }
+    @media (max-width: 600px) {
+      .catalog {
+        grid-template-columns: 1fr;
+      }
+    }
     .item {
       background: var(--card-bg);
       border-radius: 16px;
@@ -169,7 +174,7 @@
   <div id="content"></div>
 
   <footer>
-    © 2025 Karal | Bütün hüquqlar qorunur
+    © 2025 Karal | Bütün huquqlar qorunur
   </footer>
 
   <div class="modal" id="videoModal" onclick="this.classList.remove('active')">
@@ -202,44 +207,45 @@
       content.innerHTML = '';
       navMenu.innerHTML = '';
 
-      // группировка по категориям
+      // NEW block
+      const latest = data.slice(-20).reverse();
+      renderSection("Yeni", latest);
+
+      // Categories
       const categoriesMap = {};
       data.forEach(item => {
         if (!categoriesMap[item.category]) categoriesMap[item.category] = [];
         categoriesMap[item.category].push(item);
       });
 
-      const allCategories = Object.keys(categoriesMap);
+      Object.entries(categoriesMap).forEach(([cat, items]) => {
+        navMenu.innerHTML += `<a href="#${cat.toLowerCase()}">${cat}</a>`;
+        renderSection(cat, items.slice(0, 4), true);
+      });
 
-      allCategories.forEach(cat => {
-        // Меню-ссылка
-        const navLink = document.createElement('a');
-        navLink.href = `#${cat.toLowerCase()}`;
-        navLink.textContent = cat;
-        navMenu.appendChild(navLink);
-
+      function renderSection(title, items, showLink = false) {
         const section = document.createElement('div');
-        section.id = cat.toLowerCase();
+        section.id = title.toLowerCase();
 
         const sectionHeader = document.createElement('div');
         sectionHeader.className = 'category-header';
 
-        const title = document.createElement('div');
-        title.className = 'category-title';
-        title.textContent = cat;
+        const titleEl = document.createElement('div');
+        titleEl.className = 'category-title';
+        titleEl.textContent = title === "Yeni" ? "NEW" : title;
 
-        const viewAll = document.createElement('a');
-        viewAll.className = 'view-all';
-        viewAll.href = "#";
-        viewAll.textContent = "Hamısına bax →";
+        sectionHeader.appendChild(titleEl);
 
-        sectionHeader.appendChild(title);
-        sectionHeader.appendChild(viewAll);
+        if (showLink) {
+          const viewAll = document.createElement('a');
+          viewAll.className = 'view-all';
+          viewAll.href = `${title.toLowerCase()}.html`;
+          viewAll.textContent = "Hamısına bax →";
+          sectionHeader.appendChild(viewAll);
+        }
 
         const grid = document.createElement('div');
         grid.className = 'catalog';
-
-        const items = categoriesMap[cat].slice(0, 4);
 
         items.forEach((item, idx) => {
           const wrapper = document.createElement('div');
@@ -279,18 +285,20 @@
           codeRow.appendChild(codeText);
           codeRow.appendChild(waLink);
 
-          const categoryEl = document.createElement('div');
-          categoryEl.className = 'category';
-          categoryEl.textContent = item.category;
+          const category = document.createElement('div');
+          category.className = 'category';
+          category.textContent = item.category;
 
           wrapper.appendChild(video);
           wrapper.appendChild(codeRow);
-          wrapper.appendChild(categoryEl);
+          wrapper.appendChild(category);
 
-          const badge = document.createElement('div');
-          badge.className = 'badge-new';
-          badge.textContent = 'NEW';
-          wrapper.appendChild(badge);
+          if (title === "Yeni") {
+            const badge = document.createElement('div');
+            badge.className = 'badge-new';
+            badge.textContent = 'NEW';
+            wrapper.appendChild(badge);
+          }
 
           grid.appendChild(wrapper);
         });
@@ -298,7 +306,7 @@
         section.appendChild(sectionHeader);
         section.appendChild(grid);
         content.appendChild(section);
-      });
+      }
 
       const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
