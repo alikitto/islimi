@@ -450,35 +450,25 @@
         document.getElementById('videoModal').classList.add('active');
       });
 
-      const infoRow = document.createElement('div');
-infoRow.className = 'info-row';
+      const codeRow = document.createElement('div');
+      codeRow.className = 'code-row';
 
-const codeText = document.createElement('span');
-codeText.className = 'code-text';
-codeText.textContent = `Kod: ${item.productCode}`;
+      const codeText = document.createElement('span');
+      codeText.className = 'code-text';
+      codeText.textContent = `Kod: ${item.productCode}`;
 
-const separator = document.createElement('span');
-separator.textContent = ' | ';
-separator.className = 'separator';
+      const waLink = document.createElement('a');
+      waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+      waLink.target = '_blank';
+      waLink.className = 'wa-link';
 
-const category = document.createElement('span');
-category.className = 'category';
-category.textContent = item.category;
+      const waIcon = document.createElement('img');
+      waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+      waIcon.alt = 'WhatsApp';
+      waLink.appendChild(waIcon);
 
-const waLink = document.createElement('a');
-waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
-waLink.target = '_blank';
-waLink.className = 'wa-link';
-
-const waIcon = document.createElement('img');
-waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
-waIcon.alt = 'WhatsApp';
-waLink.appendChild(waIcon);
-
-infoRow.appendChild(codeText);
-infoRow.appendChild(separator);
-infoRow.appendChild(category);
-infoRow.appendChild(waLink);
+      codeRow.appendChild(codeText);
+      codeRow.appendChild(waLink);
 
       const category = document.createElement('div');
       category.className = 'category';
