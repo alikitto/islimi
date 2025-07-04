@@ -628,5 +628,10 @@ document.getElementById("loadMoreBtn").addEventListener("click", () => {
 
 document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
 </script>
+  <script>
+  window.addEventListener("load", () => {
+    document.body.classList.add("loaded");
+  });
+</script>
 </body>
 </html>
