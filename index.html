@@ -399,6 +399,20 @@ body.loaded #preloader {
   opacity: 0;
   pointer-events: none;
 }
+    .video-skeleton {
+  width: 100%;
+  height: 300px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: 12px;
+}
+
+/* Анимация полосы */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
   </style>
 </head>
 <body>
@@ -565,24 +579,41 @@ fetch(SHEET_URL)
 function renderItemsLimited() {
   catalog.innerHTML = "";
   const visibleItems = allItems.slice(0, visibleCount);
+
   visibleItems.forEach((item) => {
     const wrapper = document.createElement("div");
     wrapper.className = "item";
 
+    // 🔹 Скелетон-анимация до загрузки видео
+    const skeleton = document.createElement("div");
+    skeleton.className = "video-skeleton";
+    wrapper.appendChild(skeleton);
+
+    // 🔹 Видео
     const video = document.createElement("video");
     video.setAttribute("playsinline", "");
     video.setAttribute("muted", "");
     video.setAttribute("loop", "");
     video.setAttribute("autoplay", "");
-    video.setAttribute("preload", "none");
-    video.src = item.videoUrl; // Прямая загрузка
+    video.setAttribute("preload", "auto");
+    video.src = item.videoUrl;
     video.muted = true;
+    video.style.display = "none"; // пока не загружено — не показываем
+
+    // 🔹 Показать видео и убрать скелет при готовности
+    video.addEventListener("canplay", () => {
+      skeleton.remove();
+      video.style.display = "block";
+    });
 
     video.addEventListener("click", () => {
       document.getElementById("modalVideo").src = item.videoUrl;
       document.getElementById("videoModal").classList.add("active");
     });
 
+    wrapper.appendChild(video);
+
+    // 🔹 Код + WhatsApp
     const codeRow = document.createElement("div");
     codeRow.className = "code-row";
 
@@ -603,15 +634,17 @@ function renderItemsLimited() {
     codeRow.appendChild(codeText);
     codeRow.appendChild(waLink);
 
+    // 🔹 Категория
     const category = document.createElement("div");
     category.className = "category";
     category.textContent = item.category;
 
+    // 🔹 Бейдж "NEW"
     const badge = document.createElement("div");
     badge.className = "badge-new";
     badge.textContent = "NEW";
 
-    wrapper.appendChild(video);
+    // 🔹 Добавляем всё в карточку
     wrapper.appendChild(badge);
     wrapper.appendChild(codeRow);
     wrapper.appendChild(category);
@@ -620,6 +653,7 @@ function renderItemsLimited() {
 
   loadMoreBtn.style.display = visibleCount >= allItems.length ? "none" : "block";
 }
+
 
 document.getElementById("loadMoreBtn").addEventListener("click", () => {
   visibleCount += 8;
