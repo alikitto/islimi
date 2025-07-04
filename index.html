@@ -433,7 +433,76 @@
 
   <button id="btnTop" title="Yuxarıya" aria-label="Scroll to top">&#8679;</button>
 
-<script>
+  <script>
+  const burger = document.getElementById('burger');
+  const nav = document.getElementById('navMenu');
+  const menuLinks = document.getElementById('menuLinks');
+  const burgerText = document.getElementById('burgerText');
+
+  burger.addEventListener('click', () => {
+    nav.classList.toggle('open');
+    menuLinks.classList.toggle('open');
+    const expanded = burger.getAttribute('aria-expanded') === 'true' || false;
+    burger.setAttribute('aria-expanded', !expanded);
+  });
+
+  function checkBurgerTextVisibility() {
+    if (window.innerWidth <= 600) {
+      burgerText.style.display = 'inline-block';
+    } else {
+      burgerText.style.display = 'none';
+      nav.classList.remove('open');
+      menuLinks.classList.remove('open');
+      burger.setAttribute('aria-expanded', false);
+    }
+  }
+
+  checkBurgerTextVisibility();
+  window.addEventListener('resize', checkBurgerTextVisibility);
+
+  const navLinks = document.querySelectorAll('.nav a');
+  const currentPath = window.location.pathname.toLowerCase();
+  navLinks.forEach(link => {
+    if (currentPath.includes(link.getAttribute('href').toLowerCase())) {
+      link.classList.add('active');
+    }
+  });
+
+  const btnTop = document.getElementById('btnTop');
+  window.addEventListener('scroll', () => {
+    btnTop.style.display = window.scrollY > 300 ? 'flex' : 'none';
+  });
+
+  btnTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  function setupVideoObserver() {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          if (!video.src) {
+            video.src = video.dataset.src;
+            video.load();
+          }
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('video').forEach(video => observer.observe(video));
+
+    document.addEventListener('touchstart', () => {
+      document.querySelectorAll('video').forEach(v => {
+        if (!v.paused && v.src) return;
+        v.play().catch(() => {});
+      });
+    }, { once: true });
+  }
+
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
 const whatsappNumber = "994702920323";
 const catalog = document.getElementById("catalog");
@@ -452,7 +521,7 @@ fetch(SHEET_URL)
         videoUrl: videoUrl?.trim(),
         category: category?.trim()
       };
-    }).slice(-24).reverse();
+    }).slice(-24).reverse(); // Последние 24
     renderItemsLimited();
   });
 
@@ -469,7 +538,7 @@ function renderItemsLimited() {
     video.setAttribute("loop", "");
     video.setAttribute("autoplay", "");
     video.setAttribute("preload", "none");
-    video.dataset.src = item.videoUrl;
+    video.src = item.videoUrl; // Прямая загрузка
     video.muted = true;
 
     video.addEventListener("click", () => {
@@ -513,13 +582,14 @@ function renderItemsLimited() {
   });
 
   loadMoreBtn.style.display = visibleCount >= allItems.length ? "none" : "block";
-  setupVideoObserver();
 }
 
 document.getElementById("loadMoreBtn").addEventListener("click", () => {
   visibleCount += 8;
   renderItemsLimited();
 });
+
+document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
 </script>
 </body>
 </html>
