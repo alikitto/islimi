@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Yeni Məhsullar - Kataloq | Islimi Jewelry</title>
+  <title>Üzüklər - Kataloq | Islimi Jewelry</title>
   <style>
     :root {
       --bg: #f4f4f4;
@@ -53,11 +53,7 @@
       display: flex;
       justify-content: center;
       gap: 30px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 999;
+      transition: box-shadow 0.3s ease;
     }
 
     .nav a {
@@ -80,6 +76,102 @@
       color: white;
       background-color: var(--accent);
       box-shadow: 0 0 10px var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding-top: 100px;
+      }
+
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 0;
+        padding: 0 10px;
+        height: 60px;
+        overflow: hidden;
+        z-index: 999;
+      }
+
+      .nav .menu-links {
+        display: none;
+        flex-direction: column;
+        background: white;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        padding: 10px 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+
+      .nav.open .menu-links {
+        display: flex;
+      }
+
+      .nav a {
+        padding: 12px 20px;
+        font-size: 18px;
+        border-radius: 0;
+        border-bottom: 1px solid #eee;
+        white-space: normal;
+      }
+
+      .burger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0 16px;
+        font-size: 20px;
+        user-select: none;
+      }
+
+      .burger svg {
+        width: 28px;
+        height: 28px;
+        fill: var(--text-color);
+      }
+    }
+
+    @media (min-width: 601px) {
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 12px 20px;
+        z-index: 999;
+        border-radius: 0;
+      }
+
+      .burger {
+        display: none !important;
+      }
+
+      .menu-links {
+        display: flex !important;
+        flex-direction: row !important;
+        position: static !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+
+      .nav a {
+        font-size: 17px !important;
+        border: none !important;
+      }
+
+      body {
+        padding-top: 100px;
+      }
     }
 
     .catalog {
@@ -143,6 +235,53 @@
       border-radius: 12px;
     }
 
+    footer {
+      font-size: 14px;
+      color: #666;
+      margin-top: 40px;
+      margin-bottom: 1px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal video {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 8px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    #btnTop {
+      position: fixed;
+      bottom: 160px;
+      right: 20px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 10000;
+      color: white;
+      font-size: 28px;
+      user-select: none;
+    }
+
     #loadMoreBtn {
       display: none;
       margin: 20px auto;
@@ -154,23 +293,101 @@
       border-radius: 8px;
       cursor: pointer;
     }
+    .footer {
+  background-color: #222;
+  color: #fff;
+  padding: 40px 20px 20px;
+  font-size: 14px;
+  margin-top: 60px;
+}
+
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto 20px;
+  gap: 30px;
+}
+
+.footer-column {
+  flex: 1 1 200px;
+  min-width: 180px;
+}
+
+.footer-column h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 6px;
+}
+
+.footer-column a {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-column a:hover {
+  color: var(--accent);
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid #444;
+  padding-top: 12px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.social-icons a {
+  margin-right: 10px;
+  display: inline-block;
+}
+
+.social-icons img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+  transition: transform 0.3s ease;
+}
+
+.social-icons a:hover img {
+  transform: scale(1.2);
+  filter: brightness(0) invert(75%) sepia(100%) saturate(500%) hue-rotate(20deg);
+}
   </style>
 </head>
 <body>
   <header>
     <img src="https://karal.az/islimilogo2.png" alt="Islimi" class="logo" />
     <div class="info-glass">
-      <p style="font-size: 20px; font-weight: bold;">Yeni Məhsullar</p>
+      <p style="font-size: 20px; font-weight: bold;">Üzüklər Kataloqu</p>
       <p>Yeniləndi: <span id="lastUpdated"></span></p>
     </div>
   </header>
 
-  <nav class="nav">
-    <a href="/">Yeni</a>
-    <a href="uzukler">Üzüklər</a>
-    <a href="sirqalar">Sırgalar</a>
-    <a href="qolbaqlar">Qolbaqlar</a>
-    <a href="boyunbagilar">Boyunbağılar</a>
+  <nav class="nav" id="navMenu">
+    <div class="burger" id="burger" aria-label="Toggle menu" role="button" tabindex="0" aria-expanded="false">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span id="burgerText" style="margin-left:8px; font-weight:600; font-size:16px; display:none;">Kateqoriyalar</span>
+    </div>
+    <div class="menu-links" id="menuLinks">
+      <a href="https://catalog.islimi.az/">Yeni</a>
+      <a href="uzukler">Üzüklər</a>
+      <a href="sirqalar">Sırgalar</a>
+      <a href="qolbaqlar">Qolbaqlar</a>
+      <a href="boyunbagilar">Boyunbağılar</a>
+    </div>
   </nav>
 
   <main>
@@ -178,94 +395,131 @@
     <button id="loadMoreBtn">Daha çox göstər</button>
   </main>
 
-  <footer>
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-column">
+      <h4>Bizimlə əlaqə</h4>
+      <p><a href="tel:+994702920323">+994 70 292 03 23</p>
+      <p><a href="https://api.whatsapp.com/send/?phone=994702920323&text=Salam%21&type=phone_number&app_absent=0" target="_blank">Whatsapp Əlaqə</a></p>
+    </div>
+
+    <div class="footer-column">
+      <h4>Kateqoriyalar</h4>
+      <ul>
+        <li><a href="/">Yeni</a></li>
+        <li><a href="uzukler">Üzüklər</a></li>
+        <li><a href="sirqalar">Sırgalar</a></li>
+        <li><a href="qolbaqlar">Qolbaqlar</a></li>
+        <li><a href="boyunbagilar">Boyunbağılar</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-column">
+      <h4>Sosial Şəbəkələr</h4>
+      <div class="social-icons">
+        <a href="https://www.instagram.com/islimi_jewellery/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/9/96/Instagram.svg" alt="Instagram"></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
     <p>© 2025 Islimi Jewelry | Bütün hüquqlar qorunur</p>
-  </footer>
+  </div>
+</footer>
 
-  <script>
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
-    const whatsappNumber = "994702920323";
-    document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString('az-AZ');
+  <div class="modal" id="videoModal" onclick="this.classList.remove('active')">
+    <video id="modalVideo" controls autoplay></video>
+  </div>
 
-    let allItems = [];
-    let visibleCount = 8;
+  <button id="btnTop" title="Yuxarıya" aria-label="Scroll to top">&#8679;</button>
 
-    fetch(SHEET_URL)
-      .then(res => res.text())
-      .then(tsv => {
-        const rows = tsv.trim().split("\n").slice(1);
-        const items = rows.map(row => {
-          const [code, videoUrl, category] = row.split("\t");
-          return {
-            productCode: code?.trim(),
-            videoUrl: videoUrl?.trim(),
-            category: category?.trim()
-          };
-        });
-        allItems = items.slice(-24).reverse();
-        renderItemsLimited();
-      });
+<script>
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
+const whatsappNumber = "994702920323";
+const catalog = document.getElementById("catalog");
+const loadMoreBtn = document.getElementById("loadMoreBtn");
+let allItems = [];
+let visibleCount = 8;
 
-    function renderItemsLimited() {
-      const catalog = document.getElementById('catalog');
-      catalog.innerHTML = '';
-      const visibleItems = allItems.slice(0, visibleCount);
+fetch(SHEET_URL)
+  .then((res) => res.text())
+  .then((tsv) => {
+    const rows = tsv.trim().split("\n").slice(1);
+    allItems = rows.map((row) => {
+      const [code, videoUrl, category] = row.split("\t");
+      return {
+        productCode: code?.trim(),
+        videoUrl: videoUrl?.trim(),
+        category: category?.trim()
+      };
+    }).slice(-24).reverse();
+    renderItemsLimited();
+  });
 
-      visibleItems.forEach(item => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'item';
+function renderItemsLimited() {
+  catalog.innerHTML = "";
+  const visibleItems = allItems.slice(0, visibleCount);
+  visibleItems.forEach((item) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "item";
 
-        const video = document.createElement('video');
-        video.setAttribute('playsinline', '');
-        video.setAttribute('muted', '');
-        video.setAttribute('loop', '');
-        video.setAttribute('autoplay', '');
-        video.setAttribute('preload', 'none');
-        video.src = item.videoUrl;
+    const video = document.createElement("video");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("muted", "");
+    video.setAttribute("loop", "");
+    video.setAttribute("autoplay", "");
+    video.setAttribute("preload", "none");
+    video.dataset.src = item.videoUrl;
+    video.muted = true;
 
-        const badge = document.createElement('div');
-        badge.className = 'badge-new';
-        badge.textContent = 'NEW';
-
-        const codeRow = document.createElement('div');
-        codeRow.className = 'code-row';
-
-        const codeText = document.createElement('span');
-        codeText.className = 'code-text';
-        codeText.textContent = `Kod: ${item.productCode}`;
-
-        const waLink = document.createElement('a');
-        waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
-        waLink.target = '_blank';
-        waLink.className = 'wa-link';
-
-        const waIcon = document.createElement('img');
-        waIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
-        waIcon.alt = 'WhatsApp';
-        waLink.appendChild(waIcon);
-
-        codeRow.appendChild(codeText);
-        codeRow.appendChild(waLink);
-
-        const category = document.createElement('div');
-        category.className = 'category';
-        category.textContent = item.category;
-
-        wrapper.appendChild(video);
-        wrapper.appendChild(badge);
-        wrapper.appendChild(codeRow);
-        wrapper.appendChild(category);
-        catalog.appendChild(wrapper);
-      });
-
-      document.getElementById('loadMoreBtn').style.display =
-        visibleCount >= allItems.length ? 'none' : 'block';
-    }
-
-    document.getElementById('loadMoreBtn').addEventListener('click', () => {
-      visibleCount += 8;
-      renderItemsLimited();
+    video.addEventListener("click", () => {
+      document.getElementById("modalVideo").src = item.videoUrl;
+      document.getElementById("videoModal").classList.add("active");
     });
-  </script>
+
+    const codeRow = document.createElement("div");
+    codeRow.className = "code-row";
+
+    const codeText = document.createElement("span");
+    codeText.className = "code-text";
+    codeText.textContent = `Kod: ${item.productCode}`;
+
+    const waLink = document.createElement("a");
+    waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+    waLink.target = "_blank";
+    waLink.className = "wa-link";
+
+    const waIcon = document.createElement("img");
+    waIcon.src = "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg";
+    waIcon.alt = "WhatsApp";
+    waLink.appendChild(waIcon);
+
+    codeRow.appendChild(codeText);
+    codeRow.appendChild(waLink);
+
+    const category = document.createElement("div");
+    category.className = "category";
+    category.textContent = item.category;
+
+    const badge = document.createElement("div");
+    badge.className = "badge-new";
+    badge.textContent = "NEW";
+
+    wrapper.appendChild(video);
+    wrapper.appendChild(badge);
+    wrapper.appendChild(codeRow);
+    wrapper.appendChild(category);
+    catalog.appendChild(wrapper);
+  });
+
+  loadMoreBtn.style.display = visibleCount >= allItems.length ? "none" : "block";
+  setupVideoObserver();
+}
+
+document.getElementById("loadMoreBtn").addEventListener("click", () => {
+  visibleCount += 8;
+  renderItemsLimited();
+});
+</script>
 </body>
 </html>
