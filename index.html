@@ -606,8 +606,6 @@ function renderItemsLimited() {
     video.src = item.videoUrl;
     video.muted = true;
     video.style.display = "none"; // пока не загружено — не показываем
-    video.dataset.productId = item.productCode;
-    video.dataset.productName = `Kod: ${item.productCode}`;
 
     // 🔹 Показать видео и убрать скелет при готовности
     video.addEventListener("canplay", () => {
@@ -676,31 +674,5 @@ document.getElementById("lastUpdated").textContent = new Date().toLocaleDateStri
     document.body.classList.add("loaded");
   });
 </script>
-
-
-  <script>
-function sendView(productId, productName) {
-  fetch("https://script.google.com/macros/s/AKfycbzxf-eTo-BzDtlRGS1uaIDj372nkeTX3jFFLX_vXz_Ux2v66_A0SdvG0sxY9ClAvt5B6w/exec", {
-    method: "POST",
-    body: JSON.stringify({ productId, productName }),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }).catch((err) => console.error("Ошибка при отправке просмотра", err));
-}
-
-// Когда пользователь включает fullscreen видео
-document.addEventListener("fullscreenchange", function () {
-  const el = document.fullscreenElement;
-  if (el && el.tagName === "VIDEO") {
-    const productId = el.dataset.productId;
-    const productName = el.dataset.productName;
-    if (productId && productName) {
-      sendView(productId, productName);
-    }
-  }
-});
-</script>
-
 </body>
 </html>
