@@ -674,5 +674,15 @@ document.getElementById("lastUpdated").textContent = new Date().toLocaleDateStri
     document.body.classList.add("loaded");
   });
 </script>
+
+<script>
+function sendView(productId, productName) {
+  const url = `https://script.google.com/macros/s/AKfycbwV10fgPfcsLOM2fxskT8f-NqPqEfWT2WCWbQaHHhQXt38ZYAl81m4O1E9wzqmotrRc7Q/exec?productId=${encodeURIComponent(productId)}&productName=${encodeURIComponent(productName)}`;
+  
+  // Отправим как запрос изображения
+  const img = new Image();
+  img.src = url;
+}
+</script>
 </body>
 </html>
