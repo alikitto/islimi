@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="az">
 <head>
   <meta charset="UTF-8" />
@@ -613,17 +613,10 @@ function renderItemsLimited() {
       video.style.display = "block";
     });
 
-video.addEventListener("click", () => {
-  const modalVideo = document.getElementById("modalVideo");
-  modalVideo.src = item.videoUrl;
-
-  // Добавляем данные и отправляем просмотр
-  modalVideo.dataset.productId = item.productCode;
-  modalVideo.dataset.productName = `Kod: ${item.productCode}`;
-  sendView(item.productCode, `Kod: ${item.productCode}`);
-
-  document.getElementById("videoModal").classList.add("active");
-});
+    video.addEventListener("click", () => {
+      document.getElementById("modalVideo").src = item.videoUrl;
+      document.getElementById("videoModal").classList.add("active");
+    });
 
     wrapper.appendChild(video);
 
@@ -633,10 +626,10 @@ video.addEventListener("click", () => {
 
     const codeText = document.createElement("span");
     codeText.className = "code-text";
-    codeText.textContent = `Kod: ${item.productCode}`;
+    codeText.textContent = Kod: ${item.productCode};
 
     const waLink = document.createElement("a");
-    waLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Kod ${item.productCode}`)}`;
+    waLink.href = https://wa.me/${whatsappNumber}?text=${encodeURIComponent(Kod ${item.productCode})};
     waLink.target = "_blank";
     waLink.className = "wa-link";
 
@@ -681,13 +674,5 @@ document.getElementById("lastUpdated").textContent = new Date().toLocaleDateStri
     document.body.classList.add("loaded");
   });
 </script>
-
-  <script>
-function sendView(productId, productName) {
-  const url = `https://script.google.com/macros/s/AKfycbwV10fgPfcsLOM2fxskT8f-NqPqEfWT2WCWbQaHHhQXt38ZYAl81m4O1E9wzqmotrRc7Q/exec?productId=${encodeURIComponent(productId)}&productName=${encodeURIComponent(productName)}`;
-  
-  fetch(url).catch(err => console.error("Ошибка отправки просмотра:", err));
-}
-  </script>
 </body>
 </html>
