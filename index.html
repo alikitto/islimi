@@ -424,26 +424,18 @@
       return { productCode: code, videoUrl, category, pin };
     }
 
-    function pushpinSVG() {
-      const svgNS = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(svgNS, 'svg');
-      svg.setAttribute('viewBox', '0 0 24 24');
-      svg.setAttribute('aria-hidden', 'true');
-      const p1 = document.createElementNS(svgNS, 'path');
-      p1.setAttribute('d', 'M14.8 2.75c.7.7.7 1.84 0 2.54l-.74.74 4.91 4.91c.39.39.39 1.02 0 1.41l-1.77 1.77c-.2.2-.47.29-.73.27l-4.3-.31-3.83 6.63c-.18.32-.6.4-.88.16l-1.77-1.5c-.26-.22-.31-.6-.12-.88l4.24-6.27-.31-4.3a1 1 0 0 1 .27-.73l1.77-1.77c.39-.39 1.02-.39 1.41 0l1.38 1.38.74-.74c.7-.7 1.84-.7 2.54 0Z');
-      p1.setAttribute('fill', 'none');
-      p1.setAttribute('stroke', 'var(--pin-stroke)');
-      p1.setAttribute('stroke-width', '1.5');
-      const p2 = document.createElementNS(svgNS, 'path');
-      p2.setAttribute('d', 'M8.25 21.25L5.5 19');
-      p2.setAttribute('fill', 'none');
-      p2.setAttribute('stroke', 'var(--pin-stroke)');
-      p2.setAttribute('stroke-width', '1.5');
-      p2.setAttribute('stroke-linecap', 'round');
-      svg.appendChild(p1);
-      svg.appendChild(p2);
-      return svg;
-    }
+function pushpinSVG() {
+  const ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','0 0 24 24');
+  svg.setAttribute('aria-hidden','true');
+
+  const p=document.createElementNS(ns,'path');
+  p.setAttribute('d','M3 7l4.2 3 4.8-5 4.8 5L21 7v10H3V7zm3 12h12v-5.5l-3.1 2.2-3.9-4.1-3.9 4.1L6 13.5V19z');
+  p.setAttribute('fill','var(--pin-stroke)');
+  svg.appendChild(p);
+  return svg;
+}
 
     fetch(SHEET_URL)
       .then((res) => res.text())
