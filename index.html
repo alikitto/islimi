@@ -410,7 +410,8 @@
     }
 
     // ====== КАТАЛОГ + PIN (все PIN сверху группой) ======
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTV7eBZzgIgpUsrTExL5QYK2Z9Vr5JmWfdG43bMBl74RkB5wK1m2l_I-r8lVYLTE56PDLOOL9tMSzOf/pub?gid=0&single=true&output=tsv";
+    // Каталог из базы D1 (Worker upload-to-r2); формат тот же, что был у Google-таблицы
+    const SHEET_URL = (location.hostname === "localhost" ? "http://localhost:8787" : "https://upload-to-r2.ramizagayev122.workers.dev") + "/api/items.tsv";
     const whatsappNumber = "994702920323";
     const catalog = document.getElementById("catalog");
     const loadMoreBtn = document.getElementById("loadMoreBtn");

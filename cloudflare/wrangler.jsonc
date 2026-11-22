@@ -1,0 +1,23 @@
+// Worker "upload-to-r2": загрузка видео в R2 + API каталога (D1).
+// Деплой (из папки cloudflare/):
+//   XDG_CONFIG_HOME="$HOME/.config/islimi-cf" npx wrangler@4.158.0 deploy
+// Пароль (секрет UPLOAD_KEY) задаётся отдельно:
+//   XDG_CONFIG_HOME="$HOME/.config/islimi-cf" npx wrangler@4.158.0 secret put UPLOAD_KEY
+{
+  "$schema": "https://unpkg.com/wrangler@4.158.0/config-schema.json",
+  "name": "upload-to-r2",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "r2_buckets": [
+    { "binding": "R2_BUCKET", "bucket_name": "islimi" }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "islimi-catalog",
+      "database_id": "eb2a3de0-de96-43ab-b164-f638d23590ef"
+    }
+  ]
+}

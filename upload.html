@@ -46,7 +46,14 @@
       color: var(--text);
       width: 100%;
     }
-    input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+    select {
+      font: inherit; font-size: 16px; padding: 10px 12px; width: 100%;
+      border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--text);
+    }
+    label.field.check { justify-content: flex-end; }
+    label.field.check span { display: flex; align-items: center; gap: 8px; color: var(--text); font-size: 14px; padding: 10px 0; cursor: pointer; }
+    label.field.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+    input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
 
     .drop {
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
@@ -127,8 +134,20 @@
         <label class="field">Məhsul kodu
           <input type="text" id="code" placeholder="UN-0141" autocomplete="off" autocapitalize="characters" />
         </label>
+        <label class="field">Kateqoriya
+          <select id="category">
+            <option value="">— seçin —</option>
+            <option>Üzüklər</option>
+            <option>Sırgalar</option>
+            <option>Qolbaqlar</option>
+            <option>Boyunbağılar</option>
+          </select>
+        </label>
         <label class="field">Şifrə
           <input type="password" id="key" autocomplete="current-password" />
+        </label>
+        <label class="field check">
+          <span><input type="checkbox" id="pin" /> PIN — əsas səhifədə yuxarıda</span>
         </label>
       </div>
       <label class="drop" id="drop">
@@ -181,11 +200,12 @@
     const OUTPUT_SIZE = 1080;        // сторона квадрата, px
     const BITRATE = 1_200_000;       // ~1200 кбит/с → ~2.3 МБ на 16 сек
     const FRAME_RATE = 30;
-    const UPLOAD_URL = 'https://upload-to-r2.ramizagayev122.workers.dev';
+    const API_BASE = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://upload-to-r2.ramizagayev122.workers.dev';
+    const UPLOAD_URL = API_BASE + '/upload';
 
     const $ = (id) => document.getElementById(id);
     const els = {
-      code: $('code'), key: $('key'), drop: $('drop'), fileInput: $('fileInput'), info: $('info'),
+      code: $('code'), category: $('category'), pin: $('pin'), key: $('key'), drop: $('drop'), fileInput: $('fileInput'), info: $('info'),
       editor: $('editor'), modes: $('modes'), stage: $('stage'), preview: $('preview'), frame: $('frame'), hint: $('hint'),
       actions: $('actions'), uploadBtn: $('uploadBtn'), compressBtn: $('compressBtn'), bar: $('bar'), status: $('status'),
       result: $('result'), resultVideo: $('resultVideo'), sizes: $('sizes'), urlRow: $('urlRow'), url: $('url'),
@@ -220,7 +240,7 @@
     }
     function setBusy(busy) {
       state.busy = busy;
-      for (const el of [els.uploadBtn, els.compressBtn, els.fileInput, els.code, els.key]) el.disabled = busy;
+      for (const el of [els.uploadBtn, els.compressBtn, els.fileInput, els.code, els.category, els.pin, els.key]) el.disabled = busy;
       els.modes.querySelectorAll('button').forEach((b) => (b.disabled = busy));
     }
 
@@ -447,7 +467,10 @@
       return new Promise((resolve, reject) => {
         const form = new FormData();
         form.append('file', blob, filename);
-        if (els.key.value) form.append('key', els.key.value);
+        form.append('key', els.key.value);
+        form.append('code', els.code.value.trim());
+        form.append('category', els.category.value);
+        if (els.pin.checked) form.append('pin', '1');
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', UPLOAD_URL);
@@ -455,7 +478,7 @@
         xhr.onload = () => {
           let data = null;
           try { data = JSON.parse(xhr.responseText); } catch {}
-          if (xhr.status >= 200 && xhr.status < 300 && data?.success) resolve(data.url);
+          if (xhr.status >= 200 && xhr.status < 300 && data?.success) resolve(data);
           else reject(new Error(data?.message || `Server xətası (${xhr.status})`));
         };
         xhr.onerror = () => reject(new Error('Serverə qoşulmaq alınmadı'));
@@ -478,6 +501,13 @@
 
     async function run(withUpload) {
       if (!state.file || state.busy) return;
+      if (withUpload) {
+        const missing = !els.code.value.trim() ? 'Məhsul kodunu yazın' : !els.category.value ? 'Kateqoriyanı seçin' : !els.key.value ? 'Şifrəni yazın' : '';
+        if (missing) {
+          setStatus('❌ ' + missing, 'error');
+          return;
+        }
+      }
       setBusy(true);
       els.result.hidden = true;
       setProgress(0);
@@ -498,13 +528,20 @@
         }
 
         setStatus('Yüklənir…');
-        const url = await upload(blob, filename, (p) => {
+        const data = await upload(blob, filename, (p) => {
           setProgress(share + p * (1 - share));
           setStatus(`Yüklənir… ${Math.round(p * 100)}%`);
         });
         setProgress(1);
-        setStatus('✅ Yükləndi! Linki cədvələ əlavə edin.', 'ok');
-        showResult(blob, filename, url);
+        setStatus(
+          data.item
+            ? `✅ Yükləndi və kataloqa əlavə edildi: ${data.item.code} · ${data.item.category}${data.item.pin ? ' · PIN' : ''}`
+            : '✅ Yükləndi.',
+          'ok'
+        );
+        showResult(blob, filename, data.url);
+        els.code.value = '';
+        els.pin.checked = false;
       } catch (err) {
         setStatus('❌ ' + err.message, 'error');
       } finally {

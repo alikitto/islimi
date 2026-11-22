@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Kataloq idarəetməsi | Islimi</title>
+  <style>
+    :root {
+      --accent: #d4af37;
+      --accent-dark: #b8932a;
+      --text: #222;
+      --muted: #777;
+      --line: #e6e6e6;
+      --bg: #f7f7f5;
+      --danger: #c0392b;
+      --ok: #2e8b57;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); }
+    [hidden] { display: none !important; }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    h1 { font-size: 22px; margin: 0; }
+    header nav { display: flex; gap: 14px; font-size: 14px; }
+    a { color: var(--accent-dark); }
+    .card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+
+    input[type="text"], input[type="password"], input[type="url"], select {
+      font: inherit; font-size: 16px; padding: 9px 11px; border: 1px solid var(--line);
+      border-radius: 10px; background: #fff; color: var(--text); width: 100%;
+    }
+    input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+    input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+    button {
+      font: inherit; font-size: 15px; padding: 9px 14px; border-radius: 10px; cursor: pointer;
+      border: 1px solid var(--line); background: #fff; color: var(--text);
+    }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    button.primary:hover { background: var(--accent-dark); }
+    button:disabled { opacity: .5; cursor: default; }
+    .msg { font-size: 14px; margin: 8px 0 0; min-height: 1.2em; }
+    .msg.error { color: var(--danger); }
+    .msg.ok { color: var(--ok); }
+
+    /* login */
+    .login { max-width: 360px; margin: 60px auto; }
+    .login form { display: flex; gap: 8px; }
+    .login button { white-space: nowrap; }
+
+    /* toolbar */
+    .toolbar { display: grid; grid-template-columns: 1fr 210px auto auto; gap: 8px; align-items: center; }
+    .toolbar label.pin-only { display: flex; align-items: center; gap: 6px; font-size: 14px; white-space: nowrap; }
+    .count { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+    /* add form */
+    .add-grid { display: grid; grid-template-columns: 140px 1fr 170px auto auto; gap: 8px; align-items: center; }
+    .add-grid label.pin { display: flex; gap: 6px; align-items: center; font-size: 14px; }
+
+    /* list */
+    .list { display: flex; flex-direction: column; gap: 8px; }
+    .row {
+      display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: center;
+      background: #fff; border-radius: 12px; padding: 10px; box-shadow: 0 1px 6px rgba(0,0,0,.05);
+      border: 1px solid transparent; transition: border-color .3s;
+    }
+    .row.saved { border-color: var(--ok); }
+    .row.failed { border-color: var(--danger); }
+    .thumb {
+      width: 84px; height: 84px; border-radius: 8px; overflow: hidden; background: #f0f0f0; cursor: pointer; position: relative;
+    }
+    .thumb video { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .thumb::after {
+      content: '▶'; position: absolute; inset: auto 4px 4px auto; font-size: 11px; color: #fff;
+      background: rgba(0,0,0,.45); border-radius: 4px; padding: 1px 5px;
+    }
+    .fields { display: grid; grid-template-columns: 130px 170px auto 1fr auto; gap: 8px; align-items: center; min-width: 0; }
+    .fields .code { font-weight: 600; }
+    .fields label.pin { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+    .meta { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .meta a { color: var(--muted); }
+    .del.confirm { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .more { display: block; margin: 14px auto 0; }
+    .empty { text-align: center; color: var(--muted); padding: 30px 0; }
+
+    /* player */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; z-index: 10; }
+    .modal video { max-width: 92vw; max-height: 86vh; border-radius: 10px; background: #fff; }
+
+    @media (max-width: 720px) {
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .add-grid { grid-template-columns: 1fr 1fr; }
+      .add-grid .url { grid-column: 1 / -1; grid-row: 2; }
+      .fields { grid-template-columns: 1fr 1fr; }
+      .fields .meta { grid-column: 1 / -1; }
+      .row { align-items: start; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Вход -->
+  <section class="card login" id="loginView" hidden>
+    <h1 style="margin-bottom:12px">Kataloq idarəetməsi</h1>
+    <form id="loginForm">
+      <input type="password" id="loginKey" placeholder="Şifrə" autocomplete="current-password" required />
+      <button class="primary" type="submit">Daxil ol</button>
+    </form>
+    <p class="msg" id="loginMsg"></p>
+  </section>
+
+  <main class="wrap" id="appView" hidden>
+    <header>
+      <h1>Kataloq idarəetməsi</h1>
+      <nav>
+        <a href="upload">+ Video yüklə</a>
+        <a href="/" target="_blank">Sayta bax ↗</a>
+        <a href="#" id="logout">Çıxış</a>
+      </nav>
+    </header>
+
+    <section class="card">
+      <div class="toolbar">
+        <input type="text" id="search" placeholder="Kod ilə axtar…" autocomplete="off" />
+        <select id="filterCategory">
+          <option value="">Bütün kateqoriyalar</option>
+        </select>
+        <label class="pin-only"><input type="checkbox" id="filterPin" /> Yalnız PIN</label>
+        <button type="button" id="toggleAdd">+ Əlavə et</button>
+      </div>
+      <div class="count" id="count"></div>
+    </section>
+
+    <section class="card" id="addCard" hidden>
+      <form class="add-grid" id="addForm">
+        <input type="text" name="code" placeholder="Kod (UN-0141)" required autocomplete="off" />
+        <input type="url" name="video" class="url" placeholder="https://video.islimi.az/…mp4" required />
+        <select name="category" required></select>
+        <label class="pin"><input type="checkbox" name="pin" /> PIN</label>
+        <button class="primary" type="submit">Saxla</button>
+      </form>
+      <p class="msg" id="addMsg"></p>
+    </section>
+
+    <div class="list" id="list"></div>
+    <button type="button" class="more" id="more" hidden>Daha çox göstər</button>
+  </main>
+
+  <div class="modal" id="player" hidden>
+    <video id="playerVideo" controls autoplay loop playsinline></video>
+  </div>
+
+  <script>
+    const API_BASE = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://upload-to-r2.ramizagayev122.workers.dev';
+    const CATEGORIES = ['Üzüklər', 'Sırgalar', 'Qolbaqlar', 'Boyunbağılar'];
+    const PAGE = 40;
+    const KEY_STORAGE = 'islimi-upload-key'; // общий с формой загрузки
+
+    const $ = (id) => document.getElementById(id);
+    let key = '';
+    let items = [];          // новые — первыми
+    let shown = PAGE;
+
+    // ---------- storage ----------
+    const store = {
+      get() { try { return localStorage.getItem(KEY_STORAGE) || ''; } catch { return ''; } },
+      set(v) { try { v ? localStorage.setItem(KEY_STORAGE, v) : localStorage.removeItem(KEY_STORAGE); } catch {} },
+    };
+
+    // ---------- API ----------
+    async function api(method, path, body) {
+      const res = await fetch(API_BASE + path, {
+        method,
+        headers: {
+          Authorization: 'Bearer ' + key,
+          ...(body ? { 'Content-Type': 'application/json' } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success === false) {
+        const err = new Error(data.message || `Server xətası (${res.status})`);
+        err.status = res.status;
+        throw err;
+      }
+      return data;
+    }
+
+    // ---------- login ----------
+    async function tryLogin(candidate, silent) {
+      key = candidate;
+      try {
+        await api('GET', '/api/auth');
+        store.set(key);
+        $('loginView').hidden = true;
+        $('appView').hidden = false;
+        await loadItems();
+      } catch (err) {
+        key = '';
+        $('loginView').hidden = false;
+        $('appView').hidden = true;
+        if (!silent) setMsg($('loginMsg'), err.message, 'error');
+      }
+    }
+
+    $('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      tryLogin($('loginKey').value, false);
+    });
+    $('logout').addEventListener('click', (e) => {
+      e.preventDefault();
+      store.set('');
+      key = '';
+      $('loginKey').value = '';
+      $('appView').hidden = true;
+      $('loginView').hidden = false;
+    });
+
+    function setMsg(el, text, kind = '') {
+      el.textContent = text;
+      el.className = 'msg' + (kind ? ' ' + kind : '');
+    }
+
+    // ---------- data ----------
+    async function loadItems() {
+      const res = await fetch(API_BASE + '/api/items', { cache: 'no-store' });
+      const data = await res.json();
+      items = data.items.slice().reverse();
+      render();
+    }
+
+    function filtered() {
+      const q = $('search').value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
+      const cat = $('filterCategory').value;
+      const pinOnly = $('filterPin').checked;
+      return items.filter((it) =>
+        (!q || it.code.includes(q)) && (!cat || it.category === cat) && (!pinOnly || it.pin)
+      );
+    }
+
+    // ---------- render ----------
+    const fillCategories = (select, extra) => {
+      for (const c of CATEGORIES) select.add(new Option(c, c));
+    };
+    fillCategories($('filterCategory'));
+    fillCategories(document.querySelector('#addForm select[name="category"]'));
+
+    const thumbObserver = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const v = e.target;
+        v.src = v.dataset.src + '#t=1';
+        thumbObserver.unobserve(v);
+      }
+    }, { rootMargin: '200px' });
+
+    function render() {
+      const list = filtered();
+      const total = items.length;
+      $('count').textContent =
+        list.length === total ? `${total} məhsul` : `${list.length} / ${total} məhsul`;
+
+      const root = $('list');
+      root.innerHTML = '';
+      if (!list.length) {
+        root.innerHTML = '<div class="empty">Heç nə tapılmadı</div>';
+      }
+      for (const it of list.slice(0, shown)) root.appendChild(renderRow(it));
+      $('more').hidden = list.length <= shown;
+    }
+
+    function renderRow(it) {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.dataset.id = it.id;
+
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+      const v = document.createElement('video');
+      v.muted = true;
+      v.playsInline = true;
+      v.preload = 'metadata';
+      v.dataset.src = it.video;
+      thumbObserver.observe(v);
+      thumb.appendChild(v);
+      thumb.addEventListener('click', () => openPlayer(it.video));
+
+      const fields = document.createElement('div');
+      fields.className = 'fields';
+
+      const code = document.createElement('input');
+      code.type = 'text';
+      code.className = 'code';
+      code.value = it.code;
+      code.setAttribute('aria-label', 'Kod');
+      code.addEventListener('change', () => save(it, row, { code: code.value }, () => (code.value = it.code)));
+
+      const cat = document.createElement('select');
+      cat.setAttribute('aria-label', 'Kateqoriya');
+      fillCategories(cat);
+      cat.value = it.category;
+      cat.addEventListener('change', () => save(it, row, { category: cat.value }, () => (cat.value = it.category)));
+
+      const pinLabel = document.createElement('label');
+      pinLabel.className = 'pin';
+      const pin = document.createElement('input');
+      pin.type = 'checkbox';
+      pin.checked = !!it.pin;
+      pin.addEventListener('change', () => save(it, row, { pin: pin.checked }, () => (pin.checked = !!it.pin)));
+      pinLabel.append(pin, ' PIN');
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      const date = (it.created_at || '').slice(0, 10);
+      meta.innerHTML = `#${it.id} · ${date} · `;
+      const link = document.createElement('a');
+      link.href = it.video;
+      link.target = '_blank';
+      link.textContent = 'video ↗';
+      meta.appendChild(link);
+
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'del';
+      del.textContent = 'Sil';
+      let armed = null;
+      del.addEventListener('click', async () => {
+        if (!armed) {
+          del.classList.add('confirm');
+          del.textContent = 'Əminsiniz?';
+          armed = setTimeout(() => { armed = null; del.classList.remove('confirm'); del.textContent = 'Sil'; }, 3000);
+          return;
+        }
+        clearTimeout(armed);
+        del.disabled = true;
+        try {
+          await api('DELETE', `/api/items/${it.id}`);
+          items = items.filter((x) => x.id !== it.id);
+          render();
+        } catch (err) {
+          flash(row, false, err.message);
+          del.disabled = false;
+          armed = null;
+          del.classList.remove('confirm');
+          del.textContent = 'Sil';
+        }
+      });
+
+      fields.append(code, cat, pinLabel, meta, del);
+      row.append(thumb, fields);
+      return row;
+    }
+
+    async function save(it, row, patch, revert) {
+      try {
+        const { item } = await api('PATCH', `/api/items/${it.id}`, patch);
+        Object.assign(it, item);
+        flash(row, true);
+        if (patch.code !== undefined) row.querySelector('.code').value = item.code;
+      } catch (err) {
+        revert();
+        flash(row, false, err.message);
+      }
+    }
+
+    function flash(row, ok, message) {
+      row.classList.remove('saved', 'failed');
+      void row.offsetWidth;
+      row.classList.add(ok ? 'saved' : 'failed');
+      row.title = ok ? 'Yadda saxlanıldı' : message || 'Xəta';
+      setTimeout(() => row.classList.remove('saved'), 1200);
+      if (!ok && message) alertInline(message);
+    }
+
+    function alertInline(text) {
+      setMsg($('addMsg'), '');
+      $('count').textContent = '❌ ' + text;
+      setTimeout(render, 2500);
+    }
+
+    // ---------- filters ----------
+    for (const id of ['search', 'filterCategory', 'filterPin']) {
+      $(id).addEventListener('input', () => { shown = PAGE; render(); });
+    }
+    $('more').addEventListener('click', () => { shown += PAGE; render(); });
+
+    // ---------- add ----------
+    $('toggleAdd').addEventListener('click', () => {
+      $('addCard').hidden = !$('addCard').hidden;
+      if (!$('addCard').hidden) $('addForm').code.focus();
+    });
+    $('addForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const btn = f.querySelector('button');
+      btn.disabled = true;
+      try {
+        const { item } = await api('POST', '/api/items', {
+          code: f.code.value, video: f.video.value, category: f.category.value, pin: f.pin.checked,
+        });
+        items.unshift(item);
+        f.reset();
+        setMsg($('addMsg'), `✅ Əlavə edildi: ${item.code}`, 'ok');
+        render();
+      } catch (err) {
+        setMsg($('addMsg'), '❌ ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---------- player ----------
+    function openPlayer(url) {
+      $('playerVideo').src = url;
+      $('player').hidden = false;
+    }
+    $('player').addEventListener('click', (e) => {
+      if (e.target.id === 'player') {
+        $('playerVideo').pause();
+        $('playerVideo').removeAttribute('src');
+        $('player').hidden = true;
+      }
+    });
+
+    // ---------- start ----------
+    const saved = store.get();
+    if (saved) tryLogin(saved, true);
+    else $('loginView').hidden = false;
+  </script>
+</body>
+</html>
