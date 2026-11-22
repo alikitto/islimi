@@ -195,6 +195,9 @@
 
     video {
       width: 100%;
+      aspect-ratio: 1 / 1; /* карточки всегда квадратные */
+      object-fit: cover;
+      background: #fff;
       border-radius: 12px;
       cursor: pointer;
     }
@@ -254,6 +257,8 @@
     }
 
     .modal video {
+      aspect-ratio: auto;
+      object-fit: contain;
       max-width: 90%;
       max-height: 90%;
       border-radius: 8px;
