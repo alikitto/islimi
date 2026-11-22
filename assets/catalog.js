@@ -54,7 +54,7 @@
     lbCode: $('#lbCode'),
     lbDate: $('#lbDate'),
     lbWa: $('#lbWa'),
-    lbCopy: $('#lbCopy'),
+    lbFull: $('#lbFull'),
     lbShare: $('#lbShare'),
     lbPrev: $('#lbPrev'),
     lbNext: $('#lbNext'),
@@ -533,9 +533,13 @@
   el.lb.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeLightbox(); });
   el.lbPrev.addEventListener('click', () => step(-1));
   el.lbNext.addEventListener('click', () => step(1));
-  el.lbCopy.addEventListener('click', async () => {
-    const item = state.lbList[state.lbIndex];
-    if (item && await copyText(item.code)) toast('Kod kopyalandı');
+  // Видео на весь экран. На iPhone requestFullscreen для видео нет — там встроенный плеер webkitEnterFullscreen.
+  el.lbFull.addEventListener('click', () => {
+    const v = el.lbVideo;
+    v.play().catch(() => {});
+    if (v.requestFullscreen) v.requestFullscreen().catch(() => { if (v.webkitEnterFullscreen) v.webkitEnterFullscreen(); });
+    else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
+    else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
   });
   el.lbShare.addEventListener('click', async () => {
     const item = state.lbList[state.lbIndex];

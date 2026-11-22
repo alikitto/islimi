@@ -700,7 +700,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   position: fixed; z-index: 50;
   right: max(16px, env(safe-area-inset-right));
   bottom: max(16px, env(safe-area-inset-bottom));
-  display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px; /* «наверх» ровно по центру над WhatsApp */
 }
 .fab {
   display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%;
@@ -760,6 +760,19 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .lb__date { margin: 14px 0 0; color: var(--muted); font-size: 14px; }
 .lb__actions { margin-top: auto; padding-top: 28px; display: grid; gap: 10px; }
+.lb__row .btn { padding: 0 12px; } /* «Tam ekranda bax» помещается в половину ширины на телефоне */
+/* «WhatsApp ilə sifariş et» — в стиле остальных кнопок: кофейная, золотая иконка и кольцо */
+.lb .btn--wa {
+  background: radial-gradient(120% 160% at 30% 0%, #3a2f25, var(--esp-2));
+  color: var(--cream-text);
+  box-shadow: 0 0 0 1px rgba(216, 183, 127, .45), 0 14px 28px -16px rgba(28, 23, 19, .7);
+  transition: background .3s, color .3s, transform .15s var(--ease);
+}
+.lb .btn--wa .icon { color: var(--champagne); transition: color .3s; }
+@media (hover: hover) {
+  .lb .btn--wa:hover { background: var(--gold-grad); color: var(--esp-2); }
+  .lb .btn--wa:hover .icon { color: var(--esp-2); }
+}
 .lb__row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lb__hint { display: flex; gap: 10px; align-items: baseline; margin: 14px 0 0; font-size: 13px; line-height: 1.55; color: var(--muted); }
 .lb__hint .diamond { transform: rotate(45deg) translateY(-2px); }
