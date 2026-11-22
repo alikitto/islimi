@@ -137,10 +137,29 @@
       else chip.removeAttribute('aria-current');
     });
     const active = el.cats.querySelector('[aria-current="page"]');
-    if (active) {
+    if (active && el.cats.scrollWidth > el.cats.clientWidth) {
       const left = active.offsetLeft - (el.cats.clientWidth - active.offsetWidth) / 2;
       el.cats.scrollTo({ left, behavior: state.loaded ? 'smooth' : 'auto' });
     }
+    movePill(state.loaded && !reduceMotion);
+  }
+
+  // Золотая «таблетка» под выбранной категорией: плавно переезжает между пунктами
+  const pill = el.cats.querySelector('.cats__pill');
+  function movePill(animate) {
+    const active = el.cats.querySelector('.chip[aria-current="page"]');
+    if (!pill || !active) return;
+    if (!animate) pill.style.transition = 'none';
+    pill.style.width = active.offsetWidth + 'px';
+    pill.style.height = active.offsetHeight + 'px';
+    pill.style.transform = `translate(${active.offsetLeft}px, ${active.offsetTop}px)`;
+    el.cats.classList.add('has-pill');
+    if (!animate) { void pill.offsetWidth; pill.style.transition = ''; }
+  }
+  if (pill && 'ResizeObserver' in window) {
+    // ширина пунктов меняется при загрузке шрифта и смене размера окна
+    const ro = new ResizeObserver(() => movePill(false));
+    el.cats.querySelectorAll('.chip').forEach((chip) => ro.observe(chip));
   }
 
   function applyRoute() {

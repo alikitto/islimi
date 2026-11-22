@@ -132,7 +132,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* На телефоне: строка с логотипом уезжает при прокрутке, категории остаются (sticky с отрицательным top). */
 
 .header {
-  position: sticky; top: calc(-1 * var(--bar-h) - env(safe-area-inset-top)); z-index: 40;
+  /* при прокрутке строка с логотипом уезжает, но над категориями остаётся 8 px — капсула не упирается в край экрана */
+  position: sticky; top: calc(-1 * var(--bar-h) + 8px - env(safe-area-inset-top)); z-index: 40;
   padding-top: env(safe-area-inset-top);
   background:
     radial-gradient(600px 160px at 12% 0%, rgba(216, 183, 127, .16), rgba(216, 183, 127, 0)),
@@ -167,28 +168,46 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .header .header__wa:hover { background: var(--champagne); border-color: var(--champagne); color: var(--esp-2); }
 
+/* Категории — сегментированный переключатель: углублённая «дорожка», по которой
+   переезжает золотая «таблетка» (её двигает catalog.js). Без JS выбранный пункт
+   просто залит золотом. */
 .cats {
-  grid-area: nav;
-  display: flex; gap: 8px; padding: 2px 0 14px;
-  margin: 0 calc(-1 * var(--gutter)); padding-left: var(--gutter); padding-right: var(--gutter);
+  grid-area: nav; position: relative; isolation: isolate;
+  display: flex; gap: 0; margin: 0 0 10px; padding: 3px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .22), rgba(255, 255, 255, .03));
+  border: 1px solid rgba(216, 183, 127, .18); border-radius: 999px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, .35), 0 1px 0 rgba(255, 255, 255, .05);
   overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
 }
 .cats::-webkit-scrollbar { display: none; }
 
-.chip {
-  flex: none; position: relative;
-  display: inline-flex; align-items: center; gap: 7px;
-  height: 40px; padding: 0 16px; border-radius: 999px;
-  border: 1px solid rgba(216, 183, 127, .24); background: rgba(255, 255, 255, .04);
-  font-size: 14px; font-weight: 500; color: rgba(239, 229, 214, .82);
-  transition: background-color .2s, border-color .2s, color .2s;
+.cats__pill {
+  position: absolute; z-index: 0; top: 0; left: 0; width: 0; height: 0;
+  border-radius: 999px; background: var(--gold-grad); pointer-events: none; opacity: 0;
+  box-shadow: 0 6px 16px -6px rgba(201, 155, 92, .75), inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -1px 0 rgba(120, 82, 36, .25);
+  transition: transform .5s cubic-bezier(.3, 1.25, .45, 1), width .5s cubic-bezier(.3, 1.25, .45, 1), opacity .2s;
 }
-.chip:hover { border-color: rgba(216, 183, 127, .6); color: #fff; }
-.chip[aria-current="page"] { background: var(--gold-grad); border-color: transparent; color: var(--esp-2); font-weight: 600; }
-.chip__count { font-size: 12px; color: rgba(239, 229, 214, .45); font-variant-numeric: tabular-nums; }
+.cats.has-pill .cats__pill { opacity: 1; }
+
+.chip {
+  flex: 1 1 auto; position: relative; z-index: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 34px; padding: 0 clamp(5px, 1.7vw, 14px); border: 0; border-radius: 999px;
+  background: transparent; color: rgba(239, 229, 214, .72);
+  font-size: clamp(11.5px, 3.3vw, 14px); font-weight: 500; letter-spacing: .01em; white-space: nowrap;
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: color .3s, background-color .2s, transform .15s var(--ease);
+}
+.chip:active { transform: scale(.94); }
+.chip[aria-current="page"] { color: var(--esp-2); }
+.cats:not(.has-pill) .chip[aria-current="page"] { background: var(--gold-grad); }
+@media (hover: hover) {
+  .chip:not([aria-current="page"]):hover { color: #fff; background: rgba(255, 255, 255, .06); }
+}
+.chip__count { font-size: 11.5px; color: rgba(239, 229, 214, .45); font-variant-numeric: tabular-nums; transition: color .3s; }
 .chip__count:empty { display: none; }
 .chip[aria-current="page"] .chip__count { color: rgba(28, 23, 19, .6); }
-.chip .diamond { width: 5px; height: 5px; background: var(--champagne); }
+.chip .diamond { width: 5px; height: 5px; background: var(--champagne); transition: background-color .3s; }
 .chip[aria-current="page"] .diamond { background: var(--esp-2); }
 
 /* Шапка на телефоне и планшете: компактнее, кнопки — одинаковые круги */
@@ -201,19 +220,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .header .icon-btn .icon, .header .header__wa .icon { width: 18px; height: 18px; }
   .header .header__wa { padding: 0; border-radius: 50%; }
   .header__wa span { display: none; }
-  /* категории — одной «капсулой» на всю ширину, пункты делят ширину между собой */
-  .cats {
-    margin: 0 0 12px; padding: 3px; gap: 0;
-    background: rgba(255, 255, 255, .04); border: 1px solid rgba(216, 183, 127, .2); border-radius: 999px;
-  }
-  .chip {
-    flex: 1 1 auto; justify-content: center; gap: 6px;
-    height: 34px; padding: 0 clamp(5px, 1.7vw, 14px);
-    border-color: transparent; background: transparent;
-    font-size: clamp(11.5px, 3.3vw, 14px); white-space: nowrap;
-  }
-  .chip:hover { border-color: transparent; background: rgba(255, 255, 255, .06); }
-  .chip__count { font-size: 11.5px; }
 }
 /* на телефоне счётчики и ромбик не помещаются — прячем, чтобы все 5 пунктов встали в ряд */
 @media (max-width: 639px) {
@@ -232,13 +238,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .header__inner { grid-template-columns: auto 1fr auto; grid-template-areas: "logo nav actions"; height: 78px; gap: 24px; }
   .header__logo { height: auto; }
   .header__logo .logo-mark { width: 118px; }
-  .cats {
-    min-width: 0; justify-self: center; margin: 0; padding: 4px; gap: 2px;
-    background: rgba(255, 255, 255, .04); border: 1px solid rgba(216, 183, 127, .2); border-radius: 999px;
-  }
-  .chip { border-color: transparent; background: transparent; height: 38px; }
-  .chip:hover { border-color: transparent; background: rgba(255, 255, 255, .06); }
-  .chip[aria-current="page"], .chip[aria-current="page"]:hover { background: var(--gold-grad); }
+  .cats { min-width: 0; justify-self: center; margin: 0; padding: 4px; }
+  .chip { flex: none; height: 38px; padding: 0 16px; font-size: 14px; }
 }
 
 /* ---------- Главная: первый экран ---------- */
@@ -667,17 +668,20 @@ button { font: inherit; color: inherit; cursor: pointer; }
     display: inline-flex; align-items: center; height: 34px; padding: 0 13px; border-radius: 999px;
     border: 1px solid rgba(216, 183, 127, .22); background: rgba(255, 255, 255, .03); font-size: 13px;
   }
-  .footer ul a:hover { border-color: var(--f-gold); }
+  @media (hover: hover) { .footer ul a:hover { border-color: var(--f-gold); } }
   .footer .footer__cats {
     flex-wrap: nowrap; gap: 0; padding: 3px; max-width: 520px; margin: 0 auto;
-    border: 1px solid rgba(216, 183, 127, .22); border-radius: 999px; background: rgba(255, 255, 255, .03);
+    border: 1px solid rgba(216, 183, 127, .18); border-radius: 999px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, .22), rgba(255, 255, 255, .03));
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .35), 0 1px 0 rgba(255, 255, 255, .05);
   }
   .footer .footer__cats li { flex: 1 1 auto; }
   .footer .footer__cats a {
     width: 100%; justify-content: center; height: 32px; padding: 0 clamp(5px, 1.6vw, 12px);
     border: 0; background: transparent; font-size: clamp(11.5px, 3.3vw, 13.5px); white-space: nowrap;
   }
-  .footer .footer__cats a:hover { background: rgba(255, 255, 255, .06); color: var(--f-gold); }
+  @media (hover: hover) { .footer .footer__cats a:hover { background: rgba(255, 255, 255, .06); color: var(--f-gold); } }
+  .footer .footer__cats a:active { transform: scale(.95); }
   @media (max-width: 349px) { .footer .footer__cats a { padding: 0 3px; font-size: 11px; } }
   .footer .contact { gap: 7px; padding-left: 11px; }
   .footer .contact .icon { width: 15px; height: 15px; }
