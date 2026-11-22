@@ -297,12 +297,26 @@
   // сотни буферов и телефон перезагружает вкладку.
   const mediaOf = (v) => v.closest('.media') || v.parentElement;
 
+  // Пока страницу быстро листают, карточки пролетают мимо — их видео не качаем.
+  // Загрузка начнётся, когда прокрутка замедлится, и только у карточек, оставшихся рядом.
+  const FAST_SCROLL = 1500; // px/с
+  const RECHECK = 150;      // мс
+  let lastScroll = 0, lastY = 0, scrollSpeed = 0;
+  const flinging = () => performance.now() - lastScroll < 120 && scrollSpeed > FAST_SCROLL;
+  const pending = new Map(); // video → таймер загрузки
+  function startLoad(v) {
+    pending.delete(v);
+    if (v.src) return;
+    if (flinging()) { pending.set(v, setTimeout(() => startLoad(v), RECHECK)); return; }
+    v.preload = 'auto';
+    v.src = v.dataset.src;
+    loader.unobserve(v);
+  }
   const loader = new IntersectionObserver((entries) => {
     for (const { isIntersecting, target: v } of entries) {
-      if (!isIntersecting || v.src) continue;
-      v.preload = 'auto';
-      v.src = v.dataset.src;
-      loader.unobserve(v);
+      if (v.src) continue;
+      if (!isIntersecting) { clearTimeout(pending.get(v)); pending.delete(v); continue; }
+      if (!pending.has(v)) startLoad(v);
     }
   }, { rootMargin: '400px 0px' });
 
@@ -338,6 +352,7 @@
   }
 
   function unwireVideo(v) {
+    clearTimeout(pending.get(v)); pending.delete(v);
     loader.unobserve(v); player.unobserve(v); unloader.unobserve(v);
     v.removeAttribute('src'); v.load();
   }
@@ -515,6 +530,19 @@
   el.lbVideo.after(lbLow);
   let lbToken = 0;
 
+  // Плашка «грузится оригинал» поверх видео; появляется, только если ждать заметно
+  const lbLoading = document.createElement('div');
+  lbLoading.className = 'lb__loading';
+  lbLoading.setAttribute('role', 'status');
+  lbLoading.innerHTML = '<span class="lb__spin" aria-hidden="true"></span>Orijinal video yüklənir…';
+  lbLow.after(lbLoading);
+  let loadingTimer = 0;
+  function setLoading(on) {
+    clearTimeout(loadingTimer);
+    if (on) loadingTimer = setTimeout(() => lbLoading.classList.add('is-on'), 250);
+    else lbLoading.classList.remove('is-on');
+  }
+
   function clearLow() {
     lbLow.classList.remove('is-on');
     lbLow.pause();
@@ -527,7 +555,12 @@
     clearLow();
     stopWarm();
     const v = el.lbVideo;
-    if (item.videoSm !== item.video) {
+    setLoading(true);
+    // Полное видео не загрузилось — остаётся лёгкая копия, плашку убираем
+    v.addEventListener('error', () => { if (token === lbToken) setLoading(false); }, { once: true });
+    if (item.videoSm === item.video) {
+      v.addEventListener('playing', () => { if (token === lbToken) setLoading(false); }, { once: true });
+    } else {
       lbLow.src = item.videoSm;
       lbLow.classList.add('is-on');
       lbLow.play().catch(() => {});
@@ -535,6 +568,7 @@
         if (token !== lbToken) return;
         const done = () => {
           if (token !== lbToken) return;
+          setLoading(false);
           lbLow.classList.remove('is-on');
           setTimeout(() => { if (token === lbToken) clearLow(); }, 400); // после затухания
         };
@@ -636,6 +670,7 @@
     el.lb.hidden = true;
     lbToken++;
     clearLow();
+    setLoading(false);
     el.lbVideo.pause();
     el.lbVideo.removeAttribute('src');
     el.lbVideo.load();
@@ -739,6 +774,11 @@
 
   let ticking = false;
   addEventListener('scroll', () => {
+    const now = performance.now();
+    const dt = now - lastScroll;
+    // скорость прокрутки; после паузы считаем заново
+    scrollSpeed = dt > 0 && dt < 300 ? Math.abs(scrollY - lastY) / dt * 1000 : 0;
+    lastScroll = now; lastY = scrollY;
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
