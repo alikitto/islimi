@@ -19,3 +19,23 @@ CREATE TABLE IF NOT EXISTS meta (
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
+
+-- Сессии админки. В браузере хранится только токен; здесь — его SHA-256.
+-- key_fp — отпечаток пароля на момент входа: после смены пароля все сессии недействительны.
+CREATE TABLE IF NOT EXISTS sessions (
+  id         TEXT PRIMARY KEY,
+  token_hash TEXT NOT NULL UNIQUE,
+  key_fp     TEXT NOT NULL,
+  user_agent TEXT,
+  location   TEXT,
+  created_at TEXT NOT NULL,
+  last_seen  TEXT NOT NULL,
+  expires_at TEXT NOT NULL
+);
+
+-- Неудачные попытки входа (по хэшу IP) для защиты от подбора пароля.
+CREATE TABLE IF NOT EXISTS login_failures (
+  ip_hash  TEXT PRIMARY KEY,
+  count    INTEGER NOT NULL,
+  first_at INTEGER NOT NULL
+);

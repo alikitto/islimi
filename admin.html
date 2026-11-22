@@ -2,182 +2,550 @@
 <html lang="az">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="robots" content="noindex" />
-  <title>Kataloq idarəetməsi | Islimi</title>
+  <meta name="theme-color" content="#FAFAF9" />
+  <title>Islimi · İdarəetmə</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --accent: #d4af37;
-      --accent-dark: #b8932a;
-      --text: #222;
-      --muted: #777;
-      --line: #e6e6e6;
-      --bg: #f7f7f5;
-      --danger: #c0392b;
-      --ok: #2e8b57;
+      --bg: #FAFAF9;
+      --surface: #FFFFFF;
+      --surface-2: #F5F5F4;
+      --text: #1C1917;
+      --text-2: #44403C;
+      --muted: #78716C;
+      --line: #E7E5E4;
+      --line-2: #D6D3D1;
+      --ink: #1C1917;          /* основные кнопки */
+      --ink-hover: #292524;
+      --gold: #D4AF37;         /* декоративное золото бренда */
+      --gold-ink: #A16207;     /* золото для текста (контраст ≥ 4.5) */
+      --gold-soft: #FBF6E4;
+      --danger: #DC2626;
+      --danger-soft: #FEF2F2;
+      --ok: #15803D;
+      --ok-soft: #F0FDF4;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 1px 2px rgba(28, 25, 23, .04), 0 4px 16px rgba(28, 25, 23, .06);
+      --shadow-lg: 0 10px 40px rgba(28, 25, 23, .16);
+      --nav-h: 64px;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+      --ease: cubic-bezier(.2, .8, .2, 1);
     }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
     [hidden] { display: none !important; }
-    .wrap { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; }
-    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-    h1 { font-size: 22px; margin: 0; }
-    header nav { display: flex; gap: 14px; font-size: 14px; }
-    a { color: var(--accent-dark); }
-    .card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+    button, input, select { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    a { color: var(--gold-ink); text-decoration: none; }
+    svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    input[type="text"], input[type="password"], input[type="url"], select {
-      font: inherit; font-size: 16px; padding: 9px 11px; border: 1px solid var(--line);
-      border-radius: 10px; background: #fff; color: var(--text); width: 100%;
+    /* ---------- buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid transparent;
+      font-weight: 600; font-size: 15px; transition: background .15s, border-color .15s, transform .1s, opacity .15s;
+      white-space: nowrap;
     }
-    input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
-    input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
-    button {
-      font: inherit; font-size: 15px; padding: 9px 14px; border-radius: 10px; cursor: pointer;
-      border: 1px solid var(--line); background: #fff; color: var(--text);
+    .btn:active:not(:disabled) { transform: scale(.98); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--ink-hover); }
+    .btn-ghost { background: var(--surface); border-color: var(--line-2); color: var(--text); }
+    .btn-ghost:hover:not(:disabled) { background: var(--surface-2); }
+    .btn-danger { background: var(--surface); border-color: #FECACA; color: var(--danger); }
+    .btn-danger:hover:not(:disabled) { background: var(--danger-soft); }
+    .btn-danger.armed { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn-block { width: 100%; }
+    .icon-btn {
+      display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px;
+      border: none; background: transparent; color: var(--text-2);
     }
-    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-    button.primary:hover { background: var(--accent-dark); }
-    button:disabled { opacity: .5; cursor: default; }
-    .msg { font-size: 14px; margin: 8px 0 0; min-height: 1.2em; }
-    .msg.error { color: var(--danger); }
-    .msg.ok { color: var(--ok); }
+    .icon-btn:hover { background: var(--surface-2); }
 
-    /* login */
-    .login { max-width: 360px; margin: 60px auto; }
-    .login form { display: flex; gap: 8px; }
-    .login button { white-space: nowrap; }
-
-    /* toolbar */
-    .toolbar { display: grid; grid-template-columns: 1fr 210px auto auto; gap: 8px; align-items: center; }
-    .toolbar label.pin-only { display: flex; align-items: center; gap: 6px; font-size: 14px; white-space: nowrap; }
-    .count { font-size: 13px; color: var(--muted); margin-top: 10px; }
-
-    /* add form */
-    .add-grid { display: grid; grid-template-columns: 140px 1fr 170px auto auto; gap: 8px; align-items: center; }
-    .add-grid label.pin { display: flex; gap: 6px; align-items: center; font-size: 14px; }
-
-    /* list */
-    .list { display: flex; flex-direction: column; gap: 8px; }
-    .row {
-      display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: center;
-      background: #fff; border-radius: 12px; padding: 10px; box-shadow: 0 1px 6px rgba(0,0,0,.05);
-      border: 1px solid transparent; transition: border-color .3s;
+    /* ---------- fields ---------- */
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field > span { font-size: 13px; font-weight: 600; color: var(--text-2); }
+    .field small { font-size: 12.5px; color: var(--muted); }
+    .input {
+      width: 100%; min-height: 46px; padding: 0 14px; font-size: 16px;
+      border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface);
+      transition: border-color .15s, box-shadow .15s;
     }
-    .row.saved { border-color: var(--ok); }
-    .row.failed { border-color: var(--danger); }
-    .thumb {
-      width: 84px; height: 84px; border-radius: 8px; overflow: hidden; background: #f0f0f0; cursor: pointer; position: relative;
-    }
-    .thumb video { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
-    .thumb::after {
-      content: '▶'; position: absolute; inset: auto 4px 4px auto; font-size: 11px; color: #fff;
-      background: rgba(0,0,0,.45); border-radius: 4px; padding: 1px 5px;
-    }
-    .fields { display: grid; grid-template-columns: 130px 170px auto 1fr auto; gap: 8px; align-items: center; min-width: 0; }
-    .fields .code { font-weight: 600; }
-    .fields label.pin { display: flex; align-items: center; gap: 6px; font-size: 14px; }
-    .meta { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-    .meta a { color: var(--muted); }
-    .del.confirm { background: var(--danger); border-color: var(--danger); color: #fff; }
-    .more { display: block; margin: 14px auto 0; }
-    .empty { text-align: center; color: var(--muted); padding: 30px 0; }
+    .input:focus { outline: none; border-color: var(--text); box-shadow: 0 0 0 3px rgba(212, 175, 55, .25); }
+    .input-wrap { position: relative; }
+    .input-wrap .input { padding-left: 42px; }
+    .input-wrap > svg.i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .input-wrap .icon-btn { position: absolute; right: 2px; top: 1px; }
+    .error-text { color: var(--danger); font-size: 13.5px; min-height: 1.3em; margin: 0; }
 
-    /* player */
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; z-index: 10; }
-    .modal video { max-width: 92vw; max-height: 86vh; border-radius: 10px; background: #fff; }
+    .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: -2px; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 14px;
+      border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface);
+      font-size: 14px; font-weight: 500; color: var(--text-2); white-space: nowrap; transition: all .15s;
+    }
+    .chip:hover { border-color: var(--muted); }
+    .chip[aria-pressed="true"], .chip[aria-checked="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .chip svg.i { width: 16px; height: 16px; }
 
-    @media (max-width: 720px) {
-      .toolbar { grid-template-columns: 1fr 1fr; }
-      .add-grid { grid-template-columns: 1fr 1fr; }
-      .add-grid .url { grid-column: 1 / -1; grid-row: 2; }
-      .fields { grid-template-columns: 1fr 1fr; }
-      .fields .meta { grid-column: 1 / -1; }
-      .row { align-items: start; }
+    .switch { display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; }
+    .switch b { display: block; font-weight: 600; font-size: 15px; }
+    .switch small { color: var(--muted); font-size: 13px; }
+    .switch input { appearance: none; flex: none; width: 48px; height: 28px; border-radius: 999px; background: var(--line-2); position: relative; transition: background .2s; cursor: pointer; margin: 0; }
+    .switch input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform .2s var(--ease); }
+    .switch input:checked { background: var(--gold); }
+    .switch input:checked::after { transform: translateX(20px); }
+
+    .segmented { display: inline-flex; padding: 4px; gap: 4px; background: var(--surface-2); border-radius: 12px; }
+    .segmented button { border: none; background: transparent; min-height: 36px; padding: 0 14px; border-radius: 9px; font-weight: 500; font-size: 14px; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
+    .segmented button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.08); font-weight: 600; }
+
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+    /* ---------- login ---------- */
+    .login { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; background:
+      radial-gradient(1200px 500px at 50% -10%, var(--gold-soft), transparent 60%), var(--bg); }
+    .login .card { width: 100%; max-width: 380px; padding: 32px 24px 24px; }
+    .brand { display: flex; align-items: baseline; gap: 10px; }
+    .wordmark { font-weight: 700; letter-spacing: .28em; font-size: 15px; }
+    .wordmark::after { content: '.'; color: var(--gold); }
+    .brand .tag { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+    .login h1 { font-size: 24px; margin: 22px 0 4px; letter-spacing: -.01em; }
+    .login p.lead { margin: 0 0 22px; color: var(--muted); font-size: 14.5px; }
+    .login form { display: flex; flex-direction: column; gap: 14px; }
+
+    /* ---------- shell ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 20; height: 60px; padding: 0 16px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(250, 250, 249, .85); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .tabs-top { display: none; }
+    .tabs-top a { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 10px; color: var(--text-2); font-weight: 500; }
+    .tabs-top a:hover { background: var(--surface-2); }
+    .tabs-top a[aria-current="page"] { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.07); }
+    .main { max-width: 1080px; margin: 0 auto; padding: 20px 16px calc(var(--nav-h) + var(--safe-b) + 28px); }
+    .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    .page-head h2 { font-size: 26px; letter-spacing: -.02em; margin: 0; line-height: 1.2; }
+    .page-head .sub { color: var(--muted); font-size: 14px; margin-top: 2px; }
+
+    .bottom-nav {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+      height: calc(var(--nav-h) + var(--safe-b)); padding-bottom: var(--safe-b);
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      background: rgba(255, 255, 255, .92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--line);
+    }
+    .bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--muted); font-size: 11.5px; font-weight: 600; }
+    .bottom-nav a[aria-current="page"] { color: var(--text); }
+    .bottom-nav a[aria-current="page"] svg.i { color: var(--gold-ink); }
+    .bottom-nav .upload-pill { display: grid; place-items: center; width: 44px; height: 30px; border-radius: 999px; background: var(--ink); color: #fff; }
+    .bottom-nav a[aria-current="page"] .upload-pill { background: var(--gold); }
+    .bottom-nav a[aria-current="page"] .upload-pill svg.i { color: var(--ink); }
+
+    @media (min-width: 820px) {
+      .tabs-top { display: flex; gap: 4px; padding: 4px; background: var(--surface-2); border-radius: 12px; }
+      .bottom-nav { display: none; }
+      .main { padding-bottom: 48px; }
+    }
+
+    /* ---------- products ---------- */
+    .toolbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (min-width: 620px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 960px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+    .p-card {
+      display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden;
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      transition: transform .2s var(--ease), box-shadow .2s var(--ease);
+    }
+    .p-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .p-media { position: relative; aspect-ratio: 1; background: var(--surface-2); }
+    .p-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .badge-pin {
+      position: absolute; top: 8px; left: 8px; display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.92); color: var(--gold-ink);
+      font-size: 11.5px; font-weight: 700; letter-spacing: .02em; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .badge-pin svg.i { width: 13px; height: 13px; fill: var(--gold); stroke: var(--gold); }
+    .p-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 2px; }
+    .p-code { font-weight: 600; font-size: 15px; letter-spacing: .01em; }
+    .p-meta { font-size: 12.5px; color: var(--muted); }
+    .empty { text-align: center; padding: 48px 16px; color: var(--muted); }
+    .empty svg.i { width: 36px; height: 36px; color: var(--line-2); margin-bottom: 8px; }
+    .sentinel { height: 1px; }
+    .skeleton { border-radius: var(--radius); aspect-ratio: .82; background: linear-gradient(90deg, var(--surface-2) 25%, #fff 50%, var(--surface-2) 75%); background-size: 300% 100%; animation: shimmer 1.4s infinite; }
+    @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+    /* ---------- dialog (bottom sheet) ---------- */
+    dialog.sheet {
+      border: none; padding: 0; margin: auto auto 0; width: 100%; max-width: 560px; max-height: 92dvh;
+      border-radius: 22px 22px 0 0; background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg);
+      overflow: auto;
+    }
+    dialog.sheet::backdrop { background: rgba(28, 25, 23, .45); backdrop-filter: blur(2px); }
+    dialog.sheet[open] { animation: sheet-in .28s var(--ease); }
+    @keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } }
+    @media (min-width: 620px) { dialog.sheet { margin: auto; border-radius: 22px; } }
+    .sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 8px 6px 20px; position: sticky; top: 0; background: var(--surface); z-index: 1; }
+    .sheet-head h3 { margin: 0; font-size: 18px; }
+    .sheet-body { padding: 4px 20px 20px; display: flex; flex-direction: column; gap: 18px; }
+    .sheet-video { width: 100%; aspect-ratio: 1; border-radius: 14px; background: var(--surface-2); object-fit: cover; display: block; }
+    .sheet-actions { display: flex; gap: 10px; padding: 14px 20px calc(16px + var(--safe-b)); border-top: 1px solid var(--line); position: sticky; bottom: 0; background: var(--surface); }
+    .sheet-actions .btn-primary { flex: 1; }
+    .meta-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); }
+
+    /* ---------- upload ---------- */
+    .up-layout { display: grid; gap: 16px; }
+    @media (min-width: 960px) { .up-layout { grid-template-columns: 1.2fr 1fr; align-items: start; } }
+    .section { padding: 18px; }
+    .section-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; margin: 0 0 14px; }
+    .step { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); font-size: 12.5px; font-weight: 700; color: var(--text-2); }
+    .step.done { background: var(--gold); color: var(--ink); }
+    .dropzone {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;
+      min-height: 220px; padding: 24px; border: 1.5px dashed var(--line-2); border-radius: 14px; background: var(--surface-2);
+      cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .dropzone:hover, .dropzone.over { border-color: var(--gold); background: var(--gold-soft); }
+    .dropzone .circle { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); color: var(--gold-ink); }
+    .dropzone .circle svg.i { width: 26px; height: 26px; }
+    .dropzone b { font-size: 16px; }
+    .dropzone span { color: var(--muted); font-size: 13.5px; }
+    .file-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .file-row .ficon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--gold-soft); color: var(--gold-ink); flex: none; }
+    .file-row .fname { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-row .fmeta { font-size: 13px; color: var(--muted); }
+    .file-row > div { min-width: 0; flex: 1; }
+    .stage { position: relative; margin: 0 auto; overflow: hidden; border-radius: 14px; background: #0c0a09; touch-action: none; user-select: none; }
+    .stage video { width: 100%; height: 100%; display: block; object-fit: contain; pointer-events: none; }
+    .stage.pad { background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
+    .frame { position: absolute; top: 0; left: 0; border: 2px solid #fff; border-radius: 6px; box-shadow: 0 0 0 9999px rgba(12, 10, 9, .55); cursor: grab; }
+    .frame.dragging { cursor: grabbing; }
+    .frame .grip { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.9); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+    .stage-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .hint { font-size: 13px; color: var(--muted); margin: 0; }
+    .form-stack { display: flex; flex-direction: column; gap: 18px; }
+    .actionbar { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+    .actionbar .error-text:empty { display: none; }
+    .progress { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+    .progress > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), #E9C96B); border-radius: 999px; transition: width .25s; }
+    .stages { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+    .stages .on { color: var(--text); font-weight: 600; }
+    .link-btn { background: none; border: none; color: var(--gold-ink); font-weight: 600; font-size: 14px; padding: 6px 0; align-self: center; }
+    .success { text-align: center; padding: 28px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .success .tick { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); }
+    .success .tick svg.i { width: 30px; height: 30px; stroke-width: 2.4; }
+    .success h3 { margin: 0; font-size: 20px; }
+    .success video { width: 100%; max-width: 320px; aspect-ratio: 1; border-radius: 14px; background: var(--surface-2); object-fit: cover; }
+    .stats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .stat { padding: 6px 12px; border-radius: 999px; background: var(--surface-2); font-size: 13px; color: var(--text-2); }
+    .stat b { color: var(--text); }
+    .success .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    details.manual summary { cursor: pointer; color: var(--text-2); font-weight: 600; font-size: 14px; list-style: none; display: flex; align-items: center; gap: 8px; }
+    details.manual summary::-webkit-details-marker { display: none; }
+    details.manual[open] summary { margin-bottom: 14px; }
+
+    /* ---------- account ---------- */
+    .acc-grid { display: grid; gap: 16px; max-width: 720px; }
+    .s-list { display: flex; flex-direction: column; }
+    .s-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-top: 1px solid var(--line); }
+    .s-item:first-child { border-top: none; }
+    .s-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--surface-2); color: var(--text-2); flex: none; }
+    .s-item > div { flex: 1; min-width: 0; }
+    .s-name { font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .s-meta { font-size: 13px; color: var(--muted); }
+    .pill-ok { font-size: 11.5px; font-weight: 700; color: var(--ok); background: var(--ok-soft); padding: 2px 8px; border-radius: 999px; }
+    .note { font-size: 13.5px; color: var(--muted); margin: 0; padding: 0 2px; }
+
+    /* ---------- toast ---------- */
+    .toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + var(--safe-b) + 14px); z-index: 50; display: flex; flex-direction: column; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
+    @media (min-width: 820px) { .toasts { bottom: 24px; } }
+    .toast { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 14px; background: var(--ink); color: #fff; font-size: 14px; box-shadow: var(--shadow-lg); animation: toast-in .25s var(--ease); }
+    .toast.error { background: var(--danger); }
+    .toast svg.i { width: 18px; height: 18px; }
+    @keyframes toast-in { from { transform: translateY(10px); opacity: 0; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
   </style>
 </head>
 <body>
-  <!-- Вход -->
-  <section class="card login" id="loginView" hidden>
-    <h1 style="margin-bottom:12px">Kataloq idarəetməsi</h1>
-    <form id="loginForm">
-      <input type="password" id="loginKey" placeholder="Şifrə" autocomplete="current-password" required />
-      <button class="primary" type="submit">Daxil ol</button>
-    </form>
-    <p class="msg" id="loginMsg"></p>
+  <!-- SVG-иконки (по мотивам Lucide) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 2l2.9 6.1 6.6.8-4.9 4.5 1.3 6.6L12 16.8 6.1 20l1.3-6.6L2.5 8.9l6.6-.8z"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.1M6.6 6.6C3.8 8.3 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M14.1 14.1a3 3 0 0 1-4.2-4.2M2 2l20 20"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></symbol>
+    <symbol id="i-crop" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></symbol>
+    <symbol id="i-frame" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="8" width="10" height="8" rx="1"/></symbol>
+    <symbol id="i-move" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M8 6l4-4 4 4M8 18l4 4 4-4M6 8l-4 4 4 4M18 8l4 4-4 4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></symbol>
+    <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  </svg>
+
+  <!-- ============ ВХОД ============ -->
+  <section class="login" id="loginView" hidden>
+    <div class="card">
+      <div class="brand"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
+      <h1>Xoş gəlmisiniz</h1>
+      <p class="lead">Kataloqu idarə etmək üçün daxil olun.</p>
+      <form id="loginForm" novalidate>
+        <label class="field">
+          <span>Şifrə</span>
+          <div class="input-wrap">
+            <svg class="i"><use href="#i-lock"/></svg>
+            <input class="input" type="password" id="loginPassword" autocomplete="current-password" required />
+            <button type="button" class="icon-btn" id="togglePw" aria-label="Şifrəni göstər"><svg class="i"><use href="#i-eye"/></svg></button>
+          </div>
+        </label>
+        <p class="error-text" id="loginError" role="alert"></p>
+        <button class="btn btn-primary btn-block" type="submit" id="loginBtn">Daxil ol</button>
+      </form>
+    </div>
   </section>
 
-  <main class="wrap" id="appView" hidden>
-    <header>
-      <h1>Kataloq idarəetməsi</h1>
-      <nav>
-        <a href="upload">+ Video yüklə</a>
-        <a href="/" target="_blank">Sayta bax ↗</a>
-        <a href="#" id="logout">Çıxış</a>
+  <!-- ============ ПРИЛОЖЕНИЕ ============ -->
+  <div id="appView" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
+      <nav class="tabs-top" aria-label="Bölmələr">
+        <a href="#products" data-tab="products"><svg class="i"><use href="#i-grid"/></svg>Məhsullar</a>
+        <a href="#upload" data-tab="upload"><svg class="i"><use href="#i-upload"/></svg>Video yüklə</a>
+        <a href="#account" data-tab="account"><svg class="i"><use href="#i-user"/></svg>Hesab</a>
       </nav>
+      <a class="icon-btn" href="/" target="_blank" rel="noopener" aria-label="Sayta bax"><svg class="i"><use href="#i-external"/></svg></a>
     </header>
 
-    <section class="card">
-      <div class="toolbar">
-        <input type="text" id="search" placeholder="Kod ilə axtar…" autocomplete="off" />
-        <select id="filterCategory">
-          <option value="">Bütün kateqoriyalar</option>
-        </select>
-        <label class="pin-only"><input type="checkbox" id="filterPin" /> Yalnız PIN</label>
-        <button type="button" id="toggleAdd">+ Əlavə et</button>
-      </div>
-      <div class="count" id="count"></div>
-    </section>
+    <main class="main">
+      <!-- ---------- Товары ---------- -->
+      <section id="tab-products" data-view="products">
+        <div class="page-head">
+          <div>
+            <h2>Məhsullar</h2>
+            <div class="sub" id="count">Yüklənir…</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <div class="input-wrap">
+            <svg class="i"><use href="#i-search"/></svg>
+            <input class="input" type="search" id="search" placeholder="Kod ilə axtar…" autocomplete="off" aria-label="Kod ilə axtar" />
+          </div>
+          <div class="chips" id="filters" role="group" aria-label="Filtr"></div>
+        </div>
+        <div class="grid" id="grid"></div>
+        <div class="sentinel" id="sentinel"></div>
+      </section>
 
-    <section class="card" id="addCard" hidden>
-      <form class="add-grid" id="addForm">
-        <input type="text" name="code" placeholder="Kod (UN-0141)" required autocomplete="off" />
-        <input type="url" name="video" class="url" placeholder="https://video.islimi.az/…mp4" required />
-        <select name="category" required></select>
-        <label class="pin"><input type="checkbox" name="pin" /> PIN</label>
-        <button class="primary" type="submit">Saxla</button>
-      </form>
-      <p class="msg" id="addMsg"></p>
-    </section>
+      <!-- ---------- Загрузка ---------- -->
+      <section id="tab-upload" data-view="upload" hidden>
+        <div class="page-head">
+          <div>
+            <h2>Video yüklə</h2>
+            <div class="sub">Video avtomatik sıxılır: 1080×1080, ~2 MB</div>
+          </div>
+        </div>
 
-    <div class="list" id="list"></div>
-    <button type="button" class="more" id="more" hidden>Daha çox göstər</button>
-  </main>
+        <div class="up-layout" id="upForm">
+          <div class="card section">
+            <p class="section-title"><span class="step" id="step1">1</span>Video</p>
+            <label class="dropzone" id="drop">
+              <input type="file" id="fileInput" accept="video/*" class="sr" />
+              <span class="circle"><svg class="i"><use href="#i-upload"/></svg></span>
+              <b>Video seçin</b>
+              <span>və ya faylı bura atın · MP4, MOV</span>
+            </label>
+            <div id="filePanel" hidden>
+              <div class="file-row">
+                <span class="ficon"><svg class="i"><use href="#i-film"/></svg></span>
+                <div>
+                  <div class="fname" id="fileName"></div>
+                  <div class="fmeta" id="fileMeta"></div>
+                </div>
+                <button type="button" class="btn btn-ghost" id="changeFile">Dəyiş</button>
+              </div>
+              <div class="stage" id="stage">
+                <video id="preview" muted loop playsinline autoplay></video>
+                <div class="frame" id="frame"><span class="grip"><svg class="i"><use href="#i-move"/></svg></span></div>
+              </div>
+              <div class="stage-controls">
+                <div class="segmented" id="modes" role="group" aria-label="Kvadrat formatı">
+                  <button type="button" data-mode="crop" aria-pressed="true"><svg class="i"><use href="#i-crop"/></svg>Kəs</button>
+                  <button type="button" data-mode="pad" aria-pressed="false"><svg class="i"><use href="#i-frame"/></svg>Ağ fon</button>
+                </div>
+                <p class="hint" id="hint"></p>
+              </div>
+            </div>
+          </div>
 
-  <div class="modal" id="player" hidden>
-    <video id="playerVideo" controls autoplay loop playsinline></video>
+          <div class="form-stack">
+            <div class="card section">
+              <p class="section-title"><span class="step" id="step2">2</span>Məhsul</p>
+              <div class="form-stack">
+                <label class="field">
+                  <span>Məhsul kodu</span>
+                  <input class="input" type="text" id="code" placeholder="UN-0141" autocomplete="off" autocapitalize="characters" />
+                </label>
+                <div class="field">
+                  <span id="catLabel">Kateqoriya</span>
+                  <div class="chips" id="catChips" role="radiogroup" aria-labelledby="catLabel" style="flex-wrap: wrap;"></div>
+                </div>
+                <label class="switch">
+                  <div><b>PIN</b><small>Əsas səhifədə yuxarıda göstər</small></div>
+                  <input type="checkbox" id="pin" />
+                </label>
+              </div>
+            </div>
+
+            <div class="card actionbar" id="actionbar">
+              <div id="progressBox" hidden>
+                <div class="stages"><span id="stCompress">Sıxılır</span><span id="stPercent">0%</span><span id="stUpload">Yüklənir</span></div>
+                <div class="progress" style="margin-top:8px"><div id="bar"></div></div>
+              </div>
+              <p class="error-text" id="upError" role="alert"></p>
+              <button type="button" class="btn btn-primary btn-block" id="uploadBtn" disabled>Sıx və yüklə</button>
+              <button type="button" class="link-btn" id="compressOnly" hidden>Yükləmədən yoxla</button>
+            </div>
+
+            <details class="card section manual">
+              <summary><svg class="i"><use href="#i-link"/></svg>Video artıq yüklənib? Link ilə əlavə et</summary>
+              <form id="addForm" class="form-stack" novalidate>
+                <label class="field"><span>Video linki</span><input class="input" type="url" name="video" placeholder="https://video.islimi.az/…mp4" required /></label>
+                <p class="note">Kod, kateqoriya və PIN yuxarıdakı “Məhsul” bölməsindən götürülür.</p>
+                <button class="btn btn-ghost" type="submit">Kataloqa əlavə et</button>
+              </form>
+            </details>
+          </div>
+        </div>
+
+        <div class="card success" id="upSuccess" hidden>
+          <span class="tick"><svg class="i"><use href="#i-check"/></svg></span>
+          <h3 id="successTitle">Kataloqa əlavə edildi</h3>
+          <video id="resultVideo" muted loop playsinline autoplay></video>
+          <div class="stats" id="stats"></div>
+          <div class="btns">
+            <button type="button" class="btn btn-primary" id="again">Yenisini yüklə</button>
+            <a class="btn btn-ghost" href="#products">Məhsullara bax</a>
+            <a class="btn btn-ghost" id="downloadLink" download hidden>Faylı endir</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Аккаунт ---------- -->
+      <section id="tab-account" data-view="account" hidden>
+        <div class="page-head">
+          <div>
+            <h2>Hesab</h2>
+            <div class="sub">Aktiv sessiyalar və çıxış</div>
+          </div>
+        </div>
+        <div class="acc-grid">
+          <div class="card">
+            <div class="s-list" id="sessions"></div>
+          </div>
+          <p class="note">Sessiya son istifadədən 30 gün sonra bitir. Şifrə dəyişdirilərsə, bütün sessiyalar avtomatik bağlanır.</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <button type="button" class="btn btn-ghost" id="logoutBtn"><svg class="i"><use href="#i-logout"/></svg>Çıxış</button>
+            <button type="button" class="btn btn-danger" id="logoutAll">Bütün cihazlardan çıx</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Bölmələr">
+      <a href="#products" data-tab="products"><svg class="i"><use href="#i-grid"/></svg>Məhsullar</a>
+      <a href="#upload" data-tab="upload"><span class="upload-pill"><svg class="i"><use href="#i-upload"/></svg></span>Yüklə</a>
+      <a href="#account" data-tab="account"><svg class="i"><use href="#i-user"/></svg>Hesab</a>
+    </nav>
   </div>
 
-  <script>
-    const API_BASE = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://upload-to-r2.ramizagayev122.workers.dev';
+  <!-- Карточка товара -->
+  <dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
+    <div class="sheet-head">
+      <h3 id="sheetTitle">Məhsul</h3>
+      <button type="button" class="icon-btn" id="sheetClose" aria-label="Bağla"><svg class="i"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="sheet-body">
+      <video class="sheet-video" id="sheetVideo" muted loop playsinline autoplay controls></video>
+      <label class="field"><span>Məhsul kodu</span><input class="input" type="text" id="sheetCode" autocomplete="off" /></label>
+      <div class="field"><span id="sheetCatLabel">Kateqoriya</span><div class="chips" id="sheetCats" role="radiogroup" aria-labelledby="sheetCatLabel" style="flex-wrap: wrap;"></div></div>
+      <label class="switch"><div><b>PIN</b><small>Əsas səhifədə yuxarıda göstər</small></div><input type="checkbox" id="sheetPin" /></label>
+      <div class="meta-row"><span id="sheetMeta"></span><a id="sheetLink" target="_blank" rel="noopener">Videonu aç ↗</a></div>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="btn btn-danger" id="sheetDelete">Sil</button>
+      <button type="button" class="btn btn-primary" id="sheetSave" disabled>Yadda saxla</button>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module">
+    import {
+      Input, Output, Conversion, BlobSource, BufferTarget, Mp4OutputFormat,
+      ALL_FORMATS, Quality, canEncodeVideo,
+    } from 'https://cdn.jsdelivr.net/npm/mediabunny@1.65.2/dist/bundles/mediabunny.min.mjs';
+
+    // ===== Настройки =====
+    const API = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://upload-to-r2.ramizagayev122.workers.dev';
     const CATEGORIES = ['Üzüklər', 'Sırgalar', 'Qolbaqlar', 'Boyunbağılar'];
-    const PAGE = 40;
-    const KEY_STORAGE = 'islimi-upload-key'; // общий с формой загрузки
+    const OUTPUT_SIZE = 1080;      // сторона квадрата, px
+    const BITRATE = 1_200_000;     // ~1200 кбит/с → ~2.3 МБ на 16 сек
+    const FRAME_RATE = 30;
+    const PAGE = 24;
+    const TOKEN_KEY = 'islimi-session';
 
     const $ = (id) => document.getElementById(id);
-    let key = '';
-    let items = [];          // новые — первыми
-    let shown = PAGE;
+    const icon = (name) => `<svg class="i"><use href="#i-${name}"/></svg>`;
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmtMB = (b) => (b / 1048576).toFixed(1) + ' MB';
 
-    // ---------- storage ----------
+    // ===== Хранилище токена (пароль больше не хранится) =====
     const store = {
-      get() { try { return localStorage.getItem(KEY_STORAGE) || ''; } catch { return ''; } },
-      set(v) { try { v ? localStorage.setItem(KEY_STORAGE, v) : localStorage.removeItem(KEY_STORAGE); } catch {} },
+      get() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; } },
+      set(v) { try { v ? localStorage.setItem(TOKEN_KEY, v) : localStorage.removeItem(TOKEN_KEY); } catch {} },
     };
+    try { localStorage.removeItem('islimi-upload-key'); } catch {} // старая версия хранила сам пароль
+    let token = store.get();
 
-    // ---------- API ----------
+    // ===== API =====
     async function api(method, path, body) {
-      const res = await fetch(API_BASE + path, {
+      const res = await fetch(API + path, {
         method,
-        headers: {
-          Authorization: 'Bearer ' + key,
-          ...(body ? { 'Content-Type': 'application/json' } : {}),
-        },
+        headers: { ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(body ? { 'Content-Type': 'application/json' } : {}) },
         body: body ? JSON.stringify(body) : undefined,
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data.success === false) {
+        if (res.status === 401 && path !== '/api/login') onSessionLost(data.message);
         const err = new Error(data.message || `Server xətası (${res.status})`);
         err.status = res.status;
         throw err;
@@ -185,246 +553,647 @@
       return data;
     }
 
-    // ---------- login ----------
-    async function tryLogin(candidate, silent) {
-      key = candidate;
-      try {
-        await api('GET', '/api/auth');
-        store.set(key);
-        $('loginView').hidden = true;
-        $('appView').hidden = false;
-        await loadItems();
-      } catch (err) {
-        key = '';
-        $('loginView').hidden = false;
-        $('appView').hidden = true;
-        if (!silent) setMsg($('loginMsg'), err.message, 'error');
-      }
+    // ===== Тосты =====
+    function toast(text, kind = 'ok') {
+      const el = document.createElement('div');
+      el.className = 'toast' + (kind === 'error' ? ' error' : '');
+      el.innerHTML = icon(kind === 'error' ? 'alert' : 'check') + `<span>${esc(text)}</span>`;
+      $('toasts').appendChild(el);
+      setTimeout(() => el.remove(), kind === 'error' ? 4500 : 2600);
     }
 
-    $('loginForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      tryLogin($('loginKey').value, false);
-    });
-    $('logout').addEventListener('click', (e) => {
-      e.preventDefault();
-      store.set('');
-      key = '';
-      $('loginKey').value = '';
+    // ===== Вход / выход =====
+    function showLogin(message = '') {
       $('appView').hidden = true;
       $('loginView').hidden = false;
-    });
-
-    function setMsg(el, text, kind = '') {
-      el.textContent = text;
-      el.className = 'msg' + (kind ? ' ' + kind : '');
+      $('loginError').textContent = message;
+      setTimeout(() => $('loginPassword').focus(), 50);
+    }
+    function onSessionLost(message) {
+      token = '';
+      store.set('');
+      showLogin(message || 'Sessiya bitib. Yenidən daxil olun.');
+    }
+    async function enterApp() {
+      $('loginView').hidden = true;
+      $('appView').hidden = false;
+      route();
+      loadItems();
     }
 
-    // ---------- data ----------
+    $('togglePw').addEventListener('click', () => {
+      const input = $('loginPassword');
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      $('togglePw').innerHTML = icon(show ? 'eye-off' : 'eye');
+      $('togglePw').setAttribute('aria-label', show ? 'Şifrəni gizlət' : 'Şifrəni göstər');
+    });
+
+    $('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = $('loginPassword').value;
+      if (!password) { $('loginError').textContent = 'Şifrəni yazın'; return; }
+      $('loginBtn').disabled = true;
+      $('loginBtn').textContent = 'Yoxlanılır…';
+      try {
+        const data = await api('POST', '/api/login', { password });
+        token = data.token;
+        store.set(token);
+        $('loginPassword').value = '';
+        $('loginError').textContent = '';
+        enterApp();
+      } catch (err) {
+        $('loginError').textContent = err.message;
+      } finally {
+        $('loginBtn').disabled = false;
+        $('loginBtn').textContent = 'Daxil ol';
+      }
+    });
+
+    // ===== Навигация =====
+    const TABS = ['products', 'upload', 'account'];
+    function route() {
+      const tab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'products';
+      for (const v of document.querySelectorAll('[data-view]')) v.hidden = v.dataset.view !== tab;
+      for (const a of document.querySelectorAll('a[data-tab]')) {
+        if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+      }
+      if (tab === 'account') loadSessions();
+      if (tab === 'upload') requestAnimationFrame(layoutStage);
+      window.scrollTo({ top: 0 });
+    }
+    window.addEventListener('hashchange', route);
+
+    // ================================================================
+    //  ТОВАРЫ
+    // ================================================================
+    let items = [];       // новые — первыми
+    let shown = PAGE;
+    let filterCat = '';
+    let filterPin = false;
+
+    function renderFilters() {
+      const chips = [['', 'Hamısı'], ...CATEGORIES.map((c) => [c, c])];
+      $('filters').innerHTML =
+        chips.map(([v, label]) => `<button type="button" class="chip" data-cat="${esc(v)}" aria-pressed="${filterCat === v && !filterPin}">${esc(label)}</button>`).join('') +
+        `<button type="button" class="chip" data-pin aria-pressed="${filterPin}">${icon('pin')}PIN</button>`;
+    }
+    $('filters').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.hasAttribute('data-pin')) { filterPin = !filterPin; filterCat = ''; }
+      else { filterCat = b.dataset.cat; filterPin = false; }
+      shown = PAGE;
+      renderFilters();
+      renderGrid();
+    });
+    $('search').addEventListener('input', () => { shown = PAGE; renderGrid(); });
+
     async function loadItems() {
-      const res = await fetch(API_BASE + '/api/items', { cache: 'no-store' });
-      const data = await res.json();
-      items = data.items.slice().reverse();
-      render();
+      $('grid').innerHTML = Array.from({ length: 8 }, () => '<div class="skeleton"></div>').join('');
+      try {
+        const res = await fetch(API + '/api/items', { cache: 'no-store' });
+        const data = await res.json();
+        items = data.items.slice().reverse();
+        renderGrid();
+      } catch {
+        $('grid').innerHTML = `<div class="empty" style="grid-column:1/-1">${icon('alert')}<div>Məhsulları yükləmək alınmadı</div></div>`;
+      }
     }
 
     function filtered() {
-      const q = $('search').value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
-      const cat = $('filterCategory').value;
-      const pinOnly = $('filterPin').checked;
-      return items.filter((it) =>
-        (!q || it.code.includes(q)) && (!cat || it.category === cat) && (!pinOnly || it.pin)
-      );
+      const q = $('search').value.toLowerCase().replace(/[^a-z0-9]+/g, '');
+      return items.filter((it) => (!q || it.code.includes(q)) && (!filterCat || it.category === filterCat) && (!filterPin || it.pin));
     }
 
-    // ---------- render ----------
-    const fillCategories = (select, extra) => {
-      for (const c of CATEGORIES) select.add(new Option(c, c));
-    };
-    fillCategories($('filterCategory'));
-    fillCategories(document.querySelector('#addForm select[name="category"]'));
-
-    const thumbObserver = new IntersectionObserver((entries) => {
+    const thumbs = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (!e.isIntersecting) continue;
-        const v = e.target;
-        v.src = v.dataset.src + '#t=1';
-        thumbObserver.unobserve(v);
+        e.target.src = e.target.dataset.src + '#t=0.5';
+        thumbs.unobserve(e.target);
       }
-    }, { rootMargin: '200px' });
+    }, { rootMargin: '300px' });
 
-    function render() {
+    function renderGrid() {
       const list = filtered();
-      const total = items.length;
-      $('count').textContent =
-        list.length === total ? `${total} məhsul` : `${list.length} / ${total} məhsul`;
+      const pins = items.filter((i) => i.pin).length;
+      $('count').textContent = list.length === items.length
+        ? `${items.length} məhsul · ${pins} PIN`
+        : `${list.length} / ${items.length} məhsul`;
 
-      const root = $('list');
-      root.innerHTML = '';
       if (!list.length) {
-        root.innerHTML = '<div class="empty">Heç nə tapılmadı</div>';
+        $('grid').innerHTML = `<div class="empty" style="grid-column:1/-1">${icon('search')}<div>Heç nə tapılmadı</div></div>`;
+        return;
       }
-      for (const it of list.slice(0, shown)) root.appendChild(renderRow(it));
-      $('more').hidden = list.length <= shown;
+      $('grid').innerHTML = list.slice(0, shown).map((it) => `
+        <button type="button" class="p-card" data-id="${it.id}">
+          <div class="p-media">
+            <video muted playsinline preload="metadata" data-src="${esc(it.video)}"></video>
+            ${it.pin ? `<span class="badge-pin">${icon('pin')}PIN</span>` : ''}
+          </div>
+          <div class="p-body">
+            <span class="p-code">${esc(it.code)}</span>
+            <span class="p-meta">${esc(it.category)} · ${esc((it.created_at || '').slice(0, 10))}</span>
+          </div>
+        </button>`).join('');
+      $('grid').querySelectorAll('video').forEach((v) => thumbs.observe(v));
     }
 
-    function renderRow(it) {
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.dataset.id = it.id;
+    // Подгрузка при прокрутке
+    new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && filtered().length > shown) { shown += PAGE; renderGrid(); }
+    }, { rootMargin: '600px' }).observe($('sentinel'));
 
-      const thumb = document.createElement('div');
-      thumb.className = 'thumb';
-      const v = document.createElement('video');
-      v.muted = true;
-      v.playsInline = true;
-      v.preload = 'metadata';
-      v.dataset.src = it.video;
-      thumbObserver.observe(v);
-      thumb.appendChild(v);
-      thumb.addEventListener('click', () => openPlayer(it.video));
+    // ---------- Карточка товара ----------
+    let current = null;
+    const sheet = $('sheet');
 
-      const fields = document.createElement('div');
-      fields.className = 'fields';
+    function renderCatChips(root, value) {
+      root.innerHTML = CATEGORIES.map((c) => `<button type="button" class="chip" role="radio" data-cat="${esc(c)}" aria-checked="${c === value}">${esc(c)}</button>`).join('');
+    }
+    function chipValue(root) {
+      return root.querySelector('[aria-checked="true"]')?.dataset.cat || '';
+    }
+    function bindChips(root, onChange) {
+      root.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-cat]');
+        if (!b) return;
+        root.querySelectorAll('[data-cat]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+        onChange?.();
+      });
+    }
 
-      const code = document.createElement('input');
-      code.type = 'text';
-      code.className = 'code';
-      code.value = it.code;
-      code.setAttribute('aria-label', 'Kod');
-      code.addEventListener('change', () => save(it, row, { code: code.value }, () => (code.value = it.code)));
+    $('grid').addEventListener('click', (e) => {
+      const card = e.target.closest('.p-card');
+      if (!card) return;
+      current = items.find((i) => i.id === Number(card.dataset.id));
+      if (!current) return;
+      $('sheetTitle').textContent = current.code;
+      $('sheetVideo').src = current.video;
+      $('sheetCode').value = current.code;
+      renderCatChips($('sheetCats'), current.category);
+      $('sheetPin').checked = !!current.pin;
+      $('sheetMeta').textContent = `#${current.id} · ${(current.created_at || '').slice(0, 10)}`;
+      $('sheetLink').href = current.video;
+      $('sheetSave').disabled = true;
+      disarm($('sheetDelete'));
+      sheet.showModal();
+    });
 
-      const cat = document.createElement('select');
-      cat.setAttribute('aria-label', 'Kateqoriya');
-      fillCategories(cat);
-      cat.value = it.category;
-      cat.addEventListener('change', () => save(it, row, { category: cat.value }, () => (cat.value = it.category)));
+    function sheetDirty() {
+      if (!current) return false;
+      return $('sheetCode').value.toLowerCase().replace(/[^a-z0-9]+/g, '') !== current.code
+        || chipValue($('sheetCats')) !== current.category
+        || $('sheetPin').checked !== !!current.pin;
+    }
+    const updateSave = () => { $('sheetSave').disabled = !sheetDirty(); };
+    $('sheetCode').addEventListener('input', updateSave);
+    $('sheetPin').addEventListener('change', updateSave);
+    bindChips($('sheetCats'), updateSave);
 
-      const pinLabel = document.createElement('label');
-      pinLabel.className = 'pin';
-      const pin = document.createElement('input');
-      pin.type = 'checkbox';
-      pin.checked = !!it.pin;
-      pin.addEventListener('change', () => save(it, row, { pin: pin.checked }, () => (pin.checked = !!it.pin)));
-      pinLabel.append(pin, ' PIN');
+    function closeSheet() {
+      $('sheetVideo').pause();
+      $('sheetVideo').removeAttribute('src');
+      sheet.close();
+    }
+    $('sheetClose').addEventListener('click', closeSheet);
+    sheet.addEventListener('click', (e) => { if (e.target === sheet) closeSheet(); });
+    sheet.addEventListener('cancel', (e) => { e.preventDefault(); closeSheet(); });
 
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      const date = (it.created_at || '').slice(0, 10);
-      meta.innerHTML = `#${it.id} · ${date} · `;
-      const link = document.createElement('a');
-      link.href = it.video;
-      link.target = '_blank';
-      link.textContent = 'video ↗';
-      meta.appendChild(link);
+    $('sheetSave').addEventListener('click', async () => {
+      const btn = $('sheetSave');
+      btn.disabled = true;
+      btn.textContent = 'Saxlanılır…';
+      try {
+        const { item } = await api('PATCH', `/api/items/${current.id}`, {
+          code: $('sheetCode').value, category: chipValue($('sheetCats')), pin: $('sheetPin').checked,
+        });
+        Object.assign(current, item);
+        renderGrid();
+        closeSheet();
+        toast(`${item.code} yadda saxlanıldı`);
+      } catch (err) {
+        toast(err.message, 'error');
+        btn.disabled = false;
+      } finally {
+        btn.textContent = 'Yadda saxla';
+      }
+    });
 
-      const del = document.createElement('button');
-      del.type = 'button';
-      del.className = 'del';
-      del.textContent = 'Sil';
-      let armed = null;
-      del.addEventListener('click', async () => {
-        if (!armed) {
-          del.classList.add('confirm');
-          del.textContent = 'Əminsiniz?';
-          armed = setTimeout(() => { armed = null; del.classList.remove('confirm'); del.textContent = 'Sil'; }, 3000);
+    // Двухшаговая кнопка удаления/выхода: первый клик — «Əminsiniz?», второй — действие
+    function armable(btn, label, action) {
+      btn.addEventListener('click', async () => {
+        if (!btn.classList.contains('armed')) {
+          btn.classList.add('armed');
+          btn.dataset.label = btn.innerHTML;
+          btn.textContent = 'Əminsiniz?';
+          btn._t = setTimeout(() => disarm(btn), 3500);
           return;
         }
-        clearTimeout(armed);
-        del.disabled = true;
-        try {
-          await api('DELETE', `/api/items/${it.id}`);
-          items = items.filter((x) => x.id !== it.id);
-          render();
-        } catch (err) {
-          flash(row, false, err.message);
-          del.disabled = false;
-          armed = null;
-          del.classList.remove('confirm');
-          del.textContent = 'Sil';
-        }
+        clearTimeout(btn._t);
+        btn.disabled = true;
+        try { await action(); } finally { btn.disabled = false; disarm(btn); }
       });
-
-      fields.append(code, cat, pinLabel, meta, del);
-      row.append(thumb, fields);
-      return row;
+    }
+    function disarm(btn) {
+      if (!btn.classList.contains('armed')) return;
+      btn.classList.remove('armed');
+      btn.innerHTML = btn.dataset.label;
     }
 
-    async function save(it, row, patch, revert) {
+    armable($('sheetDelete'), 'Sil', async () => {
       try {
-        const { item } = await api('PATCH', `/api/items/${it.id}`, patch);
-        Object.assign(it, item);
-        flash(row, true);
-        if (patch.code !== undefined) row.querySelector('.code').value = item.code;
+        await api('DELETE', `/api/items/${current.id}`);
+        items = items.filter((i) => i.id !== current.id);
+        toast(`${current.code} silindi`);
+        renderGrid();
+        closeSheet();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+
+    // ================================================================
+    //  ЗАГРУЗКА
+    // ================================================================
+    const up = {
+      file: null, width: 0, height: 0, duration: 0,
+      mode: 'crop', offset: 0.5, busy: false, previewUrl: null, resultUrl: null,
+    };
+    const isSquare = () => up.width === up.height;
+
+    renderCatChips($('catChips'), '');
+    bindChips($('catChips'), validateUpload);
+    $('code').addEventListener('input', validateUpload);
+
+    function validateUpload() {
+      const hasFile = !!up.file;
+      const hasMeta = !!$('code').value.trim() && !!chipValue($('catChips'));
+      $('step1').classList.toggle('done', hasFile);
+      $('step2').classList.toggle('done', hasMeta);
+      $('uploadBtn').disabled = up.busy || !hasFile || !hasMeta;
+      $('compressOnly').hidden = !hasFile || up.busy;
+      if (hasFile && hasMeta) $('upError').textContent = '';
+    }
+
+    // ----- выбор файла -----
+    $('fileInput').addEventListener('change', () => { if ($('fileInput').files[0]) loadFile($('fileInput').files[0]); });
+    $('changeFile').addEventListener('click', () => $('fileInput').click());
+    $('drop').addEventListener('dragover', (e) => { e.preventDefault(); $('drop').classList.add('over'); });
+    $('drop').addEventListener('dragleave', () => $('drop').classList.remove('over'));
+    $('drop').addEventListener('drop', (e) => {
+      e.preventDefault();
+      $('drop').classList.remove('over');
+      if (e.dataTransfer.files[0] && !up.busy) loadFile(e.dataTransfer.files[0]);
+    });
+
+    async function loadFile(file) {
+      $('upError').textContent = '';
+      if (typeof VideoEncoder === 'undefined') {
+        $('upError').textContent = 'Bu brauzer videonu sıxa bilmir. Chrome və ya Safari-nin son versiyasını istifadə edin.';
+        return;
+      }
+      let input;
+      try {
+        input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+        const track = await input.getPrimaryVideoTrack();
+        if (!track) throw new Error('Faylda video tapılmadı');
+        if (!(await track.canDecode())) throw new Error('Bu brauzer bu video formatını oxuya bilmir');
+        up.width = await track.getDisplayWidth();
+        up.height = await track.getDisplayHeight();
+        up.duration = await input.computeDuration();
       } catch (err) {
-        revert();
-        flash(row, false, err.message);
+        $('upError').textContent = 'Fayl oxunmadı: ' + err.message;
+        return;
+      } finally {
+        input?.dispose?.();
+      }
+
+      up.file = file;
+      up.offset = 0.5;
+      up.mode = 'crop';
+      const shape = isSquare() ? 'kvadrat' : up.width > up.height ? 'üfüqi' : 'şaquli';
+      $('fileName').textContent = file.name;
+      $('fileMeta').textContent = `${up.width}×${up.height} · ${shape} · ${Math.round(up.duration)} san · ${fmtMB(file.size)}`;
+      if (up.previewUrl) URL.revokeObjectURL(up.previewUrl);
+      up.previewUrl = URL.createObjectURL(file);
+      $('preview').src = up.previewUrl;
+      $('drop').hidden = true;
+      $('filePanel').hidden = false;
+      $('modes').hidden = isSquare();
+      setMode('crop');
+      validateUpload();
+    }
+
+    // ----- рамка / белые поля -----
+    function setMode(mode) {
+      up.mode = mode;
+      $('modes').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+      layoutStage();
+    }
+    $('modes').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-mode]');
+      if (b && !up.busy) setMode(b.dataset.mode);
+    });
+
+    function layoutStage() {
+      if (!up.file || $('filePanel').hidden) return;
+      const pad = up.mode === 'pad' && !isSquare();
+      const ar = pad ? 1 : up.width / up.height;
+      const availW = $('filePanel').clientWidth;
+      if (!availW) return;
+      const maxH = Math.max(260, window.innerHeight * 0.55);
+      const w = Math.min(availW, maxH * ar);
+      const h = w / ar;
+      Object.assign($('stage').style, { width: w + 'px', height: h + 'px' });
+      $('stage').classList.toggle('pad', pad);
+
+      if (isSquare()) {
+        $('frame').hidden = true;
+        $('hint').textContent = 'Video kvadratdır — yalnız sıxılacaq.';
+      } else if (pad) {
+        $('frame').hidden = true;
+        $('hint').textContent = 'Video tam saxlanılır, boş yerlər ağ olur.';
+      } else {
+        $('frame').hidden = false;
+        const side = Math.min(w, h);
+        Object.assign($('frame').style, { width: side + 'px', height: side + 'px' });
+        positionFrame();
+        $('hint').textContent = 'Çərçivəni sürüşdürün.';
+      }
+    }
+    function positionFrame() {
+      const w = $('stage').clientWidth, h = $('stage').clientHeight, side = Math.min(w, h);
+      const x = w > h ? up.offset * (w - side) : 0;
+      const y = h > w ? up.offset * (h - side) : 0;
+      $('frame').style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    const clamp = (v) => Math.max(0, Math.min(1, v));
+    let drag = null;
+    $('stage').addEventListener('pointerdown', (e) => {
+      if (up.busy || $('frame').hidden) return;
+      const r = $('stage').getBoundingClientRect();
+      const horizontal = r.width > r.height;
+      const side = Math.min(r.width, r.height);
+      const range = (horizontal ? r.width : r.height) - side;
+      if (range <= 0) return;
+      const pos = horizontal ? e.clientX - r.left : e.clientY - r.top;
+      if (!$('frame').contains(e.target)) { up.offset = clamp((pos - side / 2) / range); positionFrame(); }
+      drag = { horizontal, range, start: pos, startOffset: up.offset };
+      $('frame').classList.add('dragging');
+      $('stage').setPointerCapture(e.pointerId);
+    });
+    $('stage').addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const r = $('stage').getBoundingClientRect();
+      const pos = drag.horizontal ? e.clientX - r.left : e.clientY - r.top;
+      up.offset = clamp(drag.startOffset + (pos - drag.start) / drag.range);
+      positionFrame();
+    });
+    const endDrag = () => { drag = null; $('frame').classList.remove('dragging'); };
+    $('stage').addEventListener('pointerup', endDrag);
+    $('stage').addEventListener('pointercancel', endDrag);
+    window.addEventListener('resize', layoutStage);
+
+    // ----- сжатие -----
+    const even = (v) => Math.max(2, Math.floor(v / 2) * 2);
+
+    function videoOptions() {
+      const quality = new Quality({ bitrate: BITRATE, bitrateMode: 'variable' });
+      const base = { codec: 'avc', frameRate: FRAME_RATE, quality, forceTranscode: true, keyFrameInterval: 2 };
+      if (up.mode === 'pad' && !isSquare()) {
+        const size = even(Math.min(OUTPUT_SIZE, Math.max(up.width, up.height)));
+        const canvas = new OffscreenCanvas(size, size);
+        const ctx = canvas.getContext('2d');
+        return {
+          ...base, size, processedWidth: size, processedHeight: size,
+          process: (sample) => {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, size, size);
+            sample.drawWithFit(ctx, { fit: 'contain' });
+            return canvas;
+          },
+        };
+      }
+      const side = Math.min(up.width, up.height);
+      const size = even(Math.min(OUTPUT_SIZE, side));
+      const opts = { ...base, size, width: size, height: size, fit: 'fill' };
+      if (!isSquare()) {
+        opts.crop = {
+          left: up.width > side ? Math.round(up.offset * (up.width - side)) : 0,
+          top: up.height > side ? Math.round(up.offset * (up.height - side)) : 0,
+          width: side, height: side,
+        };
+      }
+      return opts;
+    }
+
+    async function compress(onProgress) {
+      const { size, ...video } = videoOptions();
+      if (!(await canEncodeVideo('avc', { width: size, height: size, bitrate: BITRATE }))) {
+        throw new Error('Bu brauzer H.264 kodlaya bilmir. Chrome və ya Safari istifadə edin.');
+      }
+      const input = new Input({ source: new BlobSource(up.file), formats: ALL_FORMATS });
+      const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
+      try {
+        const conversion = await Conversion.init({ input, output, video, audio: { discard: true }, tracks: 'primary' });
+        if (!conversion.isValid) throw new Error('Video çevrilə bilmir (' + conversion.discardedTracks.map((t) => t.reason).join(', ') + ')');
+        conversion.onProgress = onProgress;
+        await conversion.execute();
+        return new Blob([output.target.buffer], { type: 'video/mp4' });
+      } finally {
+        input.dispose?.();
       }
     }
 
-    function flash(row, ok, message) {
-      row.classList.remove('saved', 'failed');
-      void row.offsetWidth;
-      row.classList.add(ok ? 'saved' : 'failed');
-      row.title = ok ? 'Yadda saxlanıldı' : message || 'Xəta';
-      setTimeout(() => row.classList.remove('saved'), 1200);
-      if (!ok && message) alertInline(message);
+    function fileNameFor(code) {
+      const base = code.trim().toUpperCase().replace(/[^A-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'video';
+      const d = new Date(), p = (n) => String(n).padStart(2, '0');
+      return `${base}_${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}-${p(d.getMinutes())}-${p(d.getSeconds())}.mp4`;
     }
 
-    function alertInline(text) {
-      setMsg($('addMsg'), '');
-      $('count').textContent = '❌ ' + text;
-      setTimeout(render, 2500);
+    function uploadBlob(blob, filename, onProgress) {
+      return new Promise((resolve, reject) => {
+        const form = new FormData();
+        form.append('file', blob, filename);
+        form.append('code', $('code').value.trim());
+        form.append('category', chipValue($('catChips')));
+        if ($('pin').checked) form.append('pin', '1');
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', API + '/upload');
+        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
+        xhr.onload = () => {
+          let data = null;
+          try { data = JSON.parse(xhr.responseText); } catch {}
+          if (xhr.status === 401) { onSessionLost(data?.message); return reject(new Error(data?.message || 'Sessiya bitib')); }
+          if (xhr.status >= 200 && xhr.status < 300 && data?.success) resolve(data);
+          else reject(new Error(data?.message || `Server xətası (${xhr.status})`));
+        };
+        xhr.onerror = () => reject(new Error('Serverə qoşulmaq alınmadı'));
+        xhr.send(form);
+      });
     }
 
-    // ---------- filters ----------
-    for (const id of ['search', 'filterCategory', 'filterPin']) {
-      $(id).addEventListener('input', () => { shown = PAGE; render(); });
+    function setBusy(busy) {
+      up.busy = busy;
+      for (const el of [$('code'), $('pin'), $('fileInput'), $('changeFile')]) el.disabled = busy;
+      $('catChips').querySelectorAll('button').forEach((b) => (b.disabled = busy));
+      $('modes').querySelectorAll('button').forEach((b) => (b.disabled = busy));
+      $('progressBox').hidden = !busy;
+      validateUpload();
     }
-    $('more').addEventListener('click', () => { shown += PAGE; render(); });
+    function setProgress(stage, fraction, share) {
+      const total = stage === 'compress' ? fraction * share : share + fraction * (1 - share);
+      $('bar').style.width = Math.round(total * 100) + '%';
+      $('stPercent').textContent = Math.round(fraction * 100) + '%';
+      $('stCompress').className = stage === 'compress' ? 'on' : '';
+      $('stUpload').className = stage === 'upload' ? 'on' : '';
+    }
 
-    // ---------- add ----------
-    $('toggleAdd').addEventListener('click', () => {
-      $('addCard').hidden = !$('addCard').hidden;
-      if (!$('addCard').hidden) $('addForm').code.focus();
-    });
+    async function run(withUpload) {
+      if (!up.file || up.busy) return;
+      $('upError').textContent = '';
+      setBusy(true);
+      $('uploadBtn').textContent = withUpload ? 'Gözləyin…' : 'Sıxılır…';
+      const share = withUpload ? 0.85 : 1;
+      try {
+        const blob = await compress((p) => setProgress('compress', p, share));
+        const filename = fileNameFor($('code').value);
+        let data = null;
+        if (withUpload) data = await uploadBlob(blob, filename, (p) => setProgress('upload', p, share));
+        showSuccess(blob, filename, data);
+      } catch (err) {
+        $('upError').textContent = err.message;
+      } finally {
+        $('uploadBtn').textContent = 'Sıx və yüklə';
+        setBusy(false);
+      }
+    }
+    $('uploadBtn').addEventListener('click', () => run(true));
+    $('compressOnly').addEventListener('click', () => run(false));
+
+    function showSuccess(blob, filename, data) {
+      if (up.resultUrl) URL.revokeObjectURL(up.resultUrl);
+      up.resultUrl = URL.createObjectURL(blob);
+      $('resultVideo').src = up.resultUrl;
+      const ratio = Math.max(1, Math.round(up.file.size / blob.size));
+      $('stats').innerHTML =
+        `<span class="stat">${fmtMB(up.file.size)} → <b>${fmtMB(blob.size)}</b></span><span class="stat"><b>${ratio}×</b> kiçik</span>` +
+        (data?.item ? `<span class="stat"><b>${esc(data.item.code)}</b> · ${esc(data.item.category)}${data.item.pin ? ' · PIN' : ''}</span>` : '');
+      $('successTitle').textContent = data?.item ? 'Kataloqa əlavə edildi' : 'Sıxıldı (yüklənmədi)';
+      $('downloadLink').hidden = !!data;
+      $('downloadLink').href = up.resultUrl;
+      $('downloadLink').download = filename;
+      $('upForm').hidden = true;
+      $('upSuccess').hidden = false;
+      if (data?.item) { items.unshift(data.item); renderGrid(); }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetUpload(keepMeta = false) {
+      up.file = null;
+      $('fileInput').value = '';
+      $('preview').removeAttribute('src');
+      $('drop').hidden = false;
+      $('filePanel').hidden = true;
+      if (!keepMeta) {
+        $('code').value = '';
+        $('pin').checked = false;
+        renderCatChips($('catChips'), '');
+      }
+      $('bar').style.width = '0';
+      $('upSuccess').hidden = true;
+      $('upForm').hidden = false;
+      validateUpload();
+    }
+    $('again').addEventListener('click', () => resetUpload(false));
+
+    // ----- добавление по ссылке -----
     $('addForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const f = e.target;
-      const btn = f.querySelector('button');
+      const code = $('code').value.trim(), category = chipValue($('catChips'));
+      if (!code || !category) { toast('Əvvəl kodu və kateqoriyanı seçin', 'error'); $('code').focus(); return; }
+      const btn = e.target.querySelector('button');
       btn.disabled = true;
       try {
-        const { item } = await api('POST', '/api/items', {
-          code: f.code.value, video: f.video.value, category: f.category.value, pin: f.pin.checked,
-        });
+        const { item } = await api('POST', '/api/items', { code, video: e.target.video.value, category, pin: $('pin').checked });
         items.unshift(item);
-        f.reset();
-        setMsg($('addMsg'), `✅ Əlavə edildi: ${item.code}`, 'ok');
-        render();
-      } catch (err) {
-        setMsg($('addMsg'), '❌ ' + err.message, 'error');
-      } finally {
-        btn.disabled = false;
-      }
+        renderGrid();
+        e.target.reset();
+        resetUpload(false);
+        toast(`${item.code} kataloqa əlavə edildi`);
+      } catch (err) { toast(err.message, 'error'); }
+      finally { btn.disabled = false; }
     });
 
-    // ---------- player ----------
-    function openPlayer(url) {
-      $('playerVideo').src = url;
-      $('player').hidden = false;
+    // ================================================================
+    //  АККАУНТ / СЕССИИ
+    // ================================================================
+    function describeUA(ua = '') {
+      const device = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : /Android/.test(ua) ? 'Android'
+        : /Macintosh|Mac OS X/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : /Linux/.test(ua) ? 'Linux' : 'Cihaz';
+      const browser = /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera' : /CriOS|Chrome\//.test(ua) ? 'Chrome'
+        : /FxiOS|Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : '';
+      const mobile = /iPhone|Android|Mobile/.test(ua);
+      return { name: browser ? `${device} · ${browser}` : device, mobile };
     }
-    $('player').addEventListener('click', (e) => {
-      if (e.target.id === 'player') {
-        $('playerVideo').pause();
-        $('playerVideo').removeAttribute('src');
-        $('player').hidden = true;
+    function ago(isoStr) {
+      const s = Math.max(0, (Date.now() - Date.parse(isoStr)) / 1000);
+      if (s < 90) return 'indicə';
+      if (s < 3600) return `${Math.round(s / 60)} dəq əvvəl`;
+      if (s < 86400) return `${Math.round(s / 3600)} saat əvvəl`;
+      return `${Math.round(s / 86400)} gün əvvəl`;
+    }
+
+    async function loadSessions() {
+      $('sessions').innerHTML = '<div class="s-item"><div class="s-meta">Yüklənir…</div></div>';
+      try {
+        const { sessions } = await api('GET', '/api/sessions');
+        $('sessions').innerHTML = sessions.map((s) => {
+          const d = describeUA(s.user_agent);
+          return `
+            <div class="s-item">
+              <span class="s-icon">${icon(d.mobile ? 'phone' : 'laptop')}</span>
+              <div>
+                <div class="s-name">${esc(d.name)}${s.current ? '<span class="pill-ok">Bu cihaz</span>' : ''}</div>
+                <div class="s-meta">${esc(s.location || 'Məkan məlum deyil')} · ${s.current ? 'aktiv' : 'son aktivlik ' + ago(s.last_seen)}</div>
+              </div>
+              ${s.current ? '' : `<button type="button" class="btn btn-ghost" data-end="${esc(s.id)}">Bitir</button>`}
+            </div>`;
+        }).join('') || '<div class="s-item"><div class="s-meta">Aktiv sessiya yoxdur</div></div>';
+      } catch (err) {
+        if (err.status !== 401) $('sessions').innerHTML = `<div class="s-item"><div class="s-meta">${esc(err.message)}</div></div>`;
       }
+    }
+    $('sessions').addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-end]');
+      if (!b) return;
+      b.disabled = true;
+      try { await api('DELETE', `/api/sessions/${b.dataset.end}`); toast('Sessiya bitirildi'); loadSessions(); }
+      catch (err) { toast(err.message, 'error'); b.disabled = false; }
     });
 
-    // ---------- start ----------
-    const saved = store.get();
-    if (saved) tryLogin(saved, true);
-    else $('loginView').hidden = false;
+    $('logoutBtn').addEventListener('click', async () => {
+      try { await api('POST', '/api/logout'); } catch {}
+      token = '';
+      store.set('');
+      showLogin('');
+    });
+    armable($('logoutAll'), '', async () => {
+      try {
+        await api('DELETE', '/api/sessions');
+        token = '';
+        store.set('');
+        showLogin('Bütün cihazlardan çıxış edildi.');
+      } catch (err) { toast(err.message, 'error'); }
+    });
+
+    // ================================================================
+    //  СТАРТ
+    // ================================================================
+    renderFilters();
+    if (!token) showLogin('');
+    else api('GET', '/api/me').then(enterApp).catch((err) => { if (err.status !== 401) showLogin(err.message); });
   </script>
 </body>
 </html>
