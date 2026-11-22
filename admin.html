@@ -30,11 +30,14 @@
       --gold-soft: #FBF6E4;
       --danger: #DC2626;
       --danger-soft: #FEF2F2;
+      --warn: #B45309;
+      --warn-soft: #FFFBEB;
       --ok: #15803D;
       --ok-soft: #F0FDF4;
       --radius: 14px;
       --shadow: 0 1px 2px rgba(28, 25, 23, .04), 0 2px 10px rgba(28, 25, 23, .05);
       --shadow-lg: 0 16px 48px rgba(28, 25, 23, .18);
+      --top-h: 56px;
       --nav-h: 64px;
       --side-w: 248px;
       --safe-b: env(safe-area-inset-bottom, 0px);
@@ -55,6 +58,8 @@
     :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .muted { color: var(--muted); }
+    @media (max-width: 1023px) { .desk { display: none !important; } }
+    @media (min-width: 1024px) { .mob { display: none !important; } }
 
     /* ---------- buttons ---------- */
     .btn {
@@ -70,17 +75,18 @@
     .btn-danger { background: var(--surface); border-color: #FECACA; color: var(--danger); }
     .btn-danger:hover:not(:disabled) { background: var(--danger-soft); }
     .btn-danger.armed, .icon-btn.armed { background: var(--danger); border-color: var(--danger); color: #fff; }
-    .btn-lg { min-height: 46px; font-size: 15px; border-radius: 12px; }
+    .btn-lg { min-height: 48px; font-size: 15px; border-radius: 12px; }
     .btn-block { width: 100%; }
     .icon-btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 36px; height: 36px; padding: 0 8px;
-      border-radius: 9px; border: 1px solid transparent; background: transparent; color: var(--text-2); font-weight: 600; font-size: 13px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 40px; height: 40px; padding: 0 8px;
+      border-radius: 10px; border: 1px solid transparent; background: transparent; color: var(--text-2); font-weight: 600; font-size: 13px;
     }
     .icon-btn:hover { background: var(--surface-2); color: var(--text); }
 
     /* ---------- fields ---------- */
     .field { display: flex; flex-direction: column; gap: 6px; }
-    .field > span { font-size: 13px; font-weight: 600; color: var(--text-2); }
+    .field > span, .field-label { font-size: 13px; font-weight: 600; color: var(--text-2); }
+    .field small { font-size: 12.5px; color: var(--muted); }
     .input, .select {
       width: 100%; min-height: 42px; padding: 0 12px; font-size: 15px;
       border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface);
@@ -90,17 +96,18 @@
     .input:focus, .select:focus { outline: none; border-color: var(--text); box-shadow: 0 0 0 3px rgba(212, 175, 55, .25); }
     @media (max-width: 1023px) { .input, .select { font-size: 16px; min-height: 46px; } }
     .input-wrap { position: relative; }
-    .input-wrap .input { padding-left: 38px; }
-    .input-wrap > svg.i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
-    .input-wrap .icon-btn { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); }
-    .error-text { color: var(--danger); font-size: 13.5px; min-height: 1.3em; margin: 0; }
+    .input-wrap .input { padding-left: 40px; }
+    .input-wrap > svg.i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .input-wrap .icon-btn { position: absolute; right: 3px; top: 50%; transform: translateY(-50%); }
+    .error-text { color: var(--danger); font-size: 13.5px; margin: 0; }
+    .error-text:empty { display: none; }
 
     .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: -2px; }
     .chips::-webkit-scrollbar { display: none; }
     .chip {
-      display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px;
+      display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 13px;
       border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface);
-      font-size: 13.5px; font-weight: 500; color: var(--text-2); white-space: nowrap; transition: all .15s;
+      font-size: 13.5px; font-weight: 500; color: var(--text-2); white-space: nowrap; transition: all .15s; flex: none;
     }
     .chip:hover { border-color: var(--muted); }
     .chip .n { color: var(--muted); font-weight: 500; font-size: 12px; }
@@ -115,18 +122,20 @@
     .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform .2s var(--ease); }
     .toggle:checked { background: var(--gold); }
     .toggle:checked::after { transform: translateX(18px); }
-    .toggle.sm { width: 36px; height: 21px; }
-    .toggle.sm::after { width: 15px; height: 15px; }
-    .toggle.sm:checked::after { transform: translateX(15px); }
+    .toggle.sm { width: 38px; height: 22px; }
+    .toggle.sm::after { width: 16px; height: 16px; }
+    .toggle.sm:checked::after { transform: translateX(16px); }
     .checkbox { width: 16px; height: 16px; accent-color: var(--ink); cursor: pointer; margin: 0; }
 
-    .segmented { display: inline-flex; padding: 3px; gap: 3px; background: var(--surface-2); border-radius: 10px; }
-    .segmented button { border: none; background: transparent; min-height: 32px; padding: 0 12px; border-radius: 8px; font-weight: 500; font-size: 13.5px; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
+    .segmented { display: inline-flex; padding: 3px; gap: 3px; background: var(--surface-2); border-radius: 10px; flex: none; }
+    .segmented button { border: none; background: transparent; min-height: 32px; padding: 0 10px; border-radius: 8px; font-weight: 500; font-size: 13.5px; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
     .segmented button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.08); font-weight: 600; }
 
     .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
-    .cat-pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: var(--surface-2); color: var(--text-2); white-space: nowrap; }
+    .cat-pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--surface-2); color: var(--text-2); white-space: nowrap; }
     .cat-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--c, var(--muted)); }
+    .badge-pin { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.94); color: var(--gold-ink); font-size: 11px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .badge-pin svg.i { width: 12px; height: 12px; fill: var(--gold); stroke: var(--gold); }
 
     /* ---------- login ---------- */
     .login { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px;
@@ -141,13 +150,14 @@
     .login form { display: flex; flex-direction: column; gap: 14px; }
 
     /* ---------- app shell ---------- */
-    .sidebar {
-      position: fixed; inset: 0 auto 0 0; width: var(--side-w); z-index: 40;
-      background: var(--side); color: var(--side-text); display: none; flex-direction: column; padding: 22px 14px;
-    }
-    .sidebar .brand { padding: 0 10px 26px; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: var(--side-w); z-index: 40; background: var(--side); color: var(--side-text); display: none; flex-direction: column; padding: 22px 14px; }
+    .sidebar .brand { padding: 0 10px 22px; }
     .sidebar .wordmark { color: #fff; }
     .sidebar .brand .tag { color: #A8A29E; }
+    .side-cta { margin: 0 0 22px; }
+    .side-cta .btn { width: 100%; background: var(--gold); color: var(--ink); }
+    .side-cta .btn:hover { background: #C9A42F; }
+    .side-cta .btn[aria-current="page"] { box-shadow: 0 0 0 2px var(--side), 0 0 0 4px var(--gold); }
     .side-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #78716C; padding: 0 12px 8px; }
     .side-nav { display: flex; flex-direction: column; gap: 2px; }
     .side-nav a { position: relative; display: flex; align-items: center; gap: 12px; height: 42px; padding: 0 12px; border-radius: 10px; color: var(--side-text); font-weight: 500; }
@@ -163,18 +173,18 @@
     .side-user .dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; flex: none; }
 
     .topbar {
-      position: sticky; top: 0; z-index: 30; min-height: 60px; padding: 0 16px;
+      position: sticky; top: 0; z-index: 30; height: var(--top-h); padding: 0 8px 0 16px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      background: rgba(255, 255, 255, .9); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
-      border-bottom: 1px solid var(--line);
+      background: rgba(246, 245, 243, .9); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
+      border-bottom: 1px solid transparent; transition: border-color .2s;
     }
+    .topbar.scrolled { border-bottom-color: var(--line); }
     .topbar .page-title { display: none; }
     .topbar .top-actions { display: flex; align-items: center; gap: 8px; }
-    .topbar .desk-only { display: none; }
-    .main { max-width: 1320px; margin: 0 auto; padding: 18px 16px calc(var(--nav-h) + var(--safe-b) + 28px); }
-    .page-head { margin-bottom: 16px; }
-    .page-head h2 { font-size: 24px; letter-spacing: -.02em; margin: 0; line-height: 1.2; }
-    .page-head .sub { color: var(--muted); font-size: 14px; margin-top: 2px; }
+    .main { max-width: 1320px; margin: 0 auto; padding: 4px 16px calc(var(--nav-h) + var(--safe-b) + 24px); }
+    .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 6px 0 12px; }
+    .page-head h2 { font-size: 26px; letter-spacing: -.02em; margin: 0; line-height: 1.15; }
+    .page-head .sub { color: var(--muted); font-size: 13.5px; margin-top: 3px; }
 
     .bottom-nav {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
@@ -183,33 +193,28 @@
       background: rgba(255, 255, 255, .94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line);
     }
     .bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--muted); font-size: 11.5px; font-weight: 600; }
-    .bottom-nav a svg.i { width: 20px; height: 20px; }
+    .bottom-nav a svg.i { width: 21px; height: 21px; }
     .bottom-nav a[aria-current="page"] { color: var(--text); }
     .bottom-nav a[aria-current="page"] svg.i { color: var(--gold-ink); }
-    .bottom-nav .upload-pill { display: grid; place-items: center; width: 44px; height: 30px; border-radius: 999px; background: var(--ink); color: #fff; }
-    .bottom-nav a[aria-current="page"] .upload-pill { background: var(--gold); }
-    .bottom-nav a[aria-current="page"] .upload-pill svg.i { color: var(--ink); }
+    .bottom-nav .new-pill { display: grid; place-items: center; width: 46px; height: 30px; border-radius: 999px; background: var(--ink); color: #fff; }
+    .bottom-nav a[aria-current="page"] .new-pill { background: var(--gold); }
+    .bottom-nav a[aria-current="page"] .new-pill svg.i { color: var(--ink); }
 
     @media (min-width: 1024px) {
       .sidebar { display: flex; }
       .content { margin-left: var(--side-w); }
-      .bottom-nav, .topbar .mob-only { display: none; }
-      .topbar { padding: 0 28px; min-height: 68px; }
+      .bottom-nav, .topbar .mob { display: none; }
+      .topbar { padding: 0 28px; height: 68px; background: rgba(255,255,255,.9); border-bottom-color: var(--line); }
       .topbar .page-title { display: block; }
       .topbar .page-title h1 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
       .topbar .page-title .crumb { font-size: 12.5px; color: var(--muted); }
-      .topbar .desk-only { display: inline-flex; }
       .main { padding: 24px 28px 48px; }
       .page-head { display: none; }
     }
 
-    /* ---------- stats ---------- */
-    .stats { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 1fr); gap: 12px; overflow-x: auto; scrollbar-width: none; margin-bottom: 16px; padding: 1px 1px 2px; }
-    .stats::-webkit-scrollbar { display: none; }
-    .stat {
-      text-align: left; padding: 14px 16px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line);
-      box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; transition: border-color .15s, box-shadow .15s;
-    }
+    /* ---------- stats (desktop) ---------- */
+    .stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat { text-align: left; padding: 14px 16px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; transition: border-color .15s, box-shadow .15s; }
     .stat:hover { border-color: var(--line-2); }
     .stat[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
     .stat .label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
@@ -218,18 +223,31 @@
     .stat .hint { font-size: 12px; color: var(--muted); }
     .stat .hint b { color: var(--ok); font-weight: 600; }
 
-    /* ---------- products panel ---------- */
-    .panel { overflow: hidden; }
-    .panel-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
-    .panel-toolbar .search { flex: 1 1 240px; min-width: 200px; }
+    /* ---------- products ---------- */
+    .panel-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
+    .panel-toolbar .search { flex: 1 1 240px; min-width: 0; }
     .panel-toolbar .chips { flex: 0 1 auto; }
     .panel-toolbar .tools { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-    /* плавающая панель массовых действий — не сдвигает таблицу */
+
+    /* мобильный: прилипающая панель поиска и фильтров без «карточки» */
+    @media (max-width: 1023px) {
+      .panel { background: none; border: none; box-shadow: none; }
+      .panel-toolbar { position: sticky; top: var(--top-h); z-index: 20; margin: 0 -16px; padding: 8px 16px 10px; background: rgba(246, 245, 243, .94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); flex-wrap: nowrap; flex-direction: column; align-items: stretch; }
+      .panel-toolbar .search { flex: none; }
+      .panel-toolbar .chips { margin: 0 -16px; padding: 2px 16px; }
+      .panel-toolbar .tools { display: none; }
+      .pager { display: none !important; }
+    }
+    @media (min-width: 1024px) {
+      .panel { overflow: hidden; }
+      .panel-toolbar { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+    }
+
+    /* плавающая панель массовых действий (компьютер) */
     .bulkbar {
       position: fixed; z-index: 35; bottom: 24px; left: calc(50% + var(--side-w) / 2); transform: translateX(-50%);
       display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; border-radius: 14px;
-      background: var(--ink); color: #fff; box-shadow: var(--shadow-lg); font-size: 13.5px; white-space: nowrap;
-      animation: toast-in .2s var(--ease);
+      background: var(--ink); color: #fff; box-shadow: var(--shadow-lg); font-size: 13.5px; white-space: nowrap; animation: toast-in .2s var(--ease);
     }
     .bulkbar b { margin-right: 8px; }
     .bulkbar .select { width: auto; min-height: 34px; font-size: 13.5px; background-color: #292524; border-color: #44403C; color: #fff; }
@@ -238,16 +256,12 @@
     .bulkbar .btn-ghost:hover { background: #3A3430; }
     .bulkbar .btn-danger { background: transparent; border-color: #7F1D1D; color: #FCA5A5; }
     .bulkbar .btn-danger.armed { background: var(--danger); border-color: var(--danger); color: #fff; }
-    .bulkbar .icon-btn { color: #A8A29E; }
+    .bulkbar .icon-btn { color: #A8A29E; height: 34px; min-width: 34px; }
     .bulkbar .icon-btn:hover { background: #292524; color: #fff; }
-    .bulkbar .spacer { width: 4px; }
 
     .table-wrap { overflow-x: auto; }
     table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .tbl th {
-      text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em;
-      padding: 10px 14px; background: var(--surface-3); border-bottom: 1px solid var(--line); white-space: nowrap;
-    }
+    .tbl th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; padding: 10px 14px; background: var(--surface-3); border-bottom: 1px solid var(--line); white-space: nowrap; }
     .tbl th button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
     .tbl th button:hover { color: var(--text); }
     .tbl th button svg.i { width: 13px; height: 13px; opacity: .35; }
@@ -265,22 +279,34 @@
     .tbl .c-actions { width: 140px; text-align: right; white-space: nowrap; }
     .tbl .code { font-weight: 600; font-variant-numeric: tabular-nums; }
     .tbl .id { color: var(--muted); font-size: 12px; font-weight: 500; margin-left: 8px; }
-    .thumb { position: relative; width: 52px; height: 52px; border-radius: 9px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); display: block; flex: none; }
+    .thumb { position: relative; width: 52px; height: 52px; border-radius: 10px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); display: block; flex: none; }
     .thumb video { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
 
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
+    /* мобильный список */
+    .m-list { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .m-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-bottom: 1px solid var(--line); cursor: pointer; }
+    .m-row:last-child { border-bottom: none; }
+    .m-row:active { background: var(--surface-3); }
+    .m-row .thumb { width: 60px; height: 60px; border-radius: 12px; }
+    .m-row .info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .m-row .code { font-weight: 600; font-size: 15.5px; letter-spacing: .01em; display: flex; align-items: center; gap: 6px; }
+    .m-row .code svg.i { width: 14px; height: 14px; fill: var(--gold); stroke: var(--gold); }
+    .m-row .sub { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+    .m-row .pin-cell { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10.5px; font-weight: 600; color: var(--muted); padding: 4px; }
+
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     @media (min-width: 620px) { .grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 1024px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+    @media (min-width: 1024px) { .grid { grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 14px; } }
     .p-card { display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; transition: box-shadow .2s; }
     .p-card:hover { box-shadow: var(--shadow); }
     .p-media { position: relative; aspect-ratio: 1; background: var(--surface-2); }
     .p-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .badge-pin { position: absolute; top: 8px; left: 8px; display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.94); color: var(--gold-ink); font-size: 11px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-    .badge-pin svg.i { width: 12px; height: 12px; fill: var(--gold); stroke: var(--gold); }
-    .p-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .p-media .badge-pin { position: absolute; top: 8px; left: 8px; }
+    .p-body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 5px; }
     .p-code { font-weight: 600; font-size: 14.5px; }
     .p-meta { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
 
+    .list-foot { text-align: center; font-size: 13px; color: var(--muted); padding: 16px 0 4px; }
     .pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--muted); }
     .pager .pages { display: flex; align-items: center; gap: 4px; }
     .pager .pages button { display: inline-grid; place-items: center; min-width: 34px; height: 34px; border-radius: 8px; border: 1px solid transparent; background: none; color: var(--text-2); font-weight: 500; }
@@ -291,94 +317,135 @@
     .pager .size .select { width: auto; min-height: 34px; font-size: 13.5px; }
     .empty { text-align: center; padding: 56px 16px; color: var(--muted); }
     .empty svg.i { width: 34px; height: 34px; color: var(--line-2); margin-bottom: 8px; }
-    .skeleton-row { height: 68px; background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%); background-size: 300% 100%; animation: shimmer 1.4s infinite; }
+    .skel { background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%); background-size: 300% 100%; animation: shimmer 1.4s infinite; }
     @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 
     /* ---------- drawer / sheet ---------- */
-    dialog.sheet {
-      border: none; padding: 0; margin: auto auto 0; width: 100%; max-width: 560px; max-height: 92dvh;
-      border-radius: 20px 20px 0 0; background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg);
-      flex-direction: column; overflow: hidden;
-    }
-    dialog.sheet[open] { display: flex; animation: sheet-up .28s var(--ease); }
-    dialog.sheet::backdrop { background: rgba(28, 25, 23, .4); }
-    @keyframes sheet-up { from { transform: translateY(24px); opacity: 0; } }
+    dialog.sheet { border: none; padding: 0; margin: auto auto 0; width: 100%; max-width: 560px; max-height: 94dvh; border-radius: 22px 22px 0 0; background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg); flex-direction: column; overflow: hidden; }
+    dialog.sheet[open] { display: flex; animation: sheet-up .3s var(--ease); }
+    dialog.sheet::backdrop { background: rgba(28, 25, 23, .45); }
+    @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } }
     @keyframes drawer-in { from { transform: translateX(40px); opacity: 0; } }
+    .grabber { width: 40px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 8px auto 0; flex: none; }
     @media (min-width: 1024px) {
       dialog.sheet { margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; max-width: 460px; border-radius: 0; }
       dialog.sheet[open] { animation: drawer-in .28s var(--ease); }
+      .grabber { display: none; }
     }
-    .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 12px 12px 20px; border-bottom: 1px solid var(--line); }
+    .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px 10px 20px; border-bottom: 1px solid var(--line); }
+    @media (min-width: 1024px) { .sheet-head { padding-top: 14px; } }
     .sheet-head:focus { outline: none; }
     .sheet-head h3 { margin: 0; font-size: 18px; }
     .sheet-head .crumb { font-size: 12.5px; color: var(--muted); }
-    .sheet-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; flex: 1; }
-    .sheet-video { width: 100%; aspect-ratio: 1; border-radius: 12px; background: var(--surface-2); object-fit: cover; display: block; }
-    .sheet-actions { display: flex; gap: 10px; padding: 14px 20px calc(14px + var(--safe-b)); border-top: 1px solid var(--line); background: var(--surface); }
+    .sheet-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; flex: 1; overscroll-behavior: contain; }
+    .sheet-video { width: min(100%, 42dvh); aspect-ratio: 1; margin: 0 auto; border-radius: 14px; background: var(--surface-2); object-fit: cover; display: block; }
+    @media (min-width: 1024px) { .sheet-video { width: 100%; } }
+    .sheet-actions { display: flex; gap: 10px; padding: 12px 20px calc(12px + var(--safe-b)); border-top: 1px solid var(--line); background: var(--surface); }
+    .sheet-actions .btn { min-height: 46px; }
     .sheet-actions .btn-primary { flex: 1; }
     .meta-list { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 13px; margin: 0; }
     .meta-list dt { color: var(--muted); }
     .meta-list dd { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* ---------- upload ---------- */
-    .up-layout { display: grid; gap: 16px; }
-    @media (min-width: 1024px) { .up-layout { grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); align-items: start; } }
+    /* ---------- Yeni məhsul ---------- */
+    .new-layout { display: grid; gap: 14px; }
+    @media (min-width: 1024px) {
+      .new-layout { grid-template-columns: minmax(0, 1.2fr) minmax(340px, 1fr); align-items: start; gap: 20px; }
+      .new-side { position: sticky; top: 92px; }
+    }
     .section { padding: 18px; }
-    .section-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; margin: 0 0 14px; }
-    .step { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); font-size: 12.5px; font-weight: 700; color: var(--text-2); }
-    .step.done { background: var(--gold); color: var(--ink); }
+    .section-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 600; font-size: 15px; margin: 0 0 14px; }
+    .section-title small { font-weight: 500; color: var(--muted); font-size: 12.5px; }
     .dropzone {
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;
-      min-height: 260px; padding: 24px; border: 1.5px dashed var(--line-2); border-radius: 12px; background: var(--surface-3);
+      aspect-ratio: 1; max-height: 520px; width: 100%; padding: 24px; border: 1.5px dashed var(--line-2); border-radius: 14px; background: var(--surface-3);
       cursor: pointer; transition: border-color .15s, background .15s;
     }
+    @media (max-width: 1023px) { .dropzone { aspect-ratio: auto; min-height: 220px; } }
     .dropzone:hover, .dropzone.over { border-color: var(--gold); background: var(--gold-soft); }
-    .dropzone .circle { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); color: var(--gold-ink); }
-    .dropzone .circle svg.i { width: 24px; height: 24px; }
-    .dropzone b { font-size: 15.5px; }
-    .dropzone span { color: var(--muted); font-size: 13.5px; }
-    .file-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .file-row .ficon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--gold-soft); color: var(--gold-ink); flex: none; }
-    .file-row .fname { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .file-row .fmeta { font-size: 13px; color: var(--muted); }
-    .file-row > div { min-width: 0; flex: 1; }
-    .stage { position: relative; margin: 0 auto; overflow: hidden; border-radius: 12px; background: #0c0a09; touch-action: none; user-select: none; }
+    .dropzone .circle { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--ink); color: #fff; box-shadow: var(--shadow); }
+    .dropzone .circle svg.i { width: 26px; height: 26px; }
+    .dropzone b { font-size: 16px; }
+    .dropzone span { color: var(--muted); font-size: 13.5px; max-width: 300px; }
+    .media-wrap { position: relative; }
+    .stage { position: relative; margin: 0 auto; overflow: hidden; border-radius: 14px; background: #0c0a09; touch-action: none; user-select: none; }
     .stage video { width: 100%; height: 100%; display: block; object-fit: contain; pointer-events: none; }
     .stage.pad { background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
-    .frame { position: absolute; top: 0; left: 0; border: 2px solid #fff; border-radius: 6px; box-shadow: 0 0 0 9999px rgba(12, 10, 9, .55); cursor: grab; }
+    .frame { position: absolute; top: 0; left: 0; border: 2px solid #fff; border-radius: 8px; box-shadow: 0 0 0 9999px rgba(12, 10, 9, .55); cursor: grab; }
     .frame.dragging { cursor: grabbing; }
-    .frame .grip { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.92); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+    .frame .grip { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.92); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+    .busy { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; border-radius: 14px; background: rgba(12, 10, 9, .62); backdrop-filter: blur(3px); color: #fff; text-align: center; }
+    .ring { --p: 0; width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 10px;
+      background: conic-gradient(var(--gold) calc(var(--p) * 1%), rgba(255,255,255,.18) 0); }
+    .ring span { display: grid; place-items: center; width: 76px; height: 76px; border-radius: 50%; background: rgba(12, 10, 9, .85); font-weight: 700; font-size: 20px; }
+    .busy .stage-label { font-weight: 600; }
+    .busy .stage-sub { font-size: 12.5px; color: #D6D3D1; margin-top: 2px; }
+    .file-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+    .file-row .ficon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--gold-soft); color: var(--gold-ink); flex: none; }
+    .file-row .fname { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-row .fmeta { font-size: 12.5px; color: var(--muted); }
+    .file-row .fmeta b { color: var(--ok); font-weight: 600; }
+    .file-row > div { min-width: 0; flex: 1; }
     .stage-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     .hint { font-size: 13px; color: var(--muted); margin: 0; }
-    .form-stack { display: flex; flex-direction: column; gap: 16px; }
-    .actionbar { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
-    .actionbar .error-text:empty { display: none; }
-    .progress { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
-    .progress > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), #E9C96B); border-radius: 999px; transition: width .25s; }
-    .stages { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
-    .stages .on { color: var(--text); font-weight: 600; }
-    .link-btn { background: none; border: none; color: var(--gold-ink); font-weight: 600; font-size: 13.5px; padding: 4px 0; align-self: center; }
-    .success { text-align: center; padding: 28px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
-    .success .tick { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); }
-    .success .tick svg.i { width: 28px; height: 28px; stroke-width: 2.4; }
-    .success h3 { margin: 0; font-size: 20px; }
-    .success video { width: 100%; max-width: 300px; aspect-ratio: 1; border-radius: 12px; background: var(--surface-2); object-fit: cover; }
+    .form-stack { display: flex; flex-direction: column; gap: 18px; }
+    .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .cat-tile {
+      display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 12px; text-align: left;
+      border-radius: 12px; border: 1px solid var(--line-2); background: var(--surface); transition: border-color .15s, background .15s, box-shadow .15s;
+    }
+    .cat-tile:hover { border-color: var(--muted); }
+    .cat-tile i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+    .cat-tile b { display: block; font-size: 14px; font-weight: 600; }
+    .cat-tile small { display: block; font-size: 12px; color: var(--muted); }
+    .cat-tile[aria-checked="true"] { border-color: var(--ink); background: var(--gold-soft); box-shadow: inset 0 0 0 1px var(--ink); }
+    .cat-tile:disabled { opacity: .5; cursor: default; }
+    .notice { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; font-size: 13px; background: var(--warn-soft); color: var(--warn); }
+    .notice svg.i { width: 16px; height: 16px; margin-top: 1px; }
+    .notice a { color: var(--warn); font-weight: 600; text-decoration: underline; }
+    .code-preview { font-size: 12.5px; color: var(--muted); }
+    .code-preview b { color: var(--text); font-variant-numeric: tabular-nums; }
+    .divider { height: 1px; background: var(--line); margin: 2px 0; }
+    .checklist { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; }
+    .checklist li { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+    .checklist li .dot { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--line-2); flex: none; }
+    .checklist li .dot svg.i { width: 11px; height: 11px; stroke-width: 3; color: #fff; opacity: 0; }
+    .checklist li.done { color: var(--text); }
+    .checklist li.done .dot { background: var(--ok); border-color: var(--ok); }
+    .checklist li.done .dot svg.i { opacity: 1; }
+    .submit-note { font-size: 12.5px; color: var(--muted); text-align: center; margin: 0; }
+    /* мобильная панель отправки — всегда видна над нижним меню */
+    .m-submit { position: fixed; left: 0; right: 0; bottom: calc(var(--nav-h) + var(--safe-b)); z-index: 25; padding: 10px 16px; background: rgba(255,255,255,.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
+    .m-submit .status { font-size: 12.5px; color: var(--muted); line-height: 1.3; min-width: 0; flex: 1; }
+    .m-submit .status b { display: block; color: var(--text); font-size: 13.5px; }
+    .m-submit .btn { flex: none; min-height: 46px; padding: 0 18px; }
+    body.has-m-submit .main { padding-bottom: calc(var(--nav-h) + var(--safe-b) + 96px); }
+    @media (min-width: 1024px) { .m-submit { display: none; } body.has-m-submit .main { padding-bottom: 48px; } }
+    details.manual summary { cursor: pointer; color: var(--text-2); font-weight: 600; font-size: 14px; list-style: none; display: flex; align-items: center; gap: 8px; }
+    details.manual summary::-webkit-details-marker { display: none; }
+    details.manual summary .chev { margin-left: auto; transition: transform .2s; }
+    details.manual[open] summary .chev { transform: rotate(90deg); }
+    details.manual[open] summary { margin-bottom: 14px; }
+    .success { text-align: center; padding: 32px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 560px; margin: 0 auto; }
+    .success .tick { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); }
+    .success .tick svg.i { width: 30px; height: 30px; stroke-width: 2.4; }
+    .success h3 { margin: 0; font-size: 22px; letter-spacing: -.01em; }
+    .success video { width: 100%; max-width: 300px; aspect-ratio: 1; border-radius: 14px; background: var(--surface-2); object-fit: cover; }
     .pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
     .pill { padding: 5px 12px; border-radius: 999px; background: var(--surface-2); font-size: 13px; color: var(--text-2); }
     .pill b { color: var(--text); }
-    .success .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-    details.manual summary { cursor: pointer; color: var(--text-2); font-weight: 600; font-size: 14px; list-style: none; display: flex; align-items: center; gap: 8px; }
-    details.manual summary::-webkit-details-marker { display: none; }
-    details.manual[open] summary { margin-bottom: 14px; }
+    .success .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; }
+    @media (max-width: 1023px) { .success .btns .btn { flex: 1 1 100%; min-height: 48px; } }
     .recent h4 { margin: 0; padding: 14px 18px; font-size: 14px; border-bottom: 1px solid var(--line); }
-    .recent-row { display: flex; align-items: center; gap: 12px; padding: 10px 18px; border-bottom: 1px solid var(--line); }
+    .recent-row { display: flex; align-items: center; gap: 12px; padding: 10px 18px; border-bottom: 1px solid var(--line); cursor: pointer; }
+    .recent-row:hover { background: var(--surface-3); }
     .recent-row:last-child { border-bottom: none; }
     .recent-row .thumb { width: 40px; height: 40px; }
     .recent-row > div { flex: 1; min-width: 0; }
 
     /* ---------- account ---------- */
     .acc-grid { display: grid; gap: 16px; max-width: 760px; }
-    .s-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-top: 1px solid var(--line); }
+    .s-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-top: 1px solid var(--line); }
     .s-item:first-child { border-top: none; }
     .s-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--surface-2); color: var(--text-2); flex: none; }
     .s-item > div { flex: 1; min-width: 0; }
@@ -386,12 +453,15 @@
     .s-meta { font-size: 13px; color: var(--muted); }
     .pill-ok { font-size: 11px; font-weight: 700; color: var(--ok); background: var(--ok-soft); padding: 2px 8px; border-radius: 999px; }
     .note { font-size: 13.5px; color: var(--muted); margin: 0; }
-    .card-head { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .card-head { padding: 14px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .card-head h4 { margin: 0; font-size: 15px; }
+    .acc-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    @media (max-width: 1023px) { .acc-actions .btn { flex: 1 1 100%; min-height: 48px; } }
 
     /* ---------- toast ---------- */
     .toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + var(--safe-b) + 14px); z-index: 60; display: flex; flex-direction: column; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
-    @media (min-width: 1024px) { .toasts { left: auto; right: 24px; transform: none; bottom: 24px; } }
+    body.has-m-submit .toasts { bottom: calc(var(--nav-h) + var(--safe-b) + 84px); }
+    @media (min-width: 1024px) { .toasts, body.has-m-submit .toasts { left: auto; right: 24px; transform: none; bottom: 24px; } }
     .toast { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 12px; background: var(--ink); color: #fff; font-size: 14px; box-shadow: var(--shadow-lg); animation: toast-in .25s var(--ease); }
     .toast.error { background: var(--danger); }
     @keyframes toast-in { from { transform: translateY(10px); opacity: 0; } }
@@ -405,6 +475,7 @@
     <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
     <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
     <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m22 8-6 4 6 4z"/></symbol>
     <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 2l2.9 6.1 6.6.8-4.9 4.5 1.3 6.6L12 16.8 6.1 20l1.3-6.6L2.5 8.9l6.6-.8z"/></symbol>
@@ -458,10 +529,10 @@
   <div id="appView" hidden>
     <aside class="sidebar" aria-label="Menyu">
       <div class="brand"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
+      <div class="side-cta"><a class="btn" href="#new" data-tab="new"><svg class="i"><use href="#i-plus"/></svg>Yeni məhsul</a></div>
       <div class="side-label">Kataloq</div>
       <nav class="side-nav">
         <a href="#products" data-tab="products"><svg class="i"><use href="#i-box"/></svg>Məhsullar<span class="count" id="navCount"></span></a>
-        <a href="#upload" data-tab="upload"><svg class="i"><use href="#i-upload"/></svg>Video yüklə</a>
       </nav>
       <div class="side-label" style="margin-top:18px">Sistem</div>
       <nav class="side-nav">
@@ -475,24 +546,30 @@
     </aside>
 
     <div class="content">
-      <header class="topbar">
-        <div class="brand mob-only"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
+      <header class="topbar" id="topbar">
+        <div class="brand mob"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
         <div class="page-title">
           <div class="crumb">İdarəetmə</div>
           <h1 id="pageTitle">Məhsullar</h1>
         </div>
         <div class="top-actions">
-          <a class="btn btn-ghost desk-only" href="/" target="_blank" rel="noopener"><svg class="i"><use href="#i-external"/></svg>Sayta bax</a>
-          <a class="btn btn-primary desk-only" href="#upload" id="topUpload"><svg class="i"><use href="#i-plus"/></svg>Yeni məhsul</a>
-          <a class="icon-btn mob-only" href="/" target="_blank" rel="noopener" aria-label="Sayta bax"><svg class="i"><use href="#i-external"/></svg></a>
+          <a class="btn btn-ghost desk" href="/" target="_blank" rel="noopener"><svg class="i"><use href="#i-external"/></svg>Sayta bax</a>
+          <a class="btn btn-primary desk" href="#new" id="topNew"><svg class="i"><use href="#i-plus"/></svg>Yeni məhsul</a>
+          <a class="icon-btn mob" href="/" target="_blank" rel="noopener" aria-label="Sayta bax"><svg class="i"><use href="#i-external"/></svg></a>
         </div>
       </header>
 
       <main class="main">
         <!-- ---------- Товары ---------- -->
         <section data-view="products">
-          <div class="page-head"><h2>Məhsullar</h2><div class="sub" id="countMobile"></div></div>
-          <div class="stats" id="stats"></div>
+          <div class="page-head">
+            <div><h2>Məhsullar</h2><div class="sub" id="countMobile"></div></div>
+            <div class="segmented" id="viewToggleM" role="group" aria-label="Görünüş">
+              <button type="button" data-view-mode="list" aria-label="Siyahı"><svg class="i"><use href="#i-list"/></svg></button>
+              <button type="button" data-view-mode="grid" aria-label="Kartlar"><svg class="i"><use href="#i-grid"/></svg></button>
+            </div>
+          </div>
+          <div class="stats desk" id="stats"></div>
 
           <div class="card panel">
             <div class="panel-toolbar">
@@ -503,8 +580,8 @@
               <div class="chips" id="filters" role="group" aria-label="Kateqoriya filtri"></div>
               <div class="tools">
                 <div class="segmented" id="viewToggle" role="group" aria-label="Görünüş">
-                  <button type="button" data-view-mode="table" aria-pressed="true" aria-label="Cədvəl" title="Cədvəl"><svg class="i"><use href="#i-list"/></svg></button>
-                  <button type="button" data-view-mode="grid" aria-pressed="false" aria-label="Kartlar" title="Kartlar"><svg class="i"><use href="#i-grid"/></svg></button>
+                  <button type="button" data-view-mode="list" aria-label="Cədvəl" title="Cədvəl"><svg class="i"><use href="#i-list"/></svg></button>
+                  <button type="button" data-view-mode="grid" aria-label="Kartlar" title="Kartlar"><svg class="i"><use href="#i-grid"/></svg></button>
                 </div>
               </div>
             </div>
@@ -515,11 +592,10 @@
               <button type="button" class="btn btn-ghost" data-bulk="pin-on"><svg class="i"><use href="#i-pin"/></svg>PIN qoy</button>
               <button type="button" class="btn btn-ghost" data-bulk="pin-off">PIN götür</button>
               <button type="button" class="btn btn-danger" id="bulkDelete"><svg class="i"><use href="#i-trash"/></svg>Sil</button>
-              <span class="spacer"></span>
               <button type="button" class="icon-btn" id="bulkClear" aria-label="Seçimi ləğv et" title="Seçimi ləğv et"><svg class="i"><use href="#i-x"/></svg></button>
             </div>
 
-            <div class="table-wrap" id="tableWrap">
+            <div class="table-wrap" id="tableWrap" hidden>
               <table class="tbl">
                 <thead>
                   <tr>
@@ -535,9 +611,12 @@
                 <tbody id="tbody"></tbody>
               </table>
             </div>
+            <div class="m-list" id="mlist" hidden></div>
             <div class="grid" id="grid" hidden></div>
+            <div class="list-foot mob" id="listFoot"></div>
+            <div id="sentinel" style="height:1px"></div>
 
-            <div class="pager">
+            <div class="pager desk" id="pager">
               <span id="range"></span>
               <div class="pages" id="pages"></div>
               <label class="size">Səhifədə
@@ -547,98 +626,123 @@
           </div>
         </section>
 
-        <!-- ---------- Загрузка ---------- -->
-        <section data-view="upload" hidden>
-          <div class="page-head"><h2>Video yüklə</h2><div class="sub">Video avtomatik sıxılır: 1080×1080, ~2 MB</div></div>
+        <!-- ---------- Новый товар ---------- -->
+        <section data-view="new" hidden>
+          <div class="page-head"><div><h2>Yeni məhsul</h2><div class="sub">Video, kod və kateqoriya — hamısı bir yerdə</div></div></div>
 
-          <div class="up-layout" id="upForm">
-            <div class="card section">
-              <p class="section-title"><span class="step" id="step1">1</span>Video</p>
-              <label class="dropzone" id="drop">
-                <input type="file" id="fileInput" accept="video/*" class="sr" />
-                <span class="circle"><svg class="i"><use href="#i-upload"/></svg></span>
-                <b>Video seçin</b>
-                <span>və ya faylı bura atın · MP4, MOV<br />avtomatik 1080×1080, ~2 MB</span>
-              </label>
-              <div id="filePanel" hidden>
-                <div class="file-row">
-                  <span class="ficon"><svg class="i"><use href="#i-film"/></svg></span>
-                  <div><div class="fname" id="fileName"></div><div class="fmeta" id="fileMeta"></div></div>
-                  <button type="button" class="btn btn-ghost" id="changeFile">Dəyiş</button>
-                </div>
-                <div class="stage" id="stage">
-                  <video id="preview" muted loop playsinline autoplay></video>
-                  <div class="frame" id="frame"><span class="grip"><svg class="i"><use href="#i-move"/></svg></span></div>
-                </div>
-                <div class="stage-controls">
-                  <div class="segmented" id="modes" role="group" aria-label="Kvadrat formatı">
-                    <button type="button" data-mode="crop" aria-pressed="true"><svg class="i"><use href="#i-crop"/></svg>Kəs</button>
-                    <button type="button" data-mode="pad" aria-pressed="false"><svg class="i"><use href="#i-frame"/></svg>Ağ fon</button>
-                  </div>
-                  <p class="hint" id="hint"></p>
-                </div>
-              </div>
-            </div>
-
+          <div class="new-layout" id="newForm">
             <div class="form-stack">
               <div class="card section">
-                <p class="section-title"><span class="step" id="step2">2</span>Məhsul məlumatı</p>
-                <div class="form-stack">
-                  <label class="field"><span>Məhsul kodu</span><input class="input" type="text" id="code" placeholder="UN-0141" autocomplete="off" autocapitalize="characters" /></label>
-                  <div class="field"><span id="catLabel">Kateqoriya</span><div class="chips" id="catChips" role="radiogroup" aria-labelledby="catLabel" style="flex-wrap: wrap;"></div></div>
-                  <label class="switch"><div><b>PIN</b><small>Əsas səhifədə yuxarıda göstər</small></div><input type="checkbox" class="toggle" id="pin" /></label>
+                <p class="section-title">Video <small id="videoHint">1080×1080-ə avtomatik sıxılır</small></p>
+                <label class="dropzone" id="drop">
+                  <input type="file" id="fileInput" accept="video/*" class="sr" />
+                  <span class="circle"><svg class="i"><use href="#i-video"/></svg></span>
+                  <b>Video seçin və ya çəkin</b>
+                  <span>Faylı bura atın · MP4, MOV. Böyük fayllar da olar — göndərməzdən əvvəl ~2 MB-a sıxılır.</span>
+                </label>
+                <div id="filePanel" hidden>
+                  <div class="media-wrap">
+                    <div class="stage" id="stage">
+                      <video id="preview" muted loop playsinline autoplay></video>
+                      <div class="frame" id="frame"><span class="grip"><svg class="i"><use href="#i-move"/></svg></span></div>
+                    </div>
+                    <div class="busy" id="busy" hidden>
+                      <div>
+                        <div class="ring" id="ring"><span id="ringPct">0%</span></div>
+                        <div class="stage-label" id="busyLabel">Sıxılır…</div>
+                        <div class="stage-sub" id="busySub">Səhifəni bağlamayın</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="stage-controls" id="stageControls">
+                    <div class="segmented" id="modes" role="group" aria-label="Kvadrat formatı">
+                      <button type="button" data-mode="crop" aria-pressed="true"><svg class="i"><use href="#i-crop"/></svg>Kəs</button>
+                      <button type="button" data-mode="pad" aria-pressed="false"><svg class="i"><use href="#i-frame"/></svg>Ağ fon</button>
+                    </div>
+                    <p class="hint" id="hint"></p>
+                  </div>
+                  <div class="file-row">
+                    <span class="ficon"><svg class="i"><use href="#i-film"/></svg></span>
+                    <div><div class="fname" id="fileName"></div><div class="fmeta" id="fileMeta"></div></div>
+                    <button type="button" class="btn btn-ghost" id="changeFile">Dəyiş</button>
+                  </div>
                 </div>
+                <p class="error-text" id="fileError" role="alert" style="margin-top:10px"></p>
               </div>
 
-              <div class="card actionbar">
-                <div id="progressBox" hidden>
-                  <div class="stages"><span id="stCompress">Sıxılır</span><span id="stPercent">0%</span><span id="stUpload">Yüklənir</span></div>
-                  <div class="progress" style="margin-top:8px"><div id="bar"></div></div>
-                </div>
-                <p class="error-text" id="upError" role="alert"></p>
-                <button type="button" class="btn btn-primary btn-lg btn-block" id="uploadBtn" disabled>Sıx və yüklə</button>
-                <button type="button" class="link-btn" id="compressOnly" hidden>Yükləmədən yoxla</button>
-              </div>
-
-              <details class="card section manual">
-                <summary><svg class="i"><use href="#i-link"/></svg>Video artıq yüklənib? Link ilə əlavə et</summary>
-                <form id="addForm" class="form-stack" novalidate>
-                  <label class="field"><span>Video linki</span><input class="input" type="url" name="video" placeholder="https://video.islimi.az/…mp4" required /></label>
-                  <p class="note">Kod, kateqoriya və PIN yuxarıdakı bölmədən götürülür.</p>
-                  <button class="btn btn-ghost" type="submit">Kataloqa əlavə et</button>
-                </form>
-              </details>
-
-              <div class="card recent">
+              <div class="card recent desk">
                 <h4>Son əlavə edilənlər</h4>
                 <div id="recent"></div>
               </div>
             </div>
+
+            <div class="new-side form-stack">
+              <div class="card section">
+                <p class="section-title">Məhsul məlumatı</p>
+                <div class="form-stack">
+                  <label class="field">
+                    <span>Məhsul kodu</span>
+                    <input class="input" type="text" id="code" placeholder="Məs: UN-0141" autocomplete="off" autocapitalize="characters" enterkeyhint="done" />
+                    <small class="code-preview" id="codePreview"></small>
+                  </label>
+                  <div class="notice" id="dupNotice" hidden></div>
+                  <div class="field">
+                    <span class="field-label" id="catLabel">Kateqoriya</span>
+                    <div class="cat-grid" id="catTiles" role="radiogroup" aria-labelledby="catLabel"></div>
+                  </div>
+                  <label class="switch"><div><b>PIN</b><small>Əsas səhifədə ən yuxarıda göstər</small></div><input type="checkbox" class="toggle" id="pin" /></label>
+
+                  <div class="desk form-stack" style="gap:12px">
+                    <div class="divider"></div>
+                    <ul class="checklist" id="checklist"></ul>
+                    <p class="error-text" id="upError" role="alert"></p>
+                    <button type="button" class="btn btn-primary btn-lg btn-block" id="submitBtn" disabled>Məhsulu əlavə et</button>
+                    <p class="submit-note">Video sıxılır, yüklənir və məhsul dərhal saytda görünür.</p>
+                  </div>
+                </div>
+              </div>
+
+              <details class="card section manual">
+                <summary><svg class="i"><use href="#i-link"/></svg>Video artıq yüklənib? Link ilə əlavə et <svg class="i chev"><use href="#i-right"/></svg></summary>
+                <form id="addForm" class="form-stack" novalidate>
+                  <label class="field"><span>Video linki</span><input class="input" type="url" name="video" placeholder="https://video.islimi.az/…mp4" required /></label>
+                  <p class="note">Kod, kateqoriya və PIN yuxarıdakı bölmədən götürülür.</p>
+                  <button class="btn btn-ghost" type="submit">Link ilə əlavə et</button>
+                </form>
+              </details>
+            </div>
           </div>
 
-          <div class="card success" id="upSuccess" hidden>
+          <!-- мобильная панель отправки -->
+          <div class="m-submit" id="mSubmit" hidden>
+            <div class="status"><b id="mStatusTitle">Hazır deyil</b><span id="mStatusText"></span></div>
+            <button type="button" class="btn btn-primary" id="submitBtnM" disabled>Əlavə et</button>
+          </div>
+
+          <div class="card success" id="newSuccess" hidden>
             <span class="tick"><svg class="i"><use href="#i-check"/></svg></span>
-            <h3 id="successTitle">Kataloqa əlavə edildi</h3>
+            <h3 id="successTitle">Məhsul əlavə edildi</h3>
             <video id="resultVideo" muted loop playsinline autoplay></video>
             <div class="pills" id="pills"></div>
             <div class="btns">
-              <button type="button" class="btn btn-primary" id="again">Yenisini yüklə</button>
-              <a class="btn btn-ghost" href="#products">Məhsullara bax</a>
-              <a class="btn btn-ghost" id="downloadLink" download hidden>Faylı endir</a>
+              <button type="button" class="btn btn-primary btn-lg" id="again"><svg class="i"><use href="#i-plus"/></svg>Növbəti məhsul</button>
+              <button type="button" class="btn btn-ghost btn-lg" id="openNew">Məhsulu aç</button>
+              <a class="btn btn-ghost btn-lg" href="#products">Bütün məhsullar</a>
             </div>
+            <p class="note" id="againNote"></p>
           </div>
         </section>
 
         <!-- ---------- Аккаунт ---------- -->
         <section data-view="account" hidden>
-          <div class="page-head"><h2>Hesab</h2><div class="sub">Aktiv sessiyalar və çıxış</div></div>
+          <div class="page-head"><div><h2>Hesab</h2><div class="sub">Aktiv sessiyalar və çıxış</div></div></div>
           <div class="acc-grid">
             <div class="card">
               <div class="card-head"><h4>Aktiv sessiyalar</h4><span class="muted" id="sessCount"></span></div>
               <div id="sessions"></div>
             </div>
             <p class="note">Sessiya son istifadədən 30 gün sonra bitir. Şifrə dəyişdirilərsə, bütün sessiyalar avtomatik bağlanır. 5 yanlış cəhddən sonra giriş 15 dəqiqəlik bağlanır.</p>
-            <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <div class="acc-actions">
               <button type="button" class="btn btn-ghost" data-logout><svg class="i"><use href="#i-logout"/></svg>Çıxış</button>
               <button type="button" class="btn btn-danger" id="logoutAll">Bütün cihazlardan çıx</button>
             </div>
@@ -649,13 +753,14 @@
 
     <nav class="bottom-nav" aria-label="Bölmələr">
       <a href="#products" data-tab="products"><svg class="i"><use href="#i-box"/></svg>Məhsullar</a>
-      <a href="#upload" data-tab="upload"><span class="upload-pill"><svg class="i"><use href="#i-upload"/></svg></span>Yüklə</a>
+      <a href="#new" data-tab="new"><span class="new-pill"><svg class="i"><use href="#i-plus"/></svg></span>Yeni məhsul</a>
       <a href="#account" data-tab="account"><svg class="i"><use href="#i-user"/></svg>Hesab</a>
     </nav>
   </div>
 
   <!-- Редактор товара: справа на компьютере, снизу на телефоне -->
   <dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
+    <div class="grabber" aria-hidden="true"></div>
     <div class="sheet-head" tabindex="-1" autofocus>
       <div><div class="crumb">Məhsul</div><h3 id="sheetTitle">Məhsul</h3></div>
       <button type="button" class="icon-btn" id="sheetClose" aria-label="Bağla"><svg class="i"><use href="#i-x"/></svg></button>
@@ -663,8 +768,8 @@
     <div class="sheet-body">
       <video class="sheet-video" id="sheetVideo" muted loop playsinline autoplay controls></video>
       <label class="field"><span>Məhsul kodu</span><input class="input" type="text" id="sheetCode" autocomplete="off" /></label>
-      <div class="field"><span id="sheetCatLabel">Kateqoriya</span><div class="chips" id="sheetCats" role="radiogroup" aria-labelledby="sheetCatLabel" style="flex-wrap: wrap;"></div></div>
-      <label class="switch"><div><b>PIN</b><small>Əsas səhifədə yuxarıda göstər</small></div><input type="checkbox" class="toggle" id="sheetPin" /></label>
+      <div class="field"><span class="field-label" id="sheetCatLabel">Kateqoriya</span><div class="cat-grid" id="sheetCats" role="radiogroup" aria-labelledby="sheetCatLabel"></div></div>
+      <label class="switch"><div><b>PIN</b><small>Əsas səhifədə ən yuxarıda göstər</small></div><input type="checkbox" class="toggle" id="sheetPin" /></label>
       <dl class="meta-list">
         <dt>ID</dt><dd id="sheetId"></dd>
         <dt>Əlavə edilib</dt><dd id="sheetDate"></dd>
@@ -692,9 +797,10 @@
     const OUTPUT_SIZE = 1080;
     const BITRATE = 1_200_000;
     const FRAME_RATE = 30;
+    const MOBILE_PAGE = 30;
     const TOKEN_KEY = 'islimi-session';
     const PREFS_KEY = 'islimi-admin-prefs';
-    const TITLES = { products: 'Məhsullar', upload: 'Video yüklə', account: 'Hesab və sessiyalar' };
+    const TITLES = { products: 'Məhsullar', new: 'Yeni məhsul', account: 'Hesab və sessiyalar' };
 
     const $ = (id) => document.getElementById(id);
     const icon = (name) => `<svg class="i"><use href="#i-${name}"/></svg>`;
@@ -702,6 +808,7 @@
     const fmtMB = (b) => (b / 1048576).toFixed(1) + ' MB';
     const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('az-AZ', { day: '2-digit', month: '2-digit', year: 'numeric' }); };
     const catPill = (c) => `<span class="cat-pill" style="--c:${CAT_COLORS[c] || '#78716C'}">${esc(c)}</span>`;
+    const normCode = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
     const desktopMQ = window.matchMedia('(min-width: 1024px)');
 
     // ===== Хранилище =====
@@ -743,6 +850,7 @@
     function showLogin(message = '') {
       $('appView').hidden = true;
       $('loginView').hidden = false;
+      document.body.classList.remove('has-m-submit');
       $('loginError').textContent = message;
       setTimeout(() => $('loginPassword').focus(), 50);
     }
@@ -796,21 +904,28 @@
     document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', () => logout('')));
 
     // ===== Навигация =====
-    const TABS = ['products', 'upload', 'account'];
+    const TABS = ['products', 'new', 'account'];
+    let currentTab = '';
     function route() {
-      const tab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'products';
+      let tab = location.hash.slice(1);
+      if (tab === 'upload') tab = 'new'; // старые ссылки
+      if (!TABS.includes(tab)) tab = 'products';
+      const changed = tab !== currentTab;
+      currentTab = tab;
       for (const v of document.querySelectorAll('[data-view]')) v.hidden = v.dataset.view !== tab;
       for (const a of document.querySelectorAll('a[data-tab]')) {
         if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
       }
       $('pageTitle').textContent = TITLES[tab];
-      $('topUpload').hidden = tab === 'upload';
+      $('topNew').hidden = tab === 'new';
       document.title = `${TITLES[tab]} · Islimi`;
+      updateMobileSubmit();
       if (tab === 'account') loadSessions();
-      if (tab === 'upload') { renderRecent(); requestAnimationFrame(layoutStage); }
-      window.scrollTo({ top: 0 });
+      if (tab === 'new') { renderRecent(); requestAnimationFrame(layoutStage); }
+      if (changed) window.scrollTo({ top: 0 });
     }
     window.addEventListener('hashchange', route);
+    window.addEventListener('scroll', () => $('topbar').classList.toggle('scrolled', scrollY > 4), { passive: true });
 
     // ================================================================
     //  ТОВАРЫ
@@ -819,21 +934,28 @@
     const view = {
       cat: '', pin: false, q: '',
       sort: prefs.sort || { key: 'id', dir: 'desc' },
-      mode: prefs.mode || 'table',
+      mode: prefs.mode === 'grid' ? 'grid' : 'list',
       page: 1, size: prefs.size || 25,
+      mshown: MOBILE_PAGE,
     };
     const selected = new Set();
     $('pageSize').value = String(view.size);
 
     async function loadItems() {
-      $('tbody').innerHTML = Array.from({ length: 8 }, () => '<tr><td colspan="7" class="skeleton-row"></td></tr>').join('');
+      $('tbody').innerHTML = Array.from({ length: 8 }, () => '<tr><td colspan="7" class="skel" style="height:68px"></td></tr>').join('');
+      $('mlist').innerHTML = Array.from({ length: 6 }, () => '<div class="m-row"><div class="thumb skel"></div><div class="info"><div class="skel" style="height:14px;width:40%;border-radius:4px"></div><div class="skel" style="height:12px;width:60%;border-radius:4px"></div></div></div>').join('');
       try {
         const res = await fetch(API + '/api/items', { cache: 'no-store' });
         items = (await res.json()).items;
         renderProducts();
         renderRecent();
+        renderCatTiles($('catTiles'), tileValue($('catTiles')) || prefs.lastCat || '', true); // с количеством товаров
+        updateDuplicate();
+        validateNew();
       } catch {
-        $('tbody').innerHTML = `<tr><td colspan="7"><div class="empty">${icon('alert')}<div>Məhsulları yükləmək alınmadı</div></div></td></tr>`;
+        const err = `<div class="empty">${icon('alert')}<div>Məhsulları yükləmək alınmadı</div></div>`;
+        $('tbody').innerHTML = `<tr><td colspan="7">${err}</td></tr>`;
+        $('mlist').innerHTML = err;
       }
     }
 
@@ -865,28 +987,29 @@
       if (!b) return;
       const k = b.dataset.stat;
       if (k === 'pin') { view.pin = !view.pin; view.cat = ''; } else { view.cat = k; view.pin = false; }
-      view.page = 1;
+      resetPaging();
       renderProducts();
     });
 
     function renderFilters() {
       const count = (c) => items.filter((i) => i.category === c).length;
       $('filters').innerHTML =
-        `<button type="button" class="chip" data-cat="" aria-pressed="${!view.cat && !view.pin}">Hamısı</button>` +
-        CATEGORIES.map((c) => `<button type="button" class="chip" data-cat="${esc(c)}" aria-pressed="${view.cat === c && !view.pin}">${esc(c)} <span class="n">${count(c)}</span></button>`).join('') +
-        `<button type="button" class="chip" data-pin aria-pressed="${view.pin}">${icon('pin')}PIN</button>`;
+        `<button type="button" class="chip" data-cat="" aria-pressed="${!view.cat && !view.pin}">Hamısı <span class="n">${items.length}</span></button>` +
+        `<button type="button" class="chip" data-pin aria-pressed="${view.pin}">${icon('pin')}PIN <span class="n">${items.filter((i) => i.pin).length}</span></button>` +
+        CATEGORIES.map((c) => `<button type="button" class="chip" data-cat="${esc(c)}" aria-pressed="${view.cat === c && !view.pin}">${esc(c)} <span class="n">${count(c)}</span></button>`).join('');
     }
     $('filters').addEventListener('click', (e) => {
       const b = e.target.closest('button');
       if (!b) return;
       if (b.hasAttribute('data-pin')) { view.pin = !view.pin; view.cat = ''; } else { view.cat = b.dataset.cat; view.pin = false; }
-      view.page = 1;
+      resetPaging();
       renderProducts();
     });
-    $('search').addEventListener('input', () => { view.q = $('search').value; view.page = 1; renderProducts(); });
+    $('search').addEventListener('input', () => { view.q = $('search').value; resetPaging(); renderProducts(); });
+    function resetPaging() { view.page = 1; view.mshown = MOBILE_PAGE; }
 
     function filteredSorted() {
-      const q = view.q.toLowerCase().replace(/[^a-z0-9]+/g, '');
+      const q = normCode(view.q);
       const list = items.filter((it) => (!q || it.code.includes(q)) && (!view.cat || it.category === view.cat) && (!view.pin || it.pin));
       const { key, dir } = view.sort;
       const m = dir === 'asc' ? 1 : -1;
@@ -897,7 +1020,7 @@
       });
     }
 
-    // Миниатюры грузятся при появлении на экране; уже загруженные — сразу (из кэша браузера)
+    // Миниатюры: грузятся при появлении на экране, уже загруженные — сразу из кэша
     const seenThumbs = new Set();
     const thumbs = new IntersectionObserver((entries) => {
       for (const e of entries) {
@@ -911,29 +1034,48 @@
       ? `<video muted playsinline preload="metadata" src="${esc(it.video)}#t=0.5"></video>`
       : `<video muted playsinline preload="metadata" data-src="${esc(it.video)}"></video>`;
     const observeThumbs = (root) => root.querySelectorAll('video[data-src]').forEach((v) => thumbs.observe(v));
+    const empty = () => `<div class="empty">${icon('search')}<div>Heç nə tapılmadı</div>${view.q || view.cat || view.pin ? '<div style="margin-top:10px"><button type="button" class="btn btn-ghost" data-reset>Filtrləri sıfırla</button></div>' : ''}</div>`;
+    document.querySelector('[data-view="products"]').addEventListener('click', (e) => {
+      if (!e.target.closest('[data-reset]')) return;
+      view.q = ''; view.cat = ''; view.pin = false; $('search').value = '';
+      resetPaging();
+      renderProducts();
+    });
 
     function renderProducts() {
       renderStats();
       renderFilters();
+      const desktop = desktopMQ.matches;
       const list = filteredSorted();
-      const pages = Math.max(1, Math.ceil(list.length / view.size));
-      view.page = Math.min(view.page, pages);
-      const start = (view.page - 1) * view.size;
-      const pageItems = list.slice(start, start + view.size);
-      const mode = desktopMQ.matches ? view.mode : 'grid';
+      const mode = view.mode;
 
-      document.querySelectorAll('.tbl th [data-sort]').forEach((b) => {
-        const on = b.dataset.sort === view.sort.key;
-        b.classList.toggle('sorted', on);
-        b.querySelector('use').setAttribute('href', on ? (view.sort.dir === 'asc' ? '#i-up' : '#i-down') : '#i-sort');
-      });
-      $('viewToggle').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.viewMode === view.mode)));
-      $('viewToggle').hidden = !desktopMQ.matches;
-      $('tableWrap').hidden = mode !== 'table';
+      for (const t of [$('viewToggle'), $('viewToggleM')]) {
+        t.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.viewMode === mode)));
+      }
+      $('tableWrap').hidden = !(desktop && mode === 'list');
+      $('mlist').hidden = !(!desktop && mode === 'list');
       $('grid').hidden = mode !== 'grid';
 
-      const empty = `<div class="empty">${icon('search')}<div>Heç nə tapılmadı</div></div>`;
-      if (mode === 'table') {
+      let pageItems;
+      if (desktop) {
+        const pages = Math.max(1, Math.ceil(list.length / view.size));
+        view.page = Math.min(view.page, pages);
+        const start = (view.page - 1) * view.size;
+        pageItems = list.slice(start, start + view.size);
+        renderPager(list.length, pages, start);
+      } else {
+        pageItems = list.slice(0, view.mshown);
+        $('listFoot').textContent = list.length ? (pageItems.length < list.length ? `${pageItems.length} / ${list.length} göstərilir` : `${list.length} məhsul`) : '';
+      }
+
+      if (mode === 'grid') {
+        $('grid').innerHTML = pageItems.length ? pageItems.map((it) => `
+          <button type="button" class="p-card" data-id="${it.id}">
+            <div class="p-media">${thumb(it)}${it.pin ? `<span class="badge-pin">${icon('pin')}PIN</span>` : ''}</div>
+            <div class="p-body"><span class="p-code">${esc(it.code)}</span><span class="p-meta">${catPill(it.category)}<span>${fmtDate(it.created_at)}</span></span></div>
+          </button>`).join('') : `<div style="grid-column:1/-1">${empty()}</div>`;
+        observeThumbs($('grid'));
+      } else if (desktop) {
         $('tbody').innerHTML = pageItems.length ? pageItems.map((it) => `
           <tr data-id="${it.id}" class="${selected.has(it.id) ? 'selected' : ''}">
             <td class="c-check"><input type="checkbox" class="checkbox" data-act="select" ${selected.has(it.id) ? 'checked' : ''} aria-label="${esc(it.code)} seç" /></td>
@@ -947,25 +1089,40 @@
               <a class="icon-btn" href="${esc(it.video)}" target="_blank" rel="noopener" aria-label="Videonu aç" title="Videonu aç">${icon('external')}</a>
               <button type="button" class="icon-btn" data-act="delete" aria-label="Sil" title="Sil">${icon('trash')}</button>
             </td>
-          </tr>`).join('') : `<tr><td colspan="7">${empty}</td></tr>`;
+          </tr>`).join('') : `<tr><td colspan="7">${empty()}</td></tr>`;
         observeThumbs($('tbody'));
       } else {
-        $('grid').innerHTML = pageItems.length ? pageItems.map((it) => `
-          <button type="button" class="p-card" data-id="${it.id}">
-            <div class="p-media">${thumb(it)}${it.pin ? `<span class="badge-pin">${icon('pin')}PIN</span>` : ''}</div>
-            <div class="p-body"><span class="p-code">${esc(it.code)}</span><span class="p-meta">${catPill(it.category)}<span>${fmtDate(it.created_at)}</span></span></div>
-          </button>`).join('') : `<div style="grid-column:1/-1">${empty}</div>`;
-        observeThumbs($('grid'));
+        $('mlist').innerHTML = pageItems.length ? pageItems.map((it) => `
+          <div class="m-row" data-id="${it.id}">
+            <span class="thumb">${thumb(it)}</span>
+            <div class="info">
+              <span class="code">${esc(it.code)}${it.pin ? icon('pin') : ''}</span>
+              <span class="sub">${catPill(it.category)}<span>${fmtDate(it.created_at)}</span></span>
+            </div>
+            <label class="pin-cell" data-act="pin-cell"><input type="checkbox" class="toggle sm" data-act="pin" ${it.pin ? 'checked' : ''} aria-label="PIN ${esc(it.code)}" />PIN</label>
+          </div>`).join('') : empty();
+        $('mlist').style.border = pageItems.length ? '' : 'none';
+        $('mlist').style.background = pageItems.length ? '' : 'none';
+        observeThumbs($('mlist'));
       }
 
+      // выбор (только таблица на компьютере)
       const pageIds = pageItems.map((i) => i.id);
       const allSel = pageIds.length > 0 && pageIds.every((id) => selected.has(id));
       $('checkAll').checked = allSel;
       $('checkAll').indeterminate = !allSel && pageIds.some((id) => selected.has(id));
-      $('bulkbar').hidden = selected.size === 0 || mode !== 'table';
+      $('bulkbar').hidden = selected.size === 0 || !desktop || mode !== 'list';
       $('bulkCount').textContent = `${selected.size} seçildi`;
 
-      $('range').textContent = list.length ? `${start + 1}–${Math.min(start + view.size, list.length)} / ${list.length}` : '0 məhsul';
+      document.querySelectorAll('.tbl th [data-sort]').forEach((b) => {
+        const on = b.dataset.sort === view.sort.key;
+        b.classList.toggle('sorted', on);
+        b.querySelector('use').setAttribute('href', on ? (view.sort.dir === 'asc' ? '#i-up' : '#i-down') : '#i-sort');
+      });
+    }
+
+    function renderPager(total, pages, start) {
+      $('range').textContent = total ? `${start + 1}–${Math.min(start + view.size, total)} / ${total}` : '0 məhsul';
       const nums = [...new Set([1, pages, view.page - 1, view.page, view.page + 1].filter((n) => n >= 1 && n <= pages))].sort((a, b) => a - b);
       let html = `<button type="button" data-page="${view.page - 1}" ${view.page === 1 ? 'disabled' : ''} aria-label="Əvvəlki">${icon('left')}</button>`;
       nums.forEach((n, i) => {
@@ -984,12 +1141,14 @@
       document.querySelector('.panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     $('pageSize').addEventListener('change', () => { view.size = Number($('pageSize').value); prefs.size = view.size; savePrefs(); view.page = 1; renderProducts(); });
-    $('viewToggle').addEventListener('click', (e) => {
-      const b = e.target.closest('[data-view-mode]');
-      if (!b) return;
-      view.mode = b.dataset.viewMode; prefs.mode = view.mode; savePrefs();
-      renderProducts();
-    });
+    for (const t of [$('viewToggle'), $('viewToggleM')]) {
+      t.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-view-mode]');
+        if (!b) return;
+        view.mode = b.dataset.viewMode; prefs.mode = view.mode; savePrefs();
+        renderProducts();
+      });
+    }
     document.querySelector('.tbl thead').addEventListener('click', (e) => {
       const b = e.target.closest('[data-sort]');
       if (!b) return;
@@ -998,7 +1157,13 @@
       prefs.sort = view.sort; savePrefs();
       renderProducts();
     });
-    desktopMQ.addEventListener('change', () => { if (items.length) renderProducts(); });
+    desktopMQ.addEventListener('change', () => { if (items.length) renderProducts(); updateMobileSubmit(); layoutStage(); });
+
+    // подгрузка на телефоне при прокрутке
+    new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting || desktopMQ.matches || currentTab !== 'products') return;
+      if (filteredSorted().length > view.mshown) { view.mshown += MOBILE_PAGE; renderProducts(); }
+    }, { rootMargin: '800px' }).observe($('sentinel'));
 
     $('checkAll').addEventListener('change', () => {
       const list = filteredSorted();
@@ -1008,32 +1173,28 @@
     });
     $('bulkClear').addEventListener('click', () => { selected.clear(); renderProducts(); });
 
+    async function togglePin(it, el) {
+      el.disabled = true;
+      try {
+        const { item } = await api('PATCH', `/api/items/${it.id}`, { pin: el.checked });
+        Object.assign(it, item);
+        toast(`${item.code}: PIN ${item.pin ? 'qoyuldu' : 'götürüldü'}`);
+        renderProducts();
+      } catch (err) { el.checked = !el.checked; el.disabled = false; toast(err.message, 'error'); }
+    }
+
     $('tbody').addEventListener('click', async (e) => {
       const row = e.target.closest('tr[data-id]');
       if (!row || e.target.closest('a')) return;
       const it = items.find((i) => i.id === Number(row.dataset.id));
       let actEl = e.target.closest('[data-act]');
-      // клик в любом месте ячейки с галочкой = выбор строки
-      if (!actEl && e.target.closest('.c-check')) {
+      if (!actEl && e.target.closest('.c-check')) { // клик в любом месте ячейки с галочкой
         actEl = row.querySelector('[data-act="select"]');
         actEl.checked = !actEl.checked;
       }
       const act = actEl?.dataset.act;
-      if (act === 'select') {
-        actEl.checked ? selected.add(it.id) : selected.delete(it.id);
-        renderProducts();
-        return;
-      }
-      if (act === 'pin') {
-        actEl.disabled = true;
-        try {
-          const { item } = await api('PATCH', `/api/items/${it.id}`, { pin: actEl.checked });
-          Object.assign(it, item);
-          toast(`${item.code}: PIN ${item.pin ? 'qoyuldu' : 'götürüldü'}`);
-          renderProducts();
-        } catch (err) { actEl.checked = !actEl.checked; actEl.disabled = false; toast(err.message, 'error'); }
-        return;
-      }
+      if (act === 'select') { actEl.checked ? selected.add(it.id) : selected.delete(it.id); renderProducts(); return; }
+      if (act === 'pin') { togglePin(it, actEl); return; }
       if (act === 'delete') {
         if (!actEl.classList.contains('armed')) {
           actEl.classList.add('armed');
@@ -1044,6 +1205,14 @@
         await deleteItems([it.id]);
         return;
       }
+      openSheet(it);
+    });
+    $('mlist').addEventListener('click', (e) => {
+      const row = e.target.closest('.m-row');
+      if (!row) return;
+      const it = items.find((i) => i.id === Number(row.dataset.id));
+      if (e.target.matches('[data-act="pin"]')) { togglePin(it, e.target); return; }
+      if (e.target.closest('[data-act="pin-cell"]')) return;
       openSheet(it);
     });
     $('grid').addEventListener('click', (e) => {
@@ -1113,15 +1282,16 @@
     }
     armable($('bulkDelete'), () => deleteItems([...selected]));
 
-    // ---------- редактор ----------
-    let current = null;
-    const sheet = $('sheet');
-
-    function renderCatChips(root, value) {
-      root.innerHTML = CATEGORIES.map((c) => `<button type="button" class="chip" role="radio" data-cat="${esc(c)}" aria-checked="${c === value}">${esc(c)}</button>`).join('');
+    // ---------- плитки категорий ----------
+    function renderCatTiles(root, value, withCounts = false) {
+      root.innerHTML = CATEGORIES.map((c) => {
+        const n = items.filter((i) => i.category === c).length;
+        return `<button type="button" class="cat-tile" role="radio" data-cat="${esc(c)}" aria-checked="${c === value}" style="--c:${CAT_COLORS[c]}">
+          <i></i><span><b>${esc(c)}</b>${withCounts ? `<small>${n} məhsul</small>` : ''}</span></button>`;
+      }).join('');
     }
-    const chipValue = (root) => root.querySelector('[aria-checked="true"]')?.dataset.cat || '';
-    function bindChips(root, onChange) {
+    const tileValue = (root) => root.querySelector('[aria-checked="true"]')?.dataset.cat || '';
+    function bindTiles(root, onChange) {
       root.addEventListener('click', (e) => {
         const b = e.target.closest('[data-cat]');
         if (!b || b.disabled) return;
@@ -1130,13 +1300,16 @@
       });
     }
 
+    // ---------- редактор ----------
+    let current = null;
+    const sheet = $('sheet');
     function openSheet(it) {
       if (!it) return;
       current = it;
       $('sheetTitle').textContent = it.code;
       $('sheetVideo').src = it.video;
       $('sheetCode').value = it.code;
-      renderCatChips($('sheetCats'), it.category);
+      renderCatTiles($('sheetCats'), it.category);
       $('sheetPin').checked = !!it.pin;
       $('sheetId').textContent = '#' + it.id;
       $('sheetDate').textContent = fmtDate(it.created_at);
@@ -1148,14 +1321,14 @@
     }
     function sheetDirty() {
       if (!current) return false;
-      return $('sheetCode').value.toLowerCase().replace(/[^a-z0-9]+/g, '') !== current.code
-        || chipValue($('sheetCats')) !== current.category
+      return normCode($('sheetCode').value) !== current.code
+        || tileValue($('sheetCats')) !== current.category
         || $('sheetPin').checked !== !!current.pin;
     }
     const updateSave = () => { $('sheetSave').disabled = !sheetDirty(); };
     $('sheetCode').addEventListener('input', updateSave);
     $('sheetPin').addEventListener('change', updateSave);
-    bindChips($('sheetCats'), updateSave);
+    bindTiles($('sheetCats'), updateSave);
     function closeSheet() {
       $('sheetVideo').pause();
       $('sheetVideo').removeAttribute('src');
@@ -1164,13 +1337,17 @@
     $('sheetClose').addEventListener('click', closeSheet);
     sheet.addEventListener('click', (e) => { if (e.target === sheet) closeSheet(); });
     sheet.addEventListener('cancel', (e) => { e.preventDefault(); closeSheet(); });
+    // свайп вниз по шапке закрывает лист на телефоне
+    let swipe = null;
+    sheet.querySelector('.sheet-head').addEventListener('touchstart', (e) => { swipe = e.touches[0].clientY; }, { passive: true });
+    sheet.querySelector('.sheet-head').addEventListener('touchend', (e) => { if (swipe !== null && e.changedTouches[0].clientY - swipe > 70) closeSheet(); swipe = null; });
     $('sheetSave').addEventListener('click', async () => {
       const btn = $('sheetSave');
       btn.disabled = true;
       btn.textContent = 'Saxlanılır…';
       try {
         const { item } = await api('PATCH', `/api/items/${current.id}`, {
-          code: $('sheetCode').value, category: chipValue($('sheetCats')), pin: $('sheetPin').checked,
+          code: $('sheetCode').value, category: tileValue($('sheetCats')), pin: $('sheetPin').checked,
         });
         Object.assign(current, item);
         renderProducts();
@@ -1182,35 +1359,76 @@
     armable($('sheetDelete'), async () => { if (await deleteItems([current.id])) closeSheet(); });
 
     // ================================================================
-    //  ЗАГРУЗКА
+    //  НОВЫЙ ТОВАР
     // ================================================================
-    const up = { file: null, width: 0, height: 0, duration: 0, mode: 'crop', offset: 0.5, busy: false, previewUrl: null, resultUrl: null };
+    const up = { file: null, width: 0, height: 0, duration: 0, mode: 'crop', offset: 0.5, busy: false, previewUrl: null, resultUrl: null, lastItem: null };
     const isSquare = () => up.width === up.height;
 
-    renderCatChips($('catChips'), '');
-    bindChips($('catChips'), validateUpload);
-    $('code').addEventListener('input', validateUpload);
+    renderCatTiles($('catTiles'), prefs.lastCat || '', true);
+    bindTiles($('catTiles'), () => { prefs.lastCat = tileValue($('catTiles')); savePrefs(); validateNew(); });
+    $('code').addEventListener('input', () => { updateDuplicate(); validateNew(); });
+    $('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('code').blur(); } });
+    $('pin').addEventListener('change', validateNew);
+
+    function updateDuplicate() {
+      const code = normCode($('code').value);
+      $('codePreview').innerHTML = code ? `Saytda belə görünəcək: <b>${esc(code)}</b>` : 'Böyük/kiçik hərf və tire fərq etmir';
+      const same = code ? items.filter((i) => i.code === code) : [];
+      $('dupNotice').hidden = !same.length;
+      if (same.length) {
+        const s = same[same.length - 1];
+        $('dupNotice').innerHTML = `${icon('alert')}<div>Bu kodla artıq məhsul var: <b>${esc(s.category)}</b>, ${fmtDate(s.created_at)}. <a href="#" data-open="${s.id}">Bax</a> · Yenə də əlavə edə bilərsiniz.</div>`;
+      }
+    }
+    $('dupNotice').addEventListener('click', (e) => {
+      const a = e.target.closest('[data-open]');
+      if (!a) return;
+      e.preventDefault();
+      openSheet(items.find((i) => i.id === Number(a.dataset.open)));
+    });
 
     function renderRecent() {
-      const last = items.slice().sort((a, b) => b.id - a.id).slice(0, 5);
+      const last = items.slice().sort((a, b) => b.id - a.id).slice(0, 6);
       $('recent').innerHTML = last.map((it) => `
-        <div class="recent-row">
+        <div class="recent-row" data-id="${it.id}">
           <span class="thumb">${thumb(it)}</span>
           <div><div style="font-weight:600">${esc(it.code)}</div><div class="muted" style="font-size:12.5px">${esc(it.category)} · ${fmtDate(it.created_at)}</div></div>
-          ${it.pin ? `<span class="badge-pin" style="position:static">${icon('pin')}PIN</span>` : ''}
+          ${it.pin ? `<span class="badge-pin">${icon('pin')}PIN</span>` : ''}
         </div>`).join('') || '<div class="recent-row muted">Hələ məhsul yoxdur</div>';
       observeThumbs($('recent'));
     }
+    $('recent').addEventListener('click', (e) => {
+      const r = e.target.closest('[data-id]');
+      if (r) openSheet(items.find((i) => i.id === Number(r.dataset.id)));
+    });
 
-    function validateUpload() {
-      const hasFile = !!up.file;
-      const hasMeta = !!$('code').value.trim() && !!chipValue($('catChips'));
-      $('step1').classList.toggle('done', hasFile);
-      $('step2').classList.toggle('done', hasMeta);
-      $('uploadBtn').disabled = up.busy || !hasFile || !hasMeta;
-      $('compressOnly').hidden = !hasFile || up.busy;
+    function readiness() {
+      return {
+        video: !!up.file,
+        code: !!normCode($('code').value),
+        cat: !!tileValue($('catTiles')),
+      };
+    }
+    function validateNew() {
+      const r = readiness();
+      const ready = r.video && r.code && r.cat;
+      const steps = [['video', 'Video seçildi'], ['code', 'Kod yazıldı'], ['cat', 'Kateqoriya seçildi']];
+      $('checklist').innerHTML = steps.map(([k, label]) => `<li class="${r[k] ? 'done' : ''}"><span class="dot">${icon('check')}</span>${label}</li>`).join('');
+      $('submitBtn').disabled = up.busy || !ready;
+      $('submitBtnM').disabled = up.busy || !ready;
+      const missing = steps.filter(([k]) => !r[k]).map(([k]) => ({ video: 'video', code: 'kod', cat: 'kateqoriya' }[k]));
+      $('mStatusTitle').textContent = up.busy ? 'Göndərilir…' : ready ? 'Hazırdır' : `${3 - missing.length} / 3 hazır`;
+      $('mStatusText').textContent = up.busy ? '' : ready
+        ? `${normCode($('code').value)} · ${tileValue($('catTiles'))}${$('pin').checked ? ' · PIN' : ''}`
+        : 'Lazımdır: ' + missing.join(', ');
+    }
+    function updateMobileSubmit() {
+      const show = currentTab === 'new' && !$('newForm').hidden && !desktopMQ.matches;
+      $('mSubmit').hidden = !show;
+      document.body.classList.toggle('has-m-submit', show);
     }
 
+    // ----- выбор файла -----
     $('fileInput').addEventListener('change', () => { if ($('fileInput').files[0]) loadFile($('fileInput').files[0]); });
     $('changeFile').addEventListener('click', () => $('fileInput').click());
     $('drop').addEventListener('dragover', (e) => { e.preventDefault(); $('drop').classList.add('over'); });
@@ -1222,9 +1440,10 @@
     });
 
     async function loadFile(file) {
+      $('fileError').textContent = '';
       $('upError').textContent = '';
       if (typeof VideoEncoder === 'undefined') {
-        $('upError').textContent = 'Bu brauzer videonu sıxa bilmir. Chrome və ya Safari-nin son versiyasını istifadə edin.';
+        $('fileError').textContent = 'Bu brauzer videonu sıxa bilmir. Chrome və ya Safari-nin son versiyasını istifadə edin.';
         return;
       }
       let input;
@@ -1237,7 +1456,7 @@
         up.height = await track.getDisplayHeight();
         up.duration = await input.computeDuration();
       } catch (err) {
-        $('upError').textContent = 'Fayl oxunmadı: ' + err.message;
+        $('fileError').textContent = 'Fayl oxunmadı: ' + err.message;
         return;
       } finally {
         input?.dispose?.();
@@ -1245,8 +1464,9 @@
       up.file = file;
       up.offset = 0.5;
       const shape = isSquare() ? 'kvadrat' : up.width > up.height ? 'üfüqi' : 'şaquli';
+      const estimate = (BITRATE * up.duration) / 8;
       $('fileName').textContent = file.name;
-      $('fileMeta').textContent = `${up.width}×${up.height} · ${shape} · ${Math.round(up.duration)} san · ${fmtMB(file.size)}`;
+      $('fileMeta').innerHTML = `${up.width}×${up.height} · ${shape} · ${Math.round(up.duration)} san · ${fmtMB(file.size)} → <b>≈${fmtMB(estimate)}</b>`;
       if (up.previewUrl) URL.revokeObjectURL(up.previewUrl);
       up.previewUrl = URL.createObjectURL(file);
       $('preview').src = up.previewUrl;
@@ -1254,9 +1474,11 @@
       $('filePanel').hidden = false;
       $('modes').hidden = isSquare();
       setMode('crop');
-      validateUpload();
+      validateNew();
+      if (!normCode($('code').value) && !desktopMQ.matches) setTimeout(() => $('code').scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
     }
 
+    // ----- рамка / белые поля -----
     function setMode(mode) {
       up.mode = mode;
       $('modes').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
@@ -1266,30 +1488,29 @@
       const b = e.target.closest('button[data-mode]');
       if (b && !up.busy) setMode(b.dataset.mode);
     });
-
     function layoutStage() {
       if (!up.file || $('filePanel').hidden) return;
       const pad = up.mode === 'pad' && !isSquare();
       const ar = pad ? 1 : up.width / up.height;
       const availW = $('filePanel').clientWidth;
       if (!availW) return;
-      const maxH = Math.max(260, window.innerHeight * 0.55);
+      const maxH = Math.max(280, window.innerHeight * (desktopMQ.matches ? 0.62 : 0.5));
       const w = Math.min(availW, maxH * ar);
       const h = w / ar;
       Object.assign($('stage').style, { width: w + 'px', height: h + 'px' });
       $('stage').classList.toggle('pad', pad);
       if (isSquare()) {
         $('frame').hidden = true;
-        $('hint').textContent = 'Video kvadratdır — yalnız sıxılacaq.';
+        $('hint').textContent = 'Video kvadratdır — olduğu kimi sıxılacaq.';
       } else if (pad) {
         $('frame').hidden = true;
-        $('hint').textContent = 'Video tam saxlanılır, boş yerlər ağ olur.';
+        $('hint').textContent = 'Video tam qalır, boş yerlər ağ olur.';
       } else {
         $('frame').hidden = false;
         const side = Math.min(w, h);
         Object.assign($('frame').style, { width: side + 'px', height: side + 'px' });
         positionFrame();
-        $('hint').textContent = 'Çərçivəni sürüşdürün.';
+        $('hint').textContent = 'Çərçivəni sürüşdürün — kənar hissə kəsiləcək.';
       }
     }
     function positionFrame() {
@@ -1323,6 +1544,7 @@
     $('stage').addEventListener('pointercancel', endDrag);
     window.addEventListener('resize', layoutStage);
 
+    // ----- сжатие и загрузка -----
     const even = (v) => Math.max(2, Math.floor(v / 2) * 2);
     function videoOptions() {
       const quality = new Quality({ bitrate: BITRATE, bitrateMode: 'variable' });
@@ -1373,7 +1595,7 @@
         const form = new FormData();
         form.append('file', blob, filename);
         form.append('code', $('code').value.trim());
-        form.append('category', chipValue($('catChips')));
+        form.append('category', tileValue($('catTiles')));
         if ($('pin').checked) form.append('pin', '1');
         const xhr = new XMLHttpRequest();
         xhr.open('POST', API + '/upload');
@@ -1393,58 +1615,59 @@
     function setBusy(busy) {
       up.busy = busy;
       for (const el of [$('code'), $('pin'), $('fileInput'), $('changeFile')]) el.disabled = busy;
-      $('catChips').querySelectorAll('button').forEach((b) => (b.disabled = busy));
+      $('catTiles').querySelectorAll('button').forEach((b) => (b.disabled = busy));
       $('modes').querySelectorAll('button').forEach((b) => (b.disabled = busy));
-      $('progressBox').hidden = !busy;
-      validateUpload();
+      $('busy').hidden = !busy;
+      $('submitBtn').textContent = busy ? 'Göndərilir…' : 'Məhsulu əlavə et';
+      $('submitBtnM').textContent = busy ? 'Gözləyin…' : 'Əlavə et';
+      validateNew();
     }
-    function setProgress(stage, fraction, share) {
-      const total = stage === 'compress' ? fraction * share : share + fraction * (1 - share);
-      $('bar').style.width = Math.round(total * 100) + '%';
-      $('stPercent').textContent = Math.round(fraction * 100) + '%';
-      $('stCompress').className = stage === 'compress' ? 'on' : '';
-      $('stUpload').className = stage === 'upload' ? 'on' : '';
+    function setProgress(stage, fraction) {
+      const total = stage === 'compress' ? fraction * 0.85 : 0.85 + fraction * 0.15;
+      const pct = Math.round(total * 100);
+      $('ring').style.setProperty('--p', pct);
+      $('ringPct').textContent = pct + '%';
+      $('busyLabel').textContent = stage === 'compress' ? 'Video sıxılır…' : 'Yüklənir…';
+      $('busySub').textContent = 'Səhifəni bağlamayın';
     }
-    async function run(withUpload) {
+    async function submitNew() {
       if (!up.file || up.busy) return;
       $('upError').textContent = '';
       setBusy(true);
-      $('uploadBtn').textContent = withUpload ? 'Gözləyin…' : 'Sıxılır…';
-      const share = withUpload ? 0.85 : 1;
+      setProgress('compress', 0);
       try {
-        const blob = await compress((p) => setProgress('compress', p, share));
-        const filename = fileNameFor($('code').value);
-        let data = null;
-        if (withUpload) data = await uploadBlob(blob, filename, (p) => setProgress('upload', p, share));
-        showSuccess(blob, filename, data);
+        const blob = await compress((p) => setProgress('compress', p));
+        const data = await uploadBlob(blob, fileNameFor($('code').value), (p) => setProgress('upload', p));
+        showSuccess(blob, data);
       } catch (err) {
         $('upError').textContent = err.message;
+        if (!desktopMQ.matches) toast(err.message, 'error');
       } finally {
-        $('uploadBtn').textContent = 'Sıx və yüklə';
         setBusy(false);
       }
     }
-    $('uploadBtn').addEventListener('click', () => run(true));
-    $('compressOnly').addEventListener('click', () => run(false));
+    $('submitBtn').addEventListener('click', submitNew);
+    $('submitBtnM').addEventListener('click', submitNew);
 
-    function showSuccess(blob, filename, data) {
+    function showSuccess(blob, data) {
       if (up.resultUrl) URL.revokeObjectURL(up.resultUrl);
       up.resultUrl = URL.createObjectURL(blob);
+      up.lastItem = data.item;
       $('resultVideo').src = up.resultUrl;
       const ratio = Math.max(1, Math.round(up.file.size / blob.size));
       $('pills').innerHTML =
-        `<span class="pill">${fmtMB(up.file.size)} → <b>${fmtMB(blob.size)}</b></span><span class="pill"><b>${ratio}×</b> kiçik</span>` +
-        (data?.item ? `<span class="pill"><b>${esc(data.item.code)}</b> · ${esc(data.item.category)}${data.item.pin ? ' · PIN' : ''}</span>` : '');
-      $('successTitle').textContent = data?.item ? 'Kataloqa əlavə edildi' : 'Sıxıldı (yüklənmədi)';
-      $('downloadLink').hidden = !!data;
-      $('downloadLink').href = up.resultUrl;
-      $('downloadLink').download = filename;
-      $('upForm').hidden = true;
-      $('upSuccess').hidden = false;
-      if (data?.item) { items.push(data.item); renderProducts(); }
+        `<span class="pill"><b>${esc(data.item.code)}</b> · ${esc(data.item.category)}${data.item.pin ? ' · PIN' : ''}</span>` +
+        `<span class="pill">${fmtMB(up.file.size)} → <b>${fmtMB(blob.size)}</b> (${ratio}× kiçik)</span>`;
+      $('againNote').textContent = `Növbəti məhsul üçün kateqoriya yadda qalır: ${data.item.category}.`;
+      items.push(data.item);
+      renderProducts();
+      renderCatTiles($('catTiles'), tileValue($('catTiles')), true);
+      $('newForm').hidden = true;
+      $('newSuccess').hidden = false;
+      updateMobileSubmit();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    function resetUpload() {
+    function resetNew() {
       up.file = null;
       $('fileInput').value = '';
       $('preview').removeAttribute('src');
@@ -1452,18 +1675,21 @@
       $('filePanel').hidden = true;
       $('code').value = '';
       $('pin').checked = false;
-      renderCatChips($('catChips'), '');
-      $('bar').style.width = '0';
-      $('upSuccess').hidden = true;
-      $('upForm').hidden = false;
+      renderCatTiles($('catTiles'), prefs.lastCat || '', true);
+      $('newSuccess').hidden = true;
+      $('newForm').hidden = false;
+      updateDuplicate();
       renderRecent();
-      validateUpload();
+      validateNew();
+      updateMobileSubmit();
+      window.scrollTo({ top: 0 });
     }
-    $('again').addEventListener('click', resetUpload);
+    $('again').addEventListener('click', resetNew);
+    $('openNew').addEventListener('click', () => { if (up.lastItem) openSheet(items.find((i) => i.id === up.lastItem.id) || up.lastItem); });
 
     $('addForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const code = $('code').value.trim(), category = chipValue($('catChips'));
+      const code = $('code').value.trim(), category = tileValue($('catTiles'));
       if (!code || !category) { toast('Əvvəl kodu və kateqoriyanı seçin', 'error'); $('code').focus(); return; }
       const btn = e.target.querySelector('button');
       btn.disabled = true;
@@ -1471,7 +1697,7 @@
         const { item } = await api('POST', '/api/items', { code, video: e.target.video.value, category, pin: $('pin').checked });
         items.push(item);
         e.target.reset();
-        resetUpload();
+        resetNew();
         renderProducts();
         toast(`${item.code} kataloqa əlavə edildi`);
       } catch (err) { toast(err.message, 'error'); }
@@ -1534,6 +1760,8 @@
     // ================================================================
     //  СТАРТ
     // ================================================================
+    updateDuplicate();
+    validateNew();
     if (!token) showLogin('');
     else api('GET', '/api/me').then((d) => enterApp(d.session)).catch((err) => { if (err.status !== 401) showLogin(err.message); });
   </script>
