@@ -15,6 +15,8 @@
 //   POST   /api/items           — добавить товар                     (сессия)
 //   PATCH  /api/items/:id       — изменить товар                     (сессия)
 //   DELETE /api/items/:id       — удалить товар (видео в R2 остаётся) (сессия)
+//   PATCH  /api/items           — массово: {ids, patch:{category?, pin?}} (сессия)
+//   POST   /api/items/delete    — массово удалить: {ids}             (сессия)
 //   POST   /upload              — загрузить видео и добавить товар    (сессия)
 //
 // Сессия передаётся заголовком "Authorization: Bearer <token>".
@@ -326,6 +328,40 @@ async function handleApi(request, env, path) {
   if (method === 'POST' && path === '/api/items') {
     const item = validateItem(await request.json().catch(() => ({})));
     return json(request, { success: true, item: await insertItem(env, item) }, 201);
+  }
+
+  // Массовые действия: {ids: [...], patch: {category?, pin?}} / {ids: [...]}
+  if ((method === 'PATCH' && path === '/api/items') || (method === 'POST' && path === '/api/items/delete')) {
+    const body = await request.json().catch(() => ({}));
+    const ids = [...new Set((Array.isArray(body.ids) ? body.ids : []).map(Number).filter((n) => Number.isInteger(n) && n > 0))];
+    if (!ids.length || ids.length > 1000) throw new HttpError(400, 'Məhsul seçilməyib');
+
+    let sql, params;
+    if (method === 'PATCH') {
+      const patch = validateItem(body.patch || {}, true);
+      delete patch.code; // код у каждого товара свой
+      delete patch.video;
+      const fields = Object.keys(patch);
+      if (!fields.length) throw new HttpError(400, 'Dəyişiklik yoxdur');
+      sql = `UPDATE items SET ${fields.map((f, i) => `${f} = ?${i + 1}`).join(', ')} WHERE id IN `;
+      params = fields.map((f) => patch[f]);
+    } else {
+      sql = 'DELETE FROM items WHERE id IN ';
+      params = [];
+    }
+
+    // D1: не больше 100 параметров в запросе → пачки по 90 id
+    const stmts = [];
+    for (let i = 0; i < ids.length; i += 90) {
+      const chunk = ids.slice(i, i + 90);
+      const base = params.length;
+      const marks = chunk.map((_, j) => `?${base + j + 1}`).join(', ');
+      stmts.push(env.DB.prepare(`${sql}(${marks})`).bind(...params, ...chunk));
+    }
+    const results = await env.DB.batch(stmts);
+    const changed = results.reduce((n, r) => n + (r.meta?.changes || 0), 0);
+    await rebuildSnapshot(env);
+    return json(request, { success: true, changed });
   }
 
   const m = path.match(/^\/api\/items\/(\d+)$/);

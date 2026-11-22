@@ -4,35 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="robots" content="noindex" />
-  <meta name="theme-color" content="#FAFAF9" />
+  <meta name="theme-color" content="#F6F5F3" />
   <title>Islimi · İdarəetmə</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #FAFAF9;
+      --bg: #F6F5F3;
       --surface: #FFFFFF;
       --surface-2: #F5F5F4;
+      --surface-3: #FAFAF9;
       --text: #1C1917;
       --text-2: #44403C;
       --muted: #78716C;
       --line: #E7E5E4;
       --line-2: #D6D3D1;
-      --ink: #1C1917;          /* основные кнопки */
+      --ink: #1C1917;
       --ink-hover: #292524;
-      --gold: #D4AF37;         /* декоративное золото бренда */
-      --gold-ink: #A16207;     /* золото для текста (контраст ≥ 4.5) */
+      --side: #171412;
+      --side-2: #24201D;
+      --side-text: #D6D3D1;
+      --gold: #D4AF37;
+      --gold-ink: #A16207;
       --gold-soft: #FBF6E4;
       --danger: #DC2626;
       --danger-soft: #FEF2F2;
       --ok: #15803D;
       --ok-soft: #F0FDF4;
-      --radius: 16px;
-      --radius-sm: 10px;
-      --shadow: 0 1px 2px rgba(28, 25, 23, .04), 0 4px 16px rgba(28, 25, 23, .06);
-      --shadow-lg: 0 10px 40px rgba(28, 25, 23, .16);
+      --radius: 14px;
+      --shadow: 0 1px 2px rgba(28, 25, 23, .04), 0 2px 10px rgba(28, 25, 23, .05);
+      --shadow-lg: 0 16px 48px rgba(28, 25, 23, .18);
       --nav-h: 64px;
+      --side-w: 248px;
       --safe-b: env(safe-area-inset-bottom, 0px);
       --ease: cubic-bezier(.2, .8, .2, 1);
     }
@@ -41,25 +45,23 @@
     body {
       margin: 0; background: var(--bg); color: var(--text);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased;
-      -webkit-tap-highlight-color: transparent;
+      font-size: 14.5px; line-height: 1.5; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
     }
     [hidden] { display: none !important; }
     button, input, select { font: inherit; color: inherit; }
     button { cursor: pointer; }
     a { color: var(--gold-ink); text-decoration: none; }
-    svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .muted { color: var(--muted); }
 
     /* ---------- buttons ---------- */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid transparent;
-      font-weight: 600; font-size: 15px; transition: background .15s, border-color .15s, transform .1s, opacity .15s;
-      white-space: nowrap;
+      min-height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid transparent;
+      font-weight: 600; font-size: 14px; white-space: nowrap; transition: background .15s, border-color .15s, opacity .15s;
     }
-    .btn:active:not(:disabled) { transform: scale(.98); }
     .btn:disabled { opacity: .45; cursor: default; }
     .btn-primary { background: var(--ink); color: #fff; }
     .btn-primary:hover:not(:disabled) { background: var(--ink-hover); }
@@ -67,229 +69,341 @@
     .btn-ghost:hover:not(:disabled) { background: var(--surface-2); }
     .btn-danger { background: var(--surface); border-color: #FECACA; color: var(--danger); }
     .btn-danger:hover:not(:disabled) { background: var(--danger-soft); }
-    .btn-danger.armed { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn-danger.armed, .icon-btn.armed { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn-lg { min-height: 46px; font-size: 15px; border-radius: 12px; }
     .btn-block { width: 100%; }
     .icon-btn {
-      display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px;
-      border: none; background: transparent; color: var(--text-2);
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 36px; height: 36px; padding: 0 8px;
+      border-radius: 9px; border: 1px solid transparent; background: transparent; color: var(--text-2); font-weight: 600; font-size: 13px;
     }
-    .icon-btn:hover { background: var(--surface-2); }
+    .icon-btn:hover { background: var(--surface-2); color: var(--text); }
 
     /* ---------- fields ---------- */
     .field { display: flex; flex-direction: column; gap: 6px; }
     .field > span { font-size: 13px; font-weight: 600; color: var(--text-2); }
-    .field small { font-size: 12.5px; color: var(--muted); }
-    .input {
-      width: 100%; min-height: 46px; padding: 0 14px; font-size: 16px;
-      border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface);
+    .input, .select {
+      width: 100%; min-height: 42px; padding: 0 12px; font-size: 15px;
+      border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface);
       transition: border-color .15s, box-shadow .15s;
     }
-    .input:focus { outline: none; border-color: var(--text); box-shadow: 0 0 0 3px rgba(212, 175, 55, .25); }
+    .select { appearance: none; padding-right: 32px; background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716C' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center; cursor: pointer; }
+    .input:focus, .select:focus { outline: none; border-color: var(--text); box-shadow: 0 0 0 3px rgba(212, 175, 55, .25); }
+    @media (max-width: 1023px) { .input, .select { font-size: 16px; min-height: 46px; } }
     .input-wrap { position: relative; }
-    .input-wrap .input { padding-left: 42px; }
-    .input-wrap > svg.i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
-    .input-wrap .icon-btn { position: absolute; right: 2px; top: 1px; }
+    .input-wrap .input { padding-left: 38px; }
+    .input-wrap > svg.i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .input-wrap .icon-btn { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); }
     .error-text { color: var(--danger); font-size: 13.5px; min-height: 1.3em; margin: 0; }
 
-    .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: -2px; }
+    .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: -2px; }
     .chips::-webkit-scrollbar { display: none; }
     .chip {
-      display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 14px;
+      display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px;
       border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface);
-      font-size: 14px; font-weight: 500; color: var(--text-2); white-space: nowrap; transition: all .15s;
+      font-size: 13.5px; font-weight: 500; color: var(--text-2); white-space: nowrap; transition: all .15s;
     }
     .chip:hover { border-color: var(--muted); }
+    .chip .n { color: var(--muted); font-weight: 500; font-size: 12px; }
     .chip[aria-pressed="true"], .chip[aria-checked="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
-    .chip svg.i { width: 16px; height: 16px; }
+    .chip[aria-pressed="true"] .n { color: #A8A29E; }
+    .chip svg.i { width: 15px; height: 15px; }
 
     .switch { display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; }
-    .switch b { display: block; font-weight: 600; font-size: 15px; }
+    .switch b { display: block; font-weight: 600; font-size: 14.5px; }
     .switch small { color: var(--muted); font-size: 13px; }
-    .switch input { appearance: none; flex: none; width: 48px; height: 28px; border-radius: 999px; background: var(--line-2); position: relative; transition: background .2s; cursor: pointer; margin: 0; }
-    .switch input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform .2s var(--ease); }
-    .switch input:checked { background: var(--gold); }
-    .switch input:checked::after { transform: translateX(20px); }
+    .toggle { appearance: none; flex: none; width: 44px; height: 26px; border-radius: 999px; background: var(--line-2); position: relative; transition: background .2s; cursor: pointer; margin: 0; }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform .2s var(--ease); }
+    .toggle:checked { background: var(--gold); }
+    .toggle:checked::after { transform: translateX(18px); }
+    .toggle.sm { width: 36px; height: 21px; }
+    .toggle.sm::after { width: 15px; height: 15px; }
+    .toggle.sm:checked::after { transform: translateX(15px); }
+    .checkbox { width: 16px; height: 16px; accent-color: var(--ink); cursor: pointer; margin: 0; }
 
-    .segmented { display: inline-flex; padding: 4px; gap: 4px; background: var(--surface-2); border-radius: 12px; }
-    .segmented button { border: none; background: transparent; min-height: 36px; padding: 0 14px; border-radius: 9px; font-weight: 500; font-size: 14px; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
+    .segmented { display: inline-flex; padding: 3px; gap: 3px; background: var(--surface-2); border-radius: 10px; }
+    .segmented button { border: none; background: transparent; min-height: 32px; padding: 0 12px; border-radius: 8px; font-weight: 500; font-size: 13.5px; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
     .segmented button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.08); font-weight: 600; }
 
     .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .cat-pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: var(--surface-2); color: var(--text-2); white-space: nowrap; }
+    .cat-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--c, var(--muted)); }
 
     /* ---------- login ---------- */
-    .login { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; background:
-      radial-gradient(1200px 500px at 50% -10%, var(--gold-soft), transparent 60%), var(--bg); }
+    .login { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px;
+      background: radial-gradient(1200px 500px at 50% -10%, var(--gold-soft), transparent 60%), var(--bg); }
     .login .card { width: 100%; max-width: 380px; padding: 32px 24px 24px; }
-    .brand { display: flex; align-items: baseline; gap: 10px; }
     .wordmark { font-weight: 700; letter-spacing: .28em; font-size: 15px; }
     .wordmark::after { content: '.'; color: var(--gold); }
-    .brand .tag { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+    .brand { display: flex; align-items: baseline; gap: 10px; }
+    .brand .tag { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
     .login h1 { font-size: 24px; margin: 22px 0 4px; letter-spacing: -.01em; }
-    .login p.lead { margin: 0 0 22px; color: var(--muted); font-size: 14.5px; }
+    .login p.lead { margin: 0 0 22px; color: var(--muted); }
     .login form { display: flex; flex-direction: column; gap: 14px; }
 
-    /* ---------- shell ---------- */
+    /* ---------- app shell ---------- */
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--side-w); z-index: 40;
+      background: var(--side); color: var(--side-text); display: none; flex-direction: column; padding: 22px 14px;
+    }
+    .sidebar .brand { padding: 0 10px 26px; }
+    .sidebar .wordmark { color: #fff; }
+    .sidebar .brand .tag { color: #A8A29E; }
+    .side-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #78716C; padding: 0 12px 8px; }
+    .side-nav { display: flex; flex-direction: column; gap: 2px; }
+    .side-nav a { position: relative; display: flex; align-items: center; gap: 12px; height: 42px; padding: 0 12px; border-radius: 10px; color: var(--side-text); font-weight: 500; }
+    .side-nav a:hover { background: var(--side-2); color: #fff; }
+    .side-nav a[aria-current="page"] { background: var(--side-2); color: #fff; font-weight: 600; }
+    .side-nav a[aria-current="page"]::before { content: ''; position: absolute; left: -14px; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--gold); }
+    .side-nav a[aria-current="page"] svg.i { color: var(--gold); }
+    .side-nav .count { margin-left: auto; font-size: 12px; color: #A8A29E; font-weight: 500; }
+    .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; border-top: 1px solid #2E2925; padding-top: 14px; }
+    .side-foot a, .side-foot button { display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 12px; border-radius: 10px; color: #A8A29E; background: none; border: none; font-size: 14px; font-weight: 500; text-align: left; }
+    .side-foot a:hover, .side-foot button:hover { background: var(--side-2); color: #fff; }
+    .side-user { display: flex; align-items: center; gap: 10px; padding: 10px 12px 4px; font-size: 12.5px; color: #78716C; }
+    .side-user .dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; flex: none; }
+
     .topbar {
-      position: sticky; top: 0; z-index: 20; height: 60px; padding: 0 16px;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      background: rgba(250, 250, 249, .85); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
+      position: sticky; top: 0; z-index: 30; min-height: 60px; padding: 0 16px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: rgba(255, 255, 255, .9); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
       border-bottom: 1px solid var(--line);
     }
-    .tabs-top { display: none; }
-    .tabs-top a { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 10px; color: var(--text-2); font-weight: 500; }
-    .tabs-top a:hover { background: var(--surface-2); }
-    .tabs-top a[aria-current="page"] { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.07); }
-    .main { max-width: 1080px; margin: 0 auto; padding: 20px 16px calc(var(--nav-h) + var(--safe-b) + 28px); }
-    .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-    .page-head h2 { font-size: 26px; letter-spacing: -.02em; margin: 0; line-height: 1.2; }
+    .topbar .page-title { display: none; }
+    .topbar .top-actions { display: flex; align-items: center; gap: 8px; }
+    .topbar .desk-only { display: none; }
+    .main { max-width: 1320px; margin: 0 auto; padding: 18px 16px calc(var(--nav-h) + var(--safe-b) + 28px); }
+    .page-head { margin-bottom: 16px; }
+    .page-head h2 { font-size: 24px; letter-spacing: -.02em; margin: 0; line-height: 1.2; }
     .page-head .sub { color: var(--muted); font-size: 14px; margin-top: 2px; }
 
     .bottom-nav {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
       height: calc(var(--nav-h) + var(--safe-b)); padding-bottom: var(--safe-b);
       display: grid; grid-template-columns: repeat(3, 1fr);
-      background: rgba(255, 255, 255, .92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, .94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line);
     }
     .bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--muted); font-size: 11.5px; font-weight: 600; }
+    .bottom-nav a svg.i { width: 20px; height: 20px; }
     .bottom-nav a[aria-current="page"] { color: var(--text); }
     .bottom-nav a[aria-current="page"] svg.i { color: var(--gold-ink); }
     .bottom-nav .upload-pill { display: grid; place-items: center; width: 44px; height: 30px; border-radius: 999px; background: var(--ink); color: #fff; }
     .bottom-nav a[aria-current="page"] .upload-pill { background: var(--gold); }
     .bottom-nav a[aria-current="page"] .upload-pill svg.i { color: var(--ink); }
 
-    @media (min-width: 820px) {
-      .tabs-top { display: flex; gap: 4px; padding: 4px; background: var(--surface-2); border-radius: 12px; }
-      .bottom-nav { display: none; }
-      .main { padding-bottom: 48px; }
+    @media (min-width: 1024px) {
+      .sidebar { display: flex; }
+      .content { margin-left: var(--side-w); }
+      .bottom-nav, .topbar .mob-only { display: none; }
+      .topbar { padding: 0 28px; min-height: 68px; }
+      .topbar .page-title { display: block; }
+      .topbar .page-title h1 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
+      .topbar .page-title .crumb { font-size: 12.5px; color: var(--muted); }
+      .topbar .desk-only { display: inline-flex; }
+      .main { padding: 24px 28px 48px; }
+      .page-head { display: none; }
     }
 
-    /* ---------- products ---------- */
-    .toolbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    @media (min-width: 620px) { .grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 960px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
-    .p-card {
-      display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden;
-      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-      transition: transform .2s var(--ease), box-shadow .2s var(--ease);
+    /* ---------- stats ---------- */
+    .stats { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 1fr); gap: 12px; overflow-x: auto; scrollbar-width: none; margin-bottom: 16px; padding: 1px 1px 2px; }
+    .stats::-webkit-scrollbar { display: none; }
+    .stat {
+      text-align: left; padding: 14px 16px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line);
+      box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; transition: border-color .15s, box-shadow .15s;
     }
-    .p-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .stat:hover { border-color: var(--line-2); }
+    .stat[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+    .stat .label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+    .stat .label i { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--muted)); }
+    .stat .value { font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
+    .stat .hint { font-size: 12px; color: var(--muted); }
+    .stat .hint b { color: var(--ok); font-weight: 600; }
+
+    /* ---------- products panel ---------- */
+    .panel { overflow: hidden; }
+    .panel-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+    .panel-toolbar .search { flex: 1 1 240px; min-width: 200px; }
+    .panel-toolbar .chips { flex: 0 1 auto; }
+    .panel-toolbar .tools { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    /* плавающая панель массовых действий — не сдвигает таблицу */
+    .bulkbar {
+      position: fixed; z-index: 35; bottom: 24px; left: calc(50% + var(--side-w) / 2); transform: translateX(-50%);
+      display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; border-radius: 14px;
+      background: var(--ink); color: #fff; box-shadow: var(--shadow-lg); font-size: 13.5px; white-space: nowrap;
+      animation: toast-in .2s var(--ease);
+    }
+    .bulkbar b { margin-right: 8px; }
+    .bulkbar .select { width: auto; min-height: 34px; font-size: 13.5px; background-color: #292524; border-color: #44403C; color: #fff; }
+    .bulkbar .btn { min-height: 34px; padding: 0 12px; font-size: 13.5px; }
+    .bulkbar .btn-ghost { background: #292524; border-color: #44403C; color: #fff; }
+    .bulkbar .btn-ghost:hover { background: #3A3430; }
+    .bulkbar .btn-danger { background: transparent; border-color: #7F1D1D; color: #FCA5A5; }
+    .bulkbar .btn-danger.armed { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .bulkbar .icon-btn { color: #A8A29E; }
+    .bulkbar .icon-btn:hover { background: #292524; color: #fff; }
+    .bulkbar .spacer { width: 4px; }
+
+    .table-wrap { overflow-x: auto; }
+    table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .tbl th {
+      text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em;
+      padding: 10px 14px; background: var(--surface-3); border-bottom: 1px solid var(--line); white-space: nowrap;
+    }
+    .tbl th button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .tbl th button:hover { color: var(--text); }
+    .tbl th button svg.i { width: 13px; height: 13px; opacity: .35; }
+    .tbl th button.sorted { color: var(--text); }
+    .tbl th button.sorted svg.i { opacity: 1; }
+    .tbl td { padding: 8px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    .tbl tbody tr { cursor: pointer; transition: background .1s; }
+    .tbl tbody tr:hover { background: var(--surface-3); }
+    .tbl tbody tr.selected { background: var(--gold-soft); }
+    .tbl tbody tr:last-child td { border-bottom: none; }
+    .tbl .c-check { width: 44px; padding-right: 0; }
+    .tbl .c-thumb { width: 76px; }
+    .tbl .c-pin { width: 80px; }
+    .tbl .c-date { width: 140px; white-space: nowrap; }
+    .tbl .c-actions { width: 140px; text-align: right; white-space: nowrap; }
+    .tbl .code { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .tbl .id { color: var(--muted); font-size: 12px; font-weight: 500; margin-left: 8px; }
+    .thumb { position: relative; width: 52px; height: 52px; border-radius: 9px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); display: block; flex: none; }
+    .thumb video { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
+    @media (min-width: 620px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 1024px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+    .p-card { display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; transition: box-shadow .2s; }
+    .p-card:hover { box-shadow: var(--shadow); }
     .p-media { position: relative; aspect-ratio: 1; background: var(--surface-2); }
     .p-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .badge-pin {
-      position: absolute; top: 8px; left: 8px; display: inline-flex; align-items: center; gap: 4px;
-      padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.92); color: var(--gold-ink);
-      font-size: 11.5px; font-weight: 700; letter-spacing: .02em; box-shadow: 0 1px 3px rgba(0,0,0,.08);
-    }
-    .badge-pin svg.i { width: 13px; height: 13px; fill: var(--gold); stroke: var(--gold); }
-    .p-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 2px; }
-    .p-code { font-weight: 600; font-size: 15px; letter-spacing: .01em; }
-    .p-meta { font-size: 12.5px; color: var(--muted); }
-    .empty { text-align: center; padding: 48px 16px; color: var(--muted); }
-    .empty svg.i { width: 36px; height: 36px; color: var(--line-2); margin-bottom: 8px; }
-    .sentinel { height: 1px; }
-    .skeleton { border-radius: var(--radius); aspect-ratio: .82; background: linear-gradient(90deg, var(--surface-2) 25%, #fff 50%, var(--surface-2) 75%); background-size: 300% 100%; animation: shimmer 1.4s infinite; }
+    .badge-pin { position: absolute; top: 8px; left: 8px; display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.94); color: var(--gold-ink); font-size: 11px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .badge-pin svg.i { width: 12px; height: 12px; fill: var(--gold); stroke: var(--gold); }
+    .p-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .p-code { font-weight: 600; font-size: 14.5px; }
+    .p-meta { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+
+    .pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--muted); }
+    .pager .pages { display: flex; align-items: center; gap: 4px; }
+    .pager .pages button { display: inline-grid; place-items: center; min-width: 34px; height: 34px; border-radius: 8px; border: 1px solid transparent; background: none; color: var(--text-2); font-weight: 500; }
+    .pager .pages button:hover:not(:disabled) { background: var(--surface-2); }
+    .pager .pages button[aria-current="page"] { background: var(--ink); color: #fff; }
+    .pager .pages button:disabled { opacity: .35; cursor: default; }
+    .pager .size { display: flex; align-items: center; gap: 8px; }
+    .pager .size .select { width: auto; min-height: 34px; font-size: 13.5px; }
+    .empty { text-align: center; padding: 56px 16px; color: var(--muted); }
+    .empty svg.i { width: 34px; height: 34px; color: var(--line-2); margin-bottom: 8px; }
+    .skeleton-row { height: 68px; background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%); background-size: 300% 100%; animation: shimmer 1.4s infinite; }
     @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 
-    /* ---------- dialog (bottom sheet) ---------- */
+    /* ---------- drawer / sheet ---------- */
     dialog.sheet {
       border: none; padding: 0; margin: auto auto 0; width: 100%; max-width: 560px; max-height: 92dvh;
-      border-radius: 22px 22px 0 0; background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg);
-      overflow: auto;
+      border-radius: 20px 20px 0 0; background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg);
+      flex-direction: column; overflow: hidden;
     }
-    dialog.sheet::backdrop { background: rgba(28, 25, 23, .45); backdrop-filter: blur(2px); }
-    dialog.sheet[open] { animation: sheet-in .28s var(--ease); }
-    @keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } }
-    @media (min-width: 620px) { dialog.sheet { margin: auto; border-radius: 22px; } }
-    .sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 8px 6px 20px; position: sticky; top: 0; background: var(--surface); z-index: 1; }
+    dialog.sheet[open] { display: flex; animation: sheet-up .28s var(--ease); }
+    dialog.sheet::backdrop { background: rgba(28, 25, 23, .4); }
+    @keyframes sheet-up { from { transform: translateY(24px); opacity: 0; } }
+    @keyframes drawer-in { from { transform: translateX(40px); opacity: 0; } }
+    @media (min-width: 1024px) {
+      dialog.sheet { margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; max-width: 460px; border-radius: 0; }
+      dialog.sheet[open] { animation: drawer-in .28s var(--ease); }
+    }
+    .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 12px 12px 20px; border-bottom: 1px solid var(--line); }
+    .sheet-head:focus { outline: none; }
     .sheet-head h3 { margin: 0; font-size: 18px; }
-    .sheet-body { padding: 4px 20px 20px; display: flex; flex-direction: column; gap: 18px; }
-    .sheet-video { width: 100%; aspect-ratio: 1; border-radius: 14px; background: var(--surface-2); object-fit: cover; display: block; }
-    .sheet-actions { display: flex; gap: 10px; padding: 14px 20px calc(16px + var(--safe-b)); border-top: 1px solid var(--line); position: sticky; bottom: 0; background: var(--surface); }
+    .sheet-head .crumb { font-size: 12.5px; color: var(--muted); }
+    .sheet-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; flex: 1; }
+    .sheet-video { width: 100%; aspect-ratio: 1; border-radius: 12px; background: var(--surface-2); object-fit: cover; display: block; }
+    .sheet-actions { display: flex; gap: 10px; padding: 14px 20px calc(14px + var(--safe-b)); border-top: 1px solid var(--line); background: var(--surface); }
     .sheet-actions .btn-primary { flex: 1; }
-    .meta-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); }
+    .meta-list { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 13px; margin: 0; }
+    .meta-list dt { color: var(--muted); }
+    .meta-list dd { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* ---------- upload ---------- */
     .up-layout { display: grid; gap: 16px; }
-    @media (min-width: 960px) { .up-layout { grid-template-columns: 1.2fr 1fr; align-items: start; } }
+    @media (min-width: 1024px) { .up-layout { grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); align-items: start; } }
     .section { padding: 18px; }
     .section-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; margin: 0 0 14px; }
     .step { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); font-size: 12.5px; font-weight: 700; color: var(--text-2); }
     .step.done { background: var(--gold); color: var(--ink); }
     .dropzone {
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;
-      min-height: 220px; padding: 24px; border: 1.5px dashed var(--line-2); border-radius: 14px; background: var(--surface-2);
+      min-height: 260px; padding: 24px; border: 1.5px dashed var(--line-2); border-radius: 12px; background: var(--surface-3);
       cursor: pointer; transition: border-color .15s, background .15s;
     }
     .dropzone:hover, .dropzone.over { border-color: var(--gold); background: var(--gold-soft); }
-    .dropzone .circle { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); color: var(--gold-ink); }
-    .dropzone .circle svg.i { width: 26px; height: 26px; }
-    .dropzone b { font-size: 16px; }
+    .dropzone .circle { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); color: var(--gold-ink); }
+    .dropzone .circle svg.i { width: 24px; height: 24px; }
+    .dropzone b { font-size: 15.5px; }
     .dropzone span { color: var(--muted); font-size: 13.5px; }
     .file-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .file-row .ficon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--gold-soft); color: var(--gold-ink); flex: none; }
+    .file-row .ficon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--gold-soft); color: var(--gold-ink); flex: none; }
     .file-row .fname { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .file-row .fmeta { font-size: 13px; color: var(--muted); }
     .file-row > div { min-width: 0; flex: 1; }
-    .stage { position: relative; margin: 0 auto; overflow: hidden; border-radius: 14px; background: #0c0a09; touch-action: none; user-select: none; }
+    .stage { position: relative; margin: 0 auto; overflow: hidden; border-radius: 12px; background: #0c0a09; touch-action: none; user-select: none; }
     .stage video { width: 100%; height: 100%; display: block; object-fit: contain; pointer-events: none; }
     .stage.pad { background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
     .frame { position: absolute; top: 0; left: 0; border: 2px solid #fff; border-radius: 6px; box-shadow: 0 0 0 9999px rgba(12, 10, 9, .55); cursor: grab; }
     .frame.dragging { cursor: grabbing; }
-    .frame .grip { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.9); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+    .frame .grip { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.92); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.25); }
     .stage-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     .hint { font-size: 13px; color: var(--muted); margin: 0; }
-    .form-stack { display: flex; flex-direction: column; gap: 18px; }
+    .form-stack { display: flex; flex-direction: column; gap: 16px; }
     .actionbar { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
     .actionbar .error-text:empty { display: none; }
     .progress { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
     .progress > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), #E9C96B); border-radius: 999px; transition: width .25s; }
     .stages { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
     .stages .on { color: var(--text); font-weight: 600; }
-    .link-btn { background: none; border: none; color: var(--gold-ink); font-weight: 600; font-size: 14px; padding: 6px 0; align-self: center; }
+    .link-btn { background: none; border: none; color: var(--gold-ink); font-weight: 600; font-size: 13.5px; padding: 4px 0; align-self: center; }
     .success { text-align: center; padding: 28px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
-    .success .tick { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); }
-    .success .tick svg.i { width: 30px; height: 30px; stroke-width: 2.4; }
+    .success .tick { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); }
+    .success .tick svg.i { width: 28px; height: 28px; stroke-width: 2.4; }
     .success h3 { margin: 0; font-size: 20px; }
-    .success video { width: 100%; max-width: 320px; aspect-ratio: 1; border-radius: 14px; background: var(--surface-2); object-fit: cover; }
-    .stats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-    .stat { padding: 6px 12px; border-radius: 999px; background: var(--surface-2); font-size: 13px; color: var(--text-2); }
-    .stat b { color: var(--text); }
+    .success video { width: 100%; max-width: 300px; aspect-ratio: 1; border-radius: 12px; background: var(--surface-2); object-fit: cover; }
+    .pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .pill { padding: 5px 12px; border-radius: 999px; background: var(--surface-2); font-size: 13px; color: var(--text-2); }
+    .pill b { color: var(--text); }
     .success .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
     details.manual summary { cursor: pointer; color: var(--text-2); font-weight: 600; font-size: 14px; list-style: none; display: flex; align-items: center; gap: 8px; }
     details.manual summary::-webkit-details-marker { display: none; }
     details.manual[open] summary { margin-bottom: 14px; }
+    .recent h4 { margin: 0; padding: 14px 18px; font-size: 14px; border-bottom: 1px solid var(--line); }
+    .recent-row { display: flex; align-items: center; gap: 12px; padding: 10px 18px; border-bottom: 1px solid var(--line); }
+    .recent-row:last-child { border-bottom: none; }
+    .recent-row .thumb { width: 40px; height: 40px; }
+    .recent-row > div { flex: 1; min-width: 0; }
 
     /* ---------- account ---------- */
-    .acc-grid { display: grid; gap: 16px; max-width: 720px; }
-    .s-list { display: flex; flex-direction: column; }
+    .acc-grid { display: grid; gap: 16px; max-width: 760px; }
     .s-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-top: 1px solid var(--line); }
     .s-item:first-child { border-top: none; }
-    .s-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--surface-2); color: var(--text-2); flex: none; }
+    .s-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--surface-2); color: var(--text-2); flex: none; }
     .s-item > div { flex: 1; min-width: 0; }
     .s-name { font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .s-meta { font-size: 13px; color: var(--muted); }
-    .pill-ok { font-size: 11.5px; font-weight: 700; color: var(--ok); background: var(--ok-soft); padding: 2px 8px; border-radius: 999px; }
-    .note { font-size: 13.5px; color: var(--muted); margin: 0; padding: 0 2px; }
+    .pill-ok { font-size: 11px; font-weight: 700; color: var(--ok); background: var(--ok-soft); padding: 2px 8px; border-radius: 999px; }
+    .note { font-size: 13.5px; color: var(--muted); margin: 0; }
+    .card-head { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .card-head h4 { margin: 0; font-size: 15px; }
 
     /* ---------- toast ---------- */
-    .toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + var(--safe-b) + 14px); z-index: 50; display: flex; flex-direction: column; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
-    @media (min-width: 820px) { .toasts { bottom: 24px; } }
-    .toast { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 14px; background: var(--ink); color: #fff; font-size: 14px; box-shadow: var(--shadow-lg); animation: toast-in .25s var(--ease); }
+    .toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + var(--safe-b) + 14px); z-index: 60; display: flex; flex-direction: column; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
+    @media (min-width: 1024px) { .toasts { left: auto; right: 24px; transform: none; bottom: 24px; } }
+    .toast { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 12px; background: var(--ink); color: #fff; font-size: 14px; box-shadow: var(--shadow-lg); animation: toast-in .25s var(--ease); }
     .toast.error { background: var(--danger); }
-    .toast svg.i { width: 18px; height: 18px; }
     @keyframes toast-in { from { transform: translateY(10px); opacity: 0; } }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
   </style>
 </head>
 <body>
-  <!-- SVG-иконки (по мотивам Lucide) -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
     <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></symbol>
     <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
@@ -309,7 +423,14 @@
     <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
     <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
     <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
-    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></symbol>
+    <symbol id="i-sort" viewBox="0 0 24 24"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
   </svg>
 
   <!-- ============ ВХОД ============ -->
@@ -328,180 +449,230 @@
           </div>
         </label>
         <p class="error-text" id="loginError" role="alert"></p>
-        <button class="btn btn-primary btn-block" type="submit" id="loginBtn">Daxil ol</button>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" id="loginBtn">Daxil ol</button>
       </form>
     </div>
   </section>
 
   <!-- ============ ПРИЛОЖЕНИЕ ============ -->
   <div id="appView" hidden>
-    <header class="topbar">
+    <aside class="sidebar" aria-label="Menyu">
       <div class="brand"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
-      <nav class="tabs-top" aria-label="Bölmələr">
-        <a href="#products" data-tab="products"><svg class="i"><use href="#i-grid"/></svg>Məhsullar</a>
+      <div class="side-label">Kataloq</div>
+      <nav class="side-nav">
+        <a href="#products" data-tab="products"><svg class="i"><use href="#i-box"/></svg>Məhsullar<span class="count" id="navCount"></span></a>
         <a href="#upload" data-tab="upload"><svg class="i"><use href="#i-upload"/></svg>Video yüklə</a>
-        <a href="#account" data-tab="account"><svg class="i"><use href="#i-user"/></svg>Hesab</a>
       </nav>
-      <a class="icon-btn" href="/" target="_blank" rel="noopener" aria-label="Sayta bax"><svg class="i"><use href="#i-external"/></svg></a>
-    </header>
+      <div class="side-label" style="margin-top:18px">Sistem</div>
+      <nav class="side-nav">
+        <a href="#account" data-tab="account"><svg class="i"><use href="#i-user"/></svg>Hesab və sessiyalar</a>
+      </nav>
+      <div class="side-foot">
+        <a href="/" target="_blank" rel="noopener"><svg class="i"><use href="#i-external"/></svg>Sayta bax</a>
+        <button type="button" data-logout><svg class="i"><use href="#i-logout"/></svg>Çıxış</button>
+        <div class="side-user"><span class="dot"></span><span id="sideDevice">Bu cihaz</span></div>
+      </div>
+    </aside>
 
-    <main class="main">
-      <!-- ---------- Товары ---------- -->
-      <section id="tab-products" data-view="products">
-        <div class="page-head">
-          <div>
-            <h2>Məhsullar</h2>
-            <div class="sub" id="count">Yüklənir…</div>
-          </div>
+    <div class="content">
+      <header class="topbar">
+        <div class="brand mob-only"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
+        <div class="page-title">
+          <div class="crumb">İdarəetmə</div>
+          <h1 id="pageTitle">Məhsullar</h1>
         </div>
-        <div class="toolbar">
-          <div class="input-wrap">
-            <svg class="i"><use href="#i-search"/></svg>
-            <input class="input" type="search" id="search" placeholder="Kod ilə axtar…" autocomplete="off" aria-label="Kod ilə axtar" />
-          </div>
-          <div class="chips" id="filters" role="group" aria-label="Filtr"></div>
+        <div class="top-actions">
+          <a class="btn btn-ghost desk-only" href="/" target="_blank" rel="noopener"><svg class="i"><use href="#i-external"/></svg>Sayta bax</a>
+          <a class="btn btn-primary desk-only" href="#upload" id="topUpload"><svg class="i"><use href="#i-plus"/></svg>Yeni məhsul</a>
+          <a class="icon-btn mob-only" href="/" target="_blank" rel="noopener" aria-label="Sayta bax"><svg class="i"><use href="#i-external"/></svg></a>
         </div>
-        <div class="grid" id="grid"></div>
-        <div class="sentinel" id="sentinel"></div>
-      </section>
+      </header>
 
-      <!-- ---------- Загрузка ---------- -->
-      <section id="tab-upload" data-view="upload" hidden>
-        <div class="page-head">
-          <div>
-            <h2>Video yüklə</h2>
-            <div class="sub">Video avtomatik sıxılır: 1080×1080, ~2 MB</div>
-          </div>
-        </div>
-
-        <div class="up-layout" id="upForm">
-          <div class="card section">
-            <p class="section-title"><span class="step" id="step1">1</span>Video</p>
-            <label class="dropzone" id="drop">
-              <input type="file" id="fileInput" accept="video/*" class="sr" />
-              <span class="circle"><svg class="i"><use href="#i-upload"/></svg></span>
-              <b>Video seçin</b>
-              <span>və ya faylı bura atın · MP4, MOV</span>
-            </label>
-            <div id="filePanel" hidden>
-              <div class="file-row">
-                <span class="ficon"><svg class="i"><use href="#i-film"/></svg></span>
-                <div>
-                  <div class="fname" id="fileName"></div>
-                  <div class="fmeta" id="fileMeta"></div>
-                </div>
-                <button type="button" class="btn btn-ghost" id="changeFile">Dəyiş</button>
-              </div>
-              <div class="stage" id="stage">
-                <video id="preview" muted loop playsinline autoplay></video>
-                <div class="frame" id="frame"><span class="grip"><svg class="i"><use href="#i-move"/></svg></span></div>
-              </div>
-              <div class="stage-controls">
-                <div class="segmented" id="modes" role="group" aria-label="Kvadrat formatı">
-                  <button type="button" data-mode="crop" aria-pressed="true"><svg class="i"><use href="#i-crop"/></svg>Kəs</button>
-                  <button type="button" data-mode="pad" aria-pressed="false"><svg class="i"><use href="#i-frame"/></svg>Ağ fon</button>
-                </div>
-                <p class="hint" id="hint"></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-stack">
-            <div class="card section">
-              <p class="section-title"><span class="step" id="step2">2</span>Məhsul</p>
-              <div class="form-stack">
-                <label class="field">
-                  <span>Məhsul kodu</span>
-                  <input class="input" type="text" id="code" placeholder="UN-0141" autocomplete="off" autocapitalize="characters" />
-                </label>
-                <div class="field">
-                  <span id="catLabel">Kateqoriya</span>
-                  <div class="chips" id="catChips" role="radiogroup" aria-labelledby="catLabel" style="flex-wrap: wrap;"></div>
-                </div>
-                <label class="switch">
-                  <div><b>PIN</b><small>Əsas səhifədə yuxarıda göstər</small></div>
-                  <input type="checkbox" id="pin" />
-                </label>
-              </div>
-            </div>
-
-            <div class="card actionbar" id="actionbar">
-              <div id="progressBox" hidden>
-                <div class="stages"><span id="stCompress">Sıxılır</span><span id="stPercent">0%</span><span id="stUpload">Yüklənir</span></div>
-                <div class="progress" style="margin-top:8px"><div id="bar"></div></div>
-              </div>
-              <p class="error-text" id="upError" role="alert"></p>
-              <button type="button" class="btn btn-primary btn-block" id="uploadBtn" disabled>Sıx və yüklə</button>
-              <button type="button" class="link-btn" id="compressOnly" hidden>Yükləmədən yoxla</button>
-            </div>
-
-            <details class="card section manual">
-              <summary><svg class="i"><use href="#i-link"/></svg>Video artıq yüklənib? Link ilə əlavə et</summary>
-              <form id="addForm" class="form-stack" novalidate>
-                <label class="field"><span>Video linki</span><input class="input" type="url" name="video" placeholder="https://video.islimi.az/…mp4" required /></label>
-                <p class="note">Kod, kateqoriya və PIN yuxarıdakı “Məhsul” bölməsindən götürülür.</p>
-                <button class="btn btn-ghost" type="submit">Kataloqa əlavə et</button>
-              </form>
-            </details>
-          </div>
-        </div>
-
-        <div class="card success" id="upSuccess" hidden>
-          <span class="tick"><svg class="i"><use href="#i-check"/></svg></span>
-          <h3 id="successTitle">Kataloqa əlavə edildi</h3>
-          <video id="resultVideo" muted loop playsinline autoplay></video>
+      <main class="main">
+        <!-- ---------- Товары ---------- -->
+        <section data-view="products">
+          <div class="page-head"><h2>Məhsullar</h2><div class="sub" id="countMobile"></div></div>
           <div class="stats" id="stats"></div>
-          <div class="btns">
-            <button type="button" class="btn btn-primary" id="again">Yenisini yüklə</button>
-            <a class="btn btn-ghost" href="#products">Məhsullara bax</a>
-            <a class="btn btn-ghost" id="downloadLink" download hidden>Faylı endir</a>
-          </div>
-        </div>
-      </section>
 
-      <!-- ---------- Аккаунт ---------- -->
-      <section id="tab-account" data-view="account" hidden>
-        <div class="page-head">
-          <div>
-            <h2>Hesab</h2>
-            <div class="sub">Aktiv sessiyalar və çıxış</div>
+          <div class="card panel">
+            <div class="panel-toolbar">
+              <div class="input-wrap search">
+                <svg class="i"><use href="#i-search"/></svg>
+                <input class="input" type="search" id="search" placeholder="Kod ilə axtar…" autocomplete="off" aria-label="Kod ilə axtar" />
+              </div>
+              <div class="chips" id="filters" role="group" aria-label="Kateqoriya filtri"></div>
+              <div class="tools">
+                <div class="segmented" id="viewToggle" role="group" aria-label="Görünüş">
+                  <button type="button" data-view-mode="table" aria-pressed="true" aria-label="Cədvəl" title="Cədvəl"><svg class="i"><use href="#i-list"/></svg></button>
+                  <button type="button" data-view-mode="grid" aria-pressed="false" aria-label="Kartlar" title="Kartlar"><svg class="i"><use href="#i-grid"/></svg></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="bulkbar" id="bulkbar" role="toolbar" aria-label="Seçilənlər üçün əməliyyatlar" hidden>
+              <b id="bulkCount"></b>
+              <select class="select" id="bulkCat" aria-label="Kateqoriyanı dəyiş"><option value="">Kateqoriyanı dəyiş…</option></select>
+              <button type="button" class="btn btn-ghost" data-bulk="pin-on"><svg class="i"><use href="#i-pin"/></svg>PIN qoy</button>
+              <button type="button" class="btn btn-ghost" data-bulk="pin-off">PIN götür</button>
+              <button type="button" class="btn btn-danger" id="bulkDelete"><svg class="i"><use href="#i-trash"/></svg>Sil</button>
+              <span class="spacer"></span>
+              <button type="button" class="icon-btn" id="bulkClear" aria-label="Seçimi ləğv et" title="Seçimi ləğv et"><svg class="i"><use href="#i-x"/></svg></button>
+            </div>
+
+            <div class="table-wrap" id="tableWrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th class="c-check"><input type="checkbox" class="checkbox" id="checkAll" aria-label="Səhifədəkiləri seç" /></th>
+                    <th class="c-thumb">Video</th>
+                    <th><button type="button" data-sort="code">Kod <svg class="i"><use href="#i-sort"/></svg></button></th>
+                    <th><button type="button" data-sort="category">Kateqoriya <svg class="i"><use href="#i-sort"/></svg></button></th>
+                    <th class="c-pin"><button type="button" data-sort="pin">PIN <svg class="i"><use href="#i-sort"/></svg></button></th>
+                    <th class="c-date"><button type="button" data-sort="id">Əlavə edilib <svg class="i"><use href="#i-sort"/></svg></button></th>
+                    <th class="c-actions"><span class="sr">Əməliyyatlar</span></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+            <div class="grid" id="grid" hidden></div>
+
+            <div class="pager">
+              <span id="range"></span>
+              <div class="pages" id="pages"></div>
+              <label class="size">Səhifədə
+                <select class="select" id="pageSize"><option>25</option><option>50</option><option>100</option></select>
+              </label>
+            </div>
           </div>
-        </div>
-        <div class="acc-grid">
-          <div class="card">
-            <div class="s-list" id="sessions"></div>
+        </section>
+
+        <!-- ---------- Загрузка ---------- -->
+        <section data-view="upload" hidden>
+          <div class="page-head"><h2>Video yüklə</h2><div class="sub">Video avtomatik sıxılır: 1080×1080, ~2 MB</div></div>
+
+          <div class="up-layout" id="upForm">
+            <div class="card section">
+              <p class="section-title"><span class="step" id="step1">1</span>Video</p>
+              <label class="dropzone" id="drop">
+                <input type="file" id="fileInput" accept="video/*" class="sr" />
+                <span class="circle"><svg class="i"><use href="#i-upload"/></svg></span>
+                <b>Video seçin</b>
+                <span>və ya faylı bura atın · MP4, MOV<br />avtomatik 1080×1080, ~2 MB</span>
+              </label>
+              <div id="filePanel" hidden>
+                <div class="file-row">
+                  <span class="ficon"><svg class="i"><use href="#i-film"/></svg></span>
+                  <div><div class="fname" id="fileName"></div><div class="fmeta" id="fileMeta"></div></div>
+                  <button type="button" class="btn btn-ghost" id="changeFile">Dəyiş</button>
+                </div>
+                <div class="stage" id="stage">
+                  <video id="preview" muted loop playsinline autoplay></video>
+                  <div class="frame" id="frame"><span class="grip"><svg class="i"><use href="#i-move"/></svg></span></div>
+                </div>
+                <div class="stage-controls">
+                  <div class="segmented" id="modes" role="group" aria-label="Kvadrat formatı">
+                    <button type="button" data-mode="crop" aria-pressed="true"><svg class="i"><use href="#i-crop"/></svg>Kəs</button>
+                    <button type="button" data-mode="pad" aria-pressed="false"><svg class="i"><use href="#i-frame"/></svg>Ağ fon</button>
+                  </div>
+                  <p class="hint" id="hint"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-stack">
+              <div class="card section">
+                <p class="section-title"><span class="step" id="step2">2</span>Məhsul məlumatı</p>
+                <div class="form-stack">
+                  <label class="field"><span>Məhsul kodu</span><input class="input" type="text" id="code" placeholder="UN-0141" autocomplete="off" autocapitalize="characters" /></label>
+                  <div class="field"><span id="catLabel">Kateqoriya</span><div class="chips" id="catChips" role="radiogroup" aria-labelledby="catLabel" style="flex-wrap: wrap;"></div></div>
+                  <label class="switch"><div><b>PIN</b><small>Əsas səhifədə yuxarıda göstər</small></div><input type="checkbox" class="toggle" id="pin" /></label>
+                </div>
+              </div>
+
+              <div class="card actionbar">
+                <div id="progressBox" hidden>
+                  <div class="stages"><span id="stCompress">Sıxılır</span><span id="stPercent">0%</span><span id="stUpload">Yüklənir</span></div>
+                  <div class="progress" style="margin-top:8px"><div id="bar"></div></div>
+                </div>
+                <p class="error-text" id="upError" role="alert"></p>
+                <button type="button" class="btn btn-primary btn-lg btn-block" id="uploadBtn" disabled>Sıx və yüklə</button>
+                <button type="button" class="link-btn" id="compressOnly" hidden>Yükləmədən yoxla</button>
+              </div>
+
+              <details class="card section manual">
+                <summary><svg class="i"><use href="#i-link"/></svg>Video artıq yüklənib? Link ilə əlavə et</summary>
+                <form id="addForm" class="form-stack" novalidate>
+                  <label class="field"><span>Video linki</span><input class="input" type="url" name="video" placeholder="https://video.islimi.az/…mp4" required /></label>
+                  <p class="note">Kod, kateqoriya və PIN yuxarıdakı bölmədən götürülür.</p>
+                  <button class="btn btn-ghost" type="submit">Kataloqa əlavə et</button>
+                </form>
+              </details>
+
+              <div class="card recent">
+                <h4>Son əlavə edilənlər</h4>
+                <div id="recent"></div>
+              </div>
+            </div>
           </div>
-          <p class="note">Sessiya son istifadədən 30 gün sonra bitir. Şifrə dəyişdirilərsə, bütün sessiyalar avtomatik bağlanır.</p>
-          <div style="display:flex; gap:10px; flex-wrap:wrap">
-            <button type="button" class="btn btn-ghost" id="logoutBtn"><svg class="i"><use href="#i-logout"/></svg>Çıxış</button>
-            <button type="button" class="btn btn-danger" id="logoutAll">Bütün cihazlardan çıx</button>
+
+          <div class="card success" id="upSuccess" hidden>
+            <span class="tick"><svg class="i"><use href="#i-check"/></svg></span>
+            <h3 id="successTitle">Kataloqa əlavə edildi</h3>
+            <video id="resultVideo" muted loop playsinline autoplay></video>
+            <div class="pills" id="pills"></div>
+            <div class="btns">
+              <button type="button" class="btn btn-primary" id="again">Yenisini yüklə</button>
+              <a class="btn btn-ghost" href="#products">Məhsullara bax</a>
+              <a class="btn btn-ghost" id="downloadLink" download hidden>Faylı endir</a>
+            </div>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+
+        <!-- ---------- Аккаунт ---------- -->
+        <section data-view="account" hidden>
+          <div class="page-head"><h2>Hesab</h2><div class="sub">Aktiv sessiyalar və çıxış</div></div>
+          <div class="acc-grid">
+            <div class="card">
+              <div class="card-head"><h4>Aktiv sessiyalar</h4><span class="muted" id="sessCount"></span></div>
+              <div id="sessions"></div>
+            </div>
+            <p class="note">Sessiya son istifadədən 30 gün sonra bitir. Şifrə dəyişdirilərsə, bütün sessiyalar avtomatik bağlanır. 5 yanlış cəhddən sonra giriş 15 dəqiqəlik bağlanır.</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+              <button type="button" class="btn btn-ghost" data-logout><svg class="i"><use href="#i-logout"/></svg>Çıxış</button>
+              <button type="button" class="btn btn-danger" id="logoutAll">Bütün cihazlardan çıx</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
 
     <nav class="bottom-nav" aria-label="Bölmələr">
-      <a href="#products" data-tab="products"><svg class="i"><use href="#i-grid"/></svg>Məhsullar</a>
+      <a href="#products" data-tab="products"><svg class="i"><use href="#i-box"/></svg>Məhsullar</a>
       <a href="#upload" data-tab="upload"><span class="upload-pill"><svg class="i"><use href="#i-upload"/></svg></span>Yüklə</a>
       <a href="#account" data-tab="account"><svg class="i"><use href="#i-user"/></svg>Hesab</a>
     </nav>
   </div>
 
-  <!-- Карточка товара -->
+  <!-- Редактор товара: справа на компьютере, снизу на телефоне -->
   <dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
-    <div class="sheet-head">
-      <h3 id="sheetTitle">Məhsul</h3>
+    <div class="sheet-head" tabindex="-1" autofocus>
+      <div><div class="crumb">Məhsul</div><h3 id="sheetTitle">Məhsul</h3></div>
       <button type="button" class="icon-btn" id="sheetClose" aria-label="Bağla"><svg class="i"><use href="#i-x"/></svg></button>
     </div>
     <div class="sheet-body">
       <video class="sheet-video" id="sheetVideo" muted loop playsinline autoplay controls></video>
       <label class="field"><span>Məhsul kodu</span><input class="input" type="text" id="sheetCode" autocomplete="off" /></label>
       <div class="field"><span id="sheetCatLabel">Kateqoriya</span><div class="chips" id="sheetCats" role="radiogroup" aria-labelledby="sheetCatLabel" style="flex-wrap: wrap;"></div></div>
-      <label class="switch"><div><b>PIN</b><small>Əsas səhifədə yuxarıda göstər</small></div><input type="checkbox" id="sheetPin" /></label>
-      <div class="meta-row"><span id="sheetMeta"></span><a id="sheetLink" target="_blank" rel="noopener">Videonu aç ↗</a></div>
+      <label class="switch"><div><b>PIN</b><small>Əsas səhifədə yuxarıda göstər</small></div><input type="checkbox" class="toggle" id="sheetPin" /></label>
+      <dl class="meta-list">
+        <dt>ID</dt><dd id="sheetId"></dd>
+        <dt>Əlavə edilib</dt><dd id="sheetDate"></dd>
+        <dt>Video</dt><dd><a id="sheetLink" target="_blank" rel="noopener"></a></dd>
+      </dl>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="btn btn-danger" id="sheetDelete">Sil</button>
+      <button type="button" class="btn btn-danger" id="sheetDelete"><svg class="i"><use href="#i-trash"/></svg>Sil</button>
       <button type="button" class="btn btn-primary" id="sheetSave" disabled>Yadda saxla</button>
     </div>
   </dialog>
@@ -517,24 +688,31 @@
     // ===== Настройки =====
     const API = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://upload-to-r2.ramizagayev122.workers.dev';
     const CATEGORIES = ['Üzüklər', 'Sırgalar', 'Qolbaqlar', 'Boyunbağılar'];
-    const OUTPUT_SIZE = 1080;      // сторона квадрата, px
-    const BITRATE = 1_200_000;     // ~1200 кбит/с → ~2.3 МБ на 16 сек
+    const CAT_COLORS = { 'Üzüklər': '#D4AF37', 'Sırgalar': '#C2410C', 'Qolbaqlar': '#0F766E', 'Boyunbağılar': '#6D28D9' };
+    const OUTPUT_SIZE = 1080;
+    const BITRATE = 1_200_000;
     const FRAME_RATE = 30;
-    const PAGE = 24;
     const TOKEN_KEY = 'islimi-session';
+    const PREFS_KEY = 'islimi-admin-prefs';
+    const TITLES = { products: 'Məhsullar', upload: 'Video yüklə', account: 'Hesab və sessiyalar' };
 
     const $ = (id) => document.getElementById(id);
     const icon = (name) => `<svg class="i"><use href="#i-${name}"/></svg>`;
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const fmtMB = (b) => (b / 1048576).toFixed(1) + ' MB';
+    const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('az-AZ', { day: '2-digit', month: '2-digit', year: 'numeric' }); };
+    const catPill = (c) => `<span class="cat-pill" style="--c:${CAT_COLORS[c] || '#78716C'}">${esc(c)}</span>`;
+    const desktopMQ = window.matchMedia('(min-width: 1024px)');
 
-    // ===== Хранилище токена (пароль больше не хранится) =====
+    // ===== Хранилище =====
     const store = {
-      get() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; } },
-      set(v) { try { v ? localStorage.setItem(TOKEN_KEY, v) : localStorage.removeItem(TOKEN_KEY); } catch {} },
+      get(k) { try { return localStorage.getItem(k) || ''; } catch { return ''; } },
+      set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} },
     };
     try { localStorage.removeItem('islimi-upload-key'); } catch {} // старая версия хранила сам пароль
-    let token = store.get();
+    let token = store.get(TOKEN_KEY);
+    const prefs = (() => { try { return JSON.parse(store.get(PREFS_KEY) || '{}'); } catch { return {}; } })();
+    const savePrefs = () => store.set(PREFS_KEY, JSON.stringify(prefs));
 
     // ===== API =====
     async function api(method, path, body) {
@@ -553,7 +731,6 @@
       return data;
     }
 
-    // ===== Тосты =====
     function toast(text, kind = 'ok') {
       const el = document.createElement('div');
       el.className = 'toast' + (kind === 'error' ? ' error' : '');
@@ -571,12 +748,14 @@
     }
     function onSessionLost(message) {
       token = '';
-      store.set('');
+      store.set(TOKEN_KEY, '');
+      if ($('sheet').open) $('sheet').close();
       showLogin(message || 'Sessiya bitib. Yenidən daxil olun.');
     }
-    async function enterApp() {
+    function enterApp(session) {
       $('loginView').hidden = true;
       $('appView').hidden = false;
+      if (session) $('sideDevice').textContent = describeUA(session.user_agent).name + ' · aktiv';
       route();
       loadItems();
     }
@@ -588,7 +767,6 @@
       $('togglePw').innerHTML = icon(show ? 'eye-off' : 'eye');
       $('togglePw').setAttribute('aria-label', show ? 'Şifrəni gizlət' : 'Şifrəni göstər');
     });
-
     $('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const password = $('loginPassword').value;
@@ -598,10 +776,10 @@
       try {
         const data = await api('POST', '/api/login', { password });
         token = data.token;
-        store.set(token);
+        store.set(TOKEN_KEY, token);
         $('loginPassword').value = '';
         $('loginError').textContent = '';
-        enterApp();
+        enterApp(data.session);
       } catch (err) {
         $('loginError').textContent = err.message;
       } finally {
@@ -609,6 +787,13 @@
         $('loginBtn').textContent = 'Daxil ol';
       }
     });
+    async function logout(message = '') {
+      try { await api('POST', '/api/logout'); } catch {}
+      token = '';
+      store.set(TOKEN_KEY, '');
+      showLogin(message);
+    }
+    document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', () => logout('')));
 
     // ===== Навигация =====
     const TABS = ['products', 'upload', 'account'];
@@ -618,8 +803,11 @@
       for (const a of document.querySelectorAll('a[data-tab]')) {
         if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
       }
+      $('pageTitle').textContent = TITLES[tab];
+      $('topUpload').hidden = tab === 'upload';
+      document.title = `${TITLES[tab]} · Islimi`;
       if (tab === 'account') loadSessions();
-      if (tab === 'upload') requestAnimationFrame(layoutStage);
+      if (tab === 'upload') { renderRecent(); requestAnimationFrame(layoutStage); }
       window.scrollTo({ top: 0 });
     }
     window.addEventListener('hashchange', route);
@@ -627,161 +815,284 @@
     // ================================================================
     //  ТОВАРЫ
     // ================================================================
-    let items = [];       // новые — первыми
-    let shown = PAGE;
-    let filterCat = '';
-    let filterPin = false;
+    let items = [];
+    const view = {
+      cat: '', pin: false, q: '',
+      sort: prefs.sort || { key: 'id', dir: 'desc' },
+      mode: prefs.mode || 'table',
+      page: 1, size: prefs.size || 25,
+    };
+    const selected = new Set();
+    $('pageSize').value = String(view.size);
+
+    async function loadItems() {
+      $('tbody').innerHTML = Array.from({ length: 8 }, () => '<tr><td colspan="7" class="skeleton-row"></td></tr>').join('');
+      try {
+        const res = await fetch(API + '/api/items', { cache: 'no-store' });
+        items = (await res.json()).items;
+        renderProducts();
+        renderRecent();
+      } catch {
+        $('tbody').innerHTML = `<tr><td colspan="7"><div class="empty">${icon('alert')}<div>Məhsulları yükləmək alınmadı</div></div></td></tr>`;
+      }
+    }
+
+    function renderStats() {
+      const monthAgo = Date.now() - 30 * 86400000;
+      const recent = items.filter((i) => Date.parse(i.created_at) > monthAgo).length;
+      const pins = items.filter((i) => i.pin).length;
+      const cards = [
+        { key: '', label: 'Bütün məhsullar', value: items.length, hint: recent ? `<b>+${recent}</b> son 30 gündə` : 'son 30 gündə yeni yoxdur' },
+        ...CATEGORIES.map((c) => {
+          const n = items.filter((i) => i.category === c).length;
+          return { key: c, label: c, value: n, color: CAT_COLORS[c], hint: items.length ? `kataloqun ${Math.round((n / items.length) * 100)}%-i` : '' };
+        }),
+        { key: 'pin', label: 'PIN', value: pins, color: '#D4AF37', hint: 'əsas səhifədə yuxarıda' },
+      ];
+      $('stats').innerHTML = cards.map((c) => {
+        const active = c.key === 'pin' ? view.pin : !view.pin && view.cat === c.key;
+        return `<button type="button" class="stat" data-stat="${esc(c.key)}" aria-pressed="${active}" ${c.color ? `style="--c:${c.color}"` : ''}>
+          <span class="label">${c.color ? '<i></i>' : ''}${esc(c.label)}</span>
+          <span class="value">${c.value}</span>
+          <span class="hint">${c.hint}</span>
+        </button>`;
+      }).join('');
+      $('navCount').textContent = items.length;
+      $('countMobile').textContent = `${items.length} məhsul · ${pins} PIN`;
+    }
+    $('stats').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-stat]');
+      if (!b) return;
+      const k = b.dataset.stat;
+      if (k === 'pin') { view.pin = !view.pin; view.cat = ''; } else { view.cat = k; view.pin = false; }
+      view.page = 1;
+      renderProducts();
+    });
 
     function renderFilters() {
-      const chips = [['', 'Hamısı'], ...CATEGORIES.map((c) => [c, c])];
+      const count = (c) => items.filter((i) => i.category === c).length;
       $('filters').innerHTML =
-        chips.map(([v, label]) => `<button type="button" class="chip" data-cat="${esc(v)}" aria-pressed="${filterCat === v && !filterPin}">${esc(label)}</button>`).join('') +
-        `<button type="button" class="chip" data-pin aria-pressed="${filterPin}">${icon('pin')}PIN</button>`;
+        `<button type="button" class="chip" data-cat="" aria-pressed="${!view.cat && !view.pin}">Hamısı</button>` +
+        CATEGORIES.map((c) => `<button type="button" class="chip" data-cat="${esc(c)}" aria-pressed="${view.cat === c && !view.pin}">${esc(c)} <span class="n">${count(c)}</span></button>`).join('') +
+        `<button type="button" class="chip" data-pin aria-pressed="${view.pin}">${icon('pin')}PIN</button>`;
     }
     $('filters').addEventListener('click', (e) => {
       const b = e.target.closest('button');
       if (!b) return;
-      if (b.hasAttribute('data-pin')) { filterPin = !filterPin; filterCat = ''; }
-      else { filterCat = b.dataset.cat; filterPin = false; }
-      shown = PAGE;
-      renderFilters();
-      renderGrid();
+      if (b.hasAttribute('data-pin')) { view.pin = !view.pin; view.cat = ''; } else { view.cat = b.dataset.cat; view.pin = false; }
+      view.page = 1;
+      renderProducts();
     });
-    $('search').addEventListener('input', () => { shown = PAGE; renderGrid(); });
+    $('search').addEventListener('input', () => { view.q = $('search').value; view.page = 1; renderProducts(); });
 
-    async function loadItems() {
-      $('grid').innerHTML = Array.from({ length: 8 }, () => '<div class="skeleton"></div>').join('');
-      try {
-        const res = await fetch(API + '/api/items', { cache: 'no-store' });
-        const data = await res.json();
-        items = data.items.slice().reverse();
-        renderGrid();
-      } catch {
-        $('grid').innerHTML = `<div class="empty" style="grid-column:1/-1">${icon('alert')}<div>Məhsulları yükləmək alınmadı</div></div>`;
-      }
+    function filteredSorted() {
+      const q = view.q.toLowerCase().replace(/[^a-z0-9]+/g, '');
+      const list = items.filter((it) => (!q || it.code.includes(q)) && (!view.cat || it.category === view.cat) && (!view.pin || it.pin));
+      const { key, dir } = view.sort;
+      const m = dir === 'asc' ? 1 : -1;
+      return list.sort((a, b) => {
+        const va = a[key], vb = b[key];
+        const r = typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb), 'az', { numeric: true });
+        return (r || a.id - b.id) * m;
+      });
     }
 
-    function filtered() {
-      const q = $('search').value.toLowerCase().replace(/[^a-z0-9]+/g, '');
-      return items.filter((it) => (!q || it.code.includes(q)) && (!filterCat || it.category === filterCat) && (!filterPin || it.pin));
-    }
-
+    // Миниатюры грузятся при появлении на экране; уже загруженные — сразу (из кэша браузера)
+    const seenThumbs = new Set();
     const thumbs = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (!e.isIntersecting) continue;
         e.target.src = e.target.dataset.src + '#t=0.5';
+        seenThumbs.add(e.target.dataset.src);
         thumbs.unobserve(e.target);
       }
     }, { rootMargin: '300px' });
+    const thumb = (it) => seenThumbs.has(it.video)
+      ? `<video muted playsinline preload="metadata" src="${esc(it.video)}#t=0.5"></video>`
+      : `<video muted playsinline preload="metadata" data-src="${esc(it.video)}"></video>`;
+    const observeThumbs = (root) => root.querySelectorAll('video[data-src]').forEach((v) => thumbs.observe(v));
 
-    function renderGrid() {
-      const list = filtered();
-      const pins = items.filter((i) => i.pin).length;
-      $('count').textContent = list.length === items.length
-        ? `${items.length} məhsul · ${pins} PIN`
-        : `${list.length} / ${items.length} məhsul`;
+    function renderProducts() {
+      renderStats();
+      renderFilters();
+      const list = filteredSorted();
+      const pages = Math.max(1, Math.ceil(list.length / view.size));
+      view.page = Math.min(view.page, pages);
+      const start = (view.page - 1) * view.size;
+      const pageItems = list.slice(start, start + view.size);
+      const mode = desktopMQ.matches ? view.mode : 'grid';
 
-      if (!list.length) {
-        $('grid').innerHTML = `<div class="empty" style="grid-column:1/-1">${icon('search')}<div>Heç nə tapılmadı</div></div>`;
+      document.querySelectorAll('.tbl th [data-sort]').forEach((b) => {
+        const on = b.dataset.sort === view.sort.key;
+        b.classList.toggle('sorted', on);
+        b.querySelector('use').setAttribute('href', on ? (view.sort.dir === 'asc' ? '#i-up' : '#i-down') : '#i-sort');
+      });
+      $('viewToggle').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.viewMode === view.mode)));
+      $('viewToggle').hidden = !desktopMQ.matches;
+      $('tableWrap').hidden = mode !== 'table';
+      $('grid').hidden = mode !== 'grid';
+
+      const empty = `<div class="empty">${icon('search')}<div>Heç nə tapılmadı</div></div>`;
+      if (mode === 'table') {
+        $('tbody').innerHTML = pageItems.length ? pageItems.map((it) => `
+          <tr data-id="${it.id}" class="${selected.has(it.id) ? 'selected' : ''}">
+            <td class="c-check"><input type="checkbox" class="checkbox" data-act="select" ${selected.has(it.id) ? 'checked' : ''} aria-label="${esc(it.code)} seç" /></td>
+            <td class="c-thumb"><span class="thumb">${thumb(it)}</span></td>
+            <td><span class="code">${esc(it.code)}</span><span class="id">#${it.id}</span></td>
+            <td>${catPill(it.category)}</td>
+            <td class="c-pin"><input type="checkbox" class="toggle sm" data-act="pin" ${it.pin ? 'checked' : ''} aria-label="PIN ${esc(it.code)}" /></td>
+            <td class="c-date muted">${fmtDate(it.created_at)}</td>
+            <td class="c-actions">
+              <button type="button" class="icon-btn" data-act="edit" aria-label="Redaktə et" title="Redaktə et">${icon('edit')}</button>
+              <a class="icon-btn" href="${esc(it.video)}" target="_blank" rel="noopener" aria-label="Videonu aç" title="Videonu aç">${icon('external')}</a>
+              <button type="button" class="icon-btn" data-act="delete" aria-label="Sil" title="Sil">${icon('trash')}</button>
+            </td>
+          </tr>`).join('') : `<tr><td colspan="7">${empty}</td></tr>`;
+        observeThumbs($('tbody'));
+      } else {
+        $('grid').innerHTML = pageItems.length ? pageItems.map((it) => `
+          <button type="button" class="p-card" data-id="${it.id}">
+            <div class="p-media">${thumb(it)}${it.pin ? `<span class="badge-pin">${icon('pin')}PIN</span>` : ''}</div>
+            <div class="p-body"><span class="p-code">${esc(it.code)}</span><span class="p-meta">${catPill(it.category)}<span>${fmtDate(it.created_at)}</span></span></div>
+          </button>`).join('') : `<div style="grid-column:1/-1">${empty}</div>`;
+        observeThumbs($('grid'));
+      }
+
+      const pageIds = pageItems.map((i) => i.id);
+      const allSel = pageIds.length > 0 && pageIds.every((id) => selected.has(id));
+      $('checkAll').checked = allSel;
+      $('checkAll').indeterminate = !allSel && pageIds.some((id) => selected.has(id));
+      $('bulkbar').hidden = selected.size === 0 || mode !== 'table';
+      $('bulkCount').textContent = `${selected.size} seçildi`;
+
+      $('range').textContent = list.length ? `${start + 1}–${Math.min(start + view.size, list.length)} / ${list.length}` : '0 məhsul';
+      const nums = [...new Set([1, pages, view.page - 1, view.page, view.page + 1].filter((n) => n >= 1 && n <= pages))].sort((a, b) => a - b);
+      let html = `<button type="button" data-page="${view.page - 1}" ${view.page === 1 ? 'disabled' : ''} aria-label="Əvvəlki">${icon('left')}</button>`;
+      nums.forEach((n, i) => {
+        if (i && n - nums[i - 1] > 1) html += '<span class="muted">…</span>';
+        html += `<button type="button" data-page="${n}" ${n === view.page ? 'aria-current="page"' : ''}>${n}</button>`;
+      });
+      html += `<button type="button" data-page="${view.page + 1}" ${view.page === pages ? 'disabled' : ''} aria-label="Növbəti">${icon('right')}</button>`;
+      $('pages').innerHTML = html;
+    }
+
+    $('pages').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-page]');
+      if (!b || b.disabled) return;
+      view.page = Number(b.dataset.page);
+      renderProducts();
+      document.querySelector('.panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    $('pageSize').addEventListener('change', () => { view.size = Number($('pageSize').value); prefs.size = view.size; savePrefs(); view.page = 1; renderProducts(); });
+    $('viewToggle').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-view-mode]');
+      if (!b) return;
+      view.mode = b.dataset.viewMode; prefs.mode = view.mode; savePrefs();
+      renderProducts();
+    });
+    document.querySelector('.tbl thead').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-sort]');
+      if (!b) return;
+      const key = b.dataset.sort;
+      view.sort = view.sort.key === key ? { key, dir: view.sort.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: key === 'id' || key === 'pin' ? 'desc' : 'asc' };
+      prefs.sort = view.sort; savePrefs();
+      renderProducts();
+    });
+    desktopMQ.addEventListener('change', () => { if (items.length) renderProducts(); });
+
+    $('checkAll').addEventListener('change', () => {
+      const list = filteredSorted();
+      const start = (view.page - 1) * view.size;
+      for (const it of list.slice(start, start + view.size)) $('checkAll').checked ? selected.add(it.id) : selected.delete(it.id);
+      renderProducts();
+    });
+    $('bulkClear').addEventListener('click', () => { selected.clear(); renderProducts(); });
+
+    $('tbody').addEventListener('click', async (e) => {
+      const row = e.target.closest('tr[data-id]');
+      if (!row || e.target.closest('a')) return;
+      const it = items.find((i) => i.id === Number(row.dataset.id));
+      let actEl = e.target.closest('[data-act]');
+      // клик в любом месте ячейки с галочкой = выбор строки
+      if (!actEl && e.target.closest('.c-check')) {
+        actEl = row.querySelector('[data-act="select"]');
+        actEl.checked = !actEl.checked;
+      }
+      const act = actEl?.dataset.act;
+      if (act === 'select') {
+        actEl.checked ? selected.add(it.id) : selected.delete(it.id);
+        renderProducts();
         return;
       }
-      $('grid').innerHTML = list.slice(0, shown).map((it) => `
-        <button type="button" class="p-card" data-id="${it.id}">
-          <div class="p-media">
-            <video muted playsinline preload="metadata" data-src="${esc(it.video)}"></video>
-            ${it.pin ? `<span class="badge-pin">${icon('pin')}PIN</span>` : ''}
-          </div>
-          <div class="p-body">
-            <span class="p-code">${esc(it.code)}</span>
-            <span class="p-meta">${esc(it.category)} · ${esc((it.created_at || '').slice(0, 10))}</span>
-          </div>
-        </button>`).join('');
-      $('grid').querySelectorAll('video').forEach((v) => thumbs.observe(v));
-    }
-
-    // Подгрузка при прокрутке
-    new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && filtered().length > shown) { shown += PAGE; renderGrid(); }
-    }, { rootMargin: '600px' }).observe($('sentinel'));
-
-    // ---------- Карточка товара ----------
-    let current = null;
-    const sheet = $('sheet');
-
-    function renderCatChips(root, value) {
-      root.innerHTML = CATEGORIES.map((c) => `<button type="button" class="chip" role="radio" data-cat="${esc(c)}" aria-checked="${c === value}">${esc(c)}</button>`).join('');
-    }
-    function chipValue(root) {
-      return root.querySelector('[aria-checked="true"]')?.dataset.cat || '';
-    }
-    function bindChips(root, onChange) {
-      root.addEventListener('click', (e) => {
-        const b = e.target.closest('[data-cat]');
-        if (!b) return;
-        root.querySelectorAll('[data-cat]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
-        onChange?.();
-      });
-    }
-
+      if (act === 'pin') {
+        actEl.disabled = true;
+        try {
+          const { item } = await api('PATCH', `/api/items/${it.id}`, { pin: actEl.checked });
+          Object.assign(it, item);
+          toast(`${item.code}: PIN ${item.pin ? 'qoyuldu' : 'götürüldü'}`);
+          renderProducts();
+        } catch (err) { actEl.checked = !actEl.checked; actEl.disabled = false; toast(err.message, 'error'); }
+        return;
+      }
+      if (act === 'delete') {
+        if (!actEl.classList.contains('armed')) {
+          actEl.classList.add('armed');
+          actEl.textContent = 'Sil?';
+          setTimeout(() => { if (actEl.isConnected) { actEl.classList.remove('armed'); actEl.innerHTML = icon('trash'); } }, 3000);
+          return;
+        }
+        await deleteItems([it.id]);
+        return;
+      }
+      openSheet(it);
+    });
     $('grid').addEventListener('click', (e) => {
       const card = e.target.closest('.p-card');
-      if (!card) return;
-      current = items.find((i) => i.id === Number(card.dataset.id));
-      if (!current) return;
-      $('sheetTitle').textContent = current.code;
-      $('sheetVideo').src = current.video;
-      $('sheetCode').value = current.code;
-      renderCatChips($('sheetCats'), current.category);
-      $('sheetPin').checked = !!current.pin;
-      $('sheetMeta').textContent = `#${current.id} · ${(current.created_at || '').slice(0, 10)}`;
-      $('sheetLink').href = current.video;
-      $('sheetSave').disabled = true;
-      disarm($('sheetDelete'));
-      sheet.showModal();
+      if (card) openSheet(items.find((i) => i.id === Number(card.dataset.id)));
     });
 
-    function sheetDirty() {
-      if (!current) return false;
-      return $('sheetCode').value.toLowerCase().replace(/[^a-z0-9]+/g, '') !== current.code
-        || chipValue($('sheetCats')) !== current.category
-        || $('sheetPin').checked !== !!current.pin;
-    }
-    const updateSave = () => { $('sheetSave').disabled = !sheetDirty(); };
-    $('sheetCode').addEventListener('input', updateSave);
-    $('sheetPin').addEventListener('change', updateSave);
-    bindChips($('sheetCats'), updateSave);
-
-    function closeSheet() {
-      $('sheetVideo').pause();
-      $('sheetVideo').removeAttribute('src');
-      sheet.close();
-    }
-    $('sheetClose').addEventListener('click', closeSheet);
-    sheet.addEventListener('click', (e) => { if (e.target === sheet) closeSheet(); });
-    sheet.addEventListener('cancel', (e) => { e.preventDefault(); closeSheet(); });
-
-    $('sheetSave').addEventListener('click', async () => {
-      const btn = $('sheetSave');
-      btn.disabled = true;
-      btn.textContent = 'Saxlanılır…';
+    // ---------- массовые действия ----------
+    async function bulkPatch(patch, label) {
+      const ids = [...selected];
       try {
-        const { item } = await api('PATCH', `/api/items/${current.id}`, {
-          code: $('sheetCode').value, category: chipValue($('sheetCats')), pin: $('sheetPin').checked,
-        });
-        Object.assign(current, item);
-        renderGrid();
-        closeSheet();
-        toast(`${item.code} yadda saxlanıldı`);
-      } catch (err) {
-        toast(err.message, 'error');
-        btn.disabled = false;
-      } finally {
-        btn.textContent = 'Yadda saxla';
-      }
+        const { changed } = await api('PATCH', '/api/items', { ids, patch });
+        for (const it of items) {
+          if (!selected.has(it.id)) continue;
+          if (patch.category) it.category = patch.category;
+          if (patch.pin !== undefined) it.pin = patch.pin ? 1 : 0;
+        }
+        selected.clear();
+        toast(`${changed} məhsul: ${label}`);
+        renderProducts();
+      } catch (err) { toast(err.message, 'error'); }
+    }
+    for (const c of CATEGORIES) $('bulkCat').add(new Option(c, c));
+    $('bulkCat').addEventListener('change', () => {
+      const c = $('bulkCat').value;
+      $('bulkCat').value = '';
+      if (c) bulkPatch({ category: c }, `kateqoriya → ${c}`);
     });
+    document.querySelectorAll('[data-bulk]').forEach((b) => b.addEventListener('click', () => {
+      const on = b.dataset.bulk === 'pin-on';
+      bulkPatch({ pin: on }, on ? 'PIN qoyuldu' : 'PIN götürüldü');
+    }));
 
-    // Двухшаговая кнопка удаления/выхода: первый клик — «Əminsiniz?», второй — действие
-    function armable(btn, label, action) {
+    async function deleteItems(ids) {
+      try {
+        if (ids.length === 1) await api('DELETE', `/api/items/${ids[0]}`);
+        else await api('POST', '/api/items/delete', { ids });
+        const gone = new Set(ids);
+        items = items.filter((i) => !gone.has(i.id));
+        ids.forEach((id) => selected.delete(id));
+        toast(ids.length === 1 ? 'Məhsul silindi' : `${ids.length} məhsul silindi`);
+        renderProducts();
+        renderRecent();
+        return true;
+      } catch (err) { toast(err.message, 'error'); return false; }
+    }
+
+    // Двухшаговая кнопка: первый клик — «Əminsiniz?», второй — действие
+    function armable(btn, action) {
       btn.addEventListener('click', async () => {
         if (!btn.classList.contains('armed')) {
           btn.classList.add('armed');
@@ -800,29 +1111,96 @@
       btn.classList.remove('armed');
       btn.innerHTML = btn.dataset.label;
     }
+    armable($('bulkDelete'), () => deleteItems([...selected]));
 
-    armable($('sheetDelete'), 'Sil', async () => {
+    // ---------- редактор ----------
+    let current = null;
+    const sheet = $('sheet');
+
+    function renderCatChips(root, value) {
+      root.innerHTML = CATEGORIES.map((c) => `<button type="button" class="chip" role="radio" data-cat="${esc(c)}" aria-checked="${c === value}">${esc(c)}</button>`).join('');
+    }
+    const chipValue = (root) => root.querySelector('[aria-checked="true"]')?.dataset.cat || '';
+    function bindChips(root, onChange) {
+      root.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-cat]');
+        if (!b || b.disabled) return;
+        root.querySelectorAll('[data-cat]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+        onChange?.();
+      });
+    }
+
+    function openSheet(it) {
+      if (!it) return;
+      current = it;
+      $('sheetTitle').textContent = it.code;
+      $('sheetVideo').src = it.video;
+      $('sheetCode').value = it.code;
+      renderCatChips($('sheetCats'), it.category);
+      $('sheetPin').checked = !!it.pin;
+      $('sheetId').textContent = '#' + it.id;
+      $('sheetDate').textContent = fmtDate(it.created_at);
+      $('sheetLink').href = it.video;
+      $('sheetLink').textContent = it.video.replace('https://', '');
+      $('sheetSave').disabled = true;
+      disarm($('sheetDelete'));
+      sheet.showModal();
+    }
+    function sheetDirty() {
+      if (!current) return false;
+      return $('sheetCode').value.toLowerCase().replace(/[^a-z0-9]+/g, '') !== current.code
+        || chipValue($('sheetCats')) !== current.category
+        || $('sheetPin').checked !== !!current.pin;
+    }
+    const updateSave = () => { $('sheetSave').disabled = !sheetDirty(); };
+    $('sheetCode').addEventListener('input', updateSave);
+    $('sheetPin').addEventListener('change', updateSave);
+    bindChips($('sheetCats'), updateSave);
+    function closeSheet() {
+      $('sheetVideo').pause();
+      $('sheetVideo').removeAttribute('src');
+      sheet.close();
+    }
+    $('sheetClose').addEventListener('click', closeSheet);
+    sheet.addEventListener('click', (e) => { if (e.target === sheet) closeSheet(); });
+    sheet.addEventListener('cancel', (e) => { e.preventDefault(); closeSheet(); });
+    $('sheetSave').addEventListener('click', async () => {
+      const btn = $('sheetSave');
+      btn.disabled = true;
+      btn.textContent = 'Saxlanılır…';
       try {
-        await api('DELETE', `/api/items/${current.id}`);
-        items = items.filter((i) => i.id !== current.id);
-        toast(`${current.code} silindi`);
-        renderGrid();
+        const { item } = await api('PATCH', `/api/items/${current.id}`, {
+          code: $('sheetCode').value, category: chipValue($('sheetCats')), pin: $('sheetPin').checked,
+        });
+        Object.assign(current, item);
+        renderProducts();
         closeSheet();
-      } catch (err) { toast(err.message, 'error'); }
+        toast(`${item.code} yadda saxlanıldı`);
+      } catch (err) { toast(err.message, 'error'); btn.disabled = false; }
+      finally { btn.textContent = 'Yadda saxla'; }
     });
+    armable($('sheetDelete'), async () => { if (await deleteItems([current.id])) closeSheet(); });
 
     // ================================================================
     //  ЗАГРУЗКА
     // ================================================================
-    const up = {
-      file: null, width: 0, height: 0, duration: 0,
-      mode: 'crop', offset: 0.5, busy: false, previewUrl: null, resultUrl: null,
-    };
+    const up = { file: null, width: 0, height: 0, duration: 0, mode: 'crop', offset: 0.5, busy: false, previewUrl: null, resultUrl: null };
     const isSquare = () => up.width === up.height;
 
     renderCatChips($('catChips'), '');
     bindChips($('catChips'), validateUpload);
     $('code').addEventListener('input', validateUpload);
+
+    function renderRecent() {
+      const last = items.slice().sort((a, b) => b.id - a.id).slice(0, 5);
+      $('recent').innerHTML = last.map((it) => `
+        <div class="recent-row">
+          <span class="thumb">${thumb(it)}</span>
+          <div><div style="font-weight:600">${esc(it.code)}</div><div class="muted" style="font-size:12.5px">${esc(it.category)} · ${fmtDate(it.created_at)}</div></div>
+          ${it.pin ? `<span class="badge-pin" style="position:static">${icon('pin')}PIN</span>` : ''}
+        </div>`).join('') || '<div class="recent-row muted">Hələ məhsul yoxdur</div>';
+      observeThumbs($('recent'));
+    }
 
     function validateUpload() {
       const hasFile = !!up.file;
@@ -831,10 +1209,8 @@
       $('step2').classList.toggle('done', hasMeta);
       $('uploadBtn').disabled = up.busy || !hasFile || !hasMeta;
       $('compressOnly').hidden = !hasFile || up.busy;
-      if (hasFile && hasMeta) $('upError').textContent = '';
     }
 
-    // ----- выбор файла -----
     $('fileInput').addEventListener('change', () => { if ($('fileInput').files[0]) loadFile($('fileInput').files[0]); });
     $('changeFile').addEventListener('click', () => $('fileInput').click());
     $('drop').addEventListener('dragover', (e) => { e.preventDefault(); $('drop').classList.add('over'); });
@@ -866,10 +1242,8 @@
       } finally {
         input?.dispose?.();
       }
-
       up.file = file;
       up.offset = 0.5;
-      up.mode = 'crop';
       const shape = isSquare() ? 'kvadrat' : up.width > up.height ? 'üfüqi' : 'şaquli';
       $('fileName').textContent = file.name;
       $('fileMeta').textContent = `${up.width}×${up.height} · ${shape} · ${Math.round(up.duration)} san · ${fmtMB(file.size)}`;
@@ -883,7 +1257,6 @@
       validateUpload();
     }
 
-    // ----- рамка / белые поля -----
     function setMode(mode) {
       up.mode = mode;
       $('modes').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
@@ -905,7 +1278,6 @@
       const h = w / ar;
       Object.assign($('stage').style, { width: w + 'px', height: h + 'px' });
       $('stage').classList.toggle('pad', pad);
-
       if (isSquare()) {
         $('frame').hidden = true;
         $('hint').textContent = 'Video kvadratdır — yalnız sıxılacaq.';
@@ -922,11 +1294,8 @@
     }
     function positionFrame() {
       const w = $('stage').clientWidth, h = $('stage').clientHeight, side = Math.min(w, h);
-      const x = w > h ? up.offset * (w - side) : 0;
-      const y = h > w ? up.offset * (h - side) : 0;
-      $('frame').style.transform = `translate(${x}px, ${y}px)`;
+      $('frame').style.transform = `translate(${w > h ? up.offset * (w - side) : 0}px, ${h > w ? up.offset * (h - side) : 0}px)`;
     }
-
     const clamp = (v) => Math.max(0, Math.min(1, v));
     let drag = null;
     $('stage').addEventListener('pointerdown', (e) => {
@@ -954,9 +1323,7 @@
     $('stage').addEventListener('pointercancel', endDrag);
     window.addEventListener('resize', layoutStage);
 
-    // ----- сжатие -----
     const even = (v) => Math.max(2, Math.floor(v / 2) * 2);
-
     function videoOptions() {
       const quality = new Quality({ bitrate: BITRATE, bitrateMode: 'variable' });
       const base = { codec: 'avc', frameRate: FRAME_RATE, quality, forceTranscode: true, keyFrameInterval: 2 };
@@ -966,12 +1333,7 @@
         const ctx = canvas.getContext('2d');
         return {
           ...base, size, processedWidth: size, processedHeight: size,
-          process: (sample) => {
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(0, 0, size, size);
-            sample.drawWithFit(ctx, { fit: 'contain' });
-            return canvas;
-          },
+          process: (sample) => { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, size, size); sample.drawWithFit(ctx, { fit: 'contain' }); return canvas; },
         };
       }
       const side = Math.min(up.width, up.height);
@@ -986,7 +1348,6 @@
       }
       return opts;
     }
-
     async function compress(onProgress) {
       const { size, ...video } = videoOptions();
       if (!(await canEncodeVideo('avc', { width: size, height: size, bitrate: BITRATE }))) {
@@ -1000,17 +1361,13 @@
         conversion.onProgress = onProgress;
         await conversion.execute();
         return new Blob([output.target.buffer], { type: 'video/mp4' });
-      } finally {
-        input.dispose?.();
-      }
+      } finally { input.dispose?.(); }
     }
-
     function fileNameFor(code) {
       const base = code.trim().toUpperCase().replace(/[^A-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'video';
       const d = new Date(), p = (n) => String(n).padStart(2, '0');
       return `${base}_${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}-${p(d.getMinutes())}-${p(d.getSeconds())}.mp4`;
     }
-
     function uploadBlob(blob, filename, onProgress) {
       return new Promise((resolve, reject) => {
         const form = new FormData();
@@ -1033,7 +1390,6 @@
         xhr.send(form);
       });
     }
-
     function setBusy(busy) {
       up.busy = busy;
       for (const el of [$('code'), $('pin'), $('fileInput'), $('changeFile')]) el.disabled = busy;
@@ -1049,7 +1405,6 @@
       $('stCompress').className = stage === 'compress' ? 'on' : '';
       $('stUpload').className = stage === 'upload' ? 'on' : '';
     }
-
     async function run(withUpload) {
       if (!up.file || up.busy) return;
       $('upError').textContent = '';
@@ -1077,38 +1432,35 @@
       up.resultUrl = URL.createObjectURL(blob);
       $('resultVideo').src = up.resultUrl;
       const ratio = Math.max(1, Math.round(up.file.size / blob.size));
-      $('stats').innerHTML =
-        `<span class="stat">${fmtMB(up.file.size)} → <b>${fmtMB(blob.size)}</b></span><span class="stat"><b>${ratio}×</b> kiçik</span>` +
-        (data?.item ? `<span class="stat"><b>${esc(data.item.code)}</b> · ${esc(data.item.category)}${data.item.pin ? ' · PIN' : ''}</span>` : '');
+      $('pills').innerHTML =
+        `<span class="pill">${fmtMB(up.file.size)} → <b>${fmtMB(blob.size)}</b></span><span class="pill"><b>${ratio}×</b> kiçik</span>` +
+        (data?.item ? `<span class="pill"><b>${esc(data.item.code)}</b> · ${esc(data.item.category)}${data.item.pin ? ' · PIN' : ''}</span>` : '');
       $('successTitle').textContent = data?.item ? 'Kataloqa əlavə edildi' : 'Sıxıldı (yüklənmədi)';
       $('downloadLink').hidden = !!data;
       $('downloadLink').href = up.resultUrl;
       $('downloadLink').download = filename;
       $('upForm').hidden = true;
       $('upSuccess').hidden = false;
-      if (data?.item) { items.unshift(data.item); renderGrid(); }
+      if (data?.item) { items.push(data.item); renderProducts(); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
-    function resetUpload(keepMeta = false) {
+    function resetUpload() {
       up.file = null;
       $('fileInput').value = '';
       $('preview').removeAttribute('src');
       $('drop').hidden = false;
       $('filePanel').hidden = true;
-      if (!keepMeta) {
-        $('code').value = '';
-        $('pin').checked = false;
-        renderCatChips($('catChips'), '');
-      }
+      $('code').value = '';
+      $('pin').checked = false;
+      renderCatChips($('catChips'), '');
       $('bar').style.width = '0';
       $('upSuccess').hidden = true;
       $('upForm').hidden = false;
+      renderRecent();
       validateUpload();
     }
-    $('again').addEventListener('click', () => resetUpload(false));
+    $('again').addEventListener('click', resetUpload);
 
-    // ----- добавление по ссылке -----
     $('addForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const code = $('code').value.trim(), category = chipValue($('catChips'));
@@ -1117,46 +1469,44 @@
       btn.disabled = true;
       try {
         const { item } = await api('POST', '/api/items', { code, video: e.target.video.value, category, pin: $('pin').checked });
-        items.unshift(item);
-        renderGrid();
+        items.push(item);
         e.target.reset();
-        resetUpload(false);
+        resetUpload();
+        renderProducts();
         toast(`${item.code} kataloqa əlavə edildi`);
       } catch (err) { toast(err.message, 'error'); }
       finally { btn.disabled = false; }
     });
 
     // ================================================================
-    //  АККАУНТ / СЕССИИ
+    //  АККАУНТ
     // ================================================================
     function describeUA(ua = '') {
       const device = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : /Android/.test(ua) ? 'Android'
         : /Macintosh|Mac OS X/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : /Linux/.test(ua) ? 'Linux' : 'Cihaz';
       const browser = /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera' : /CriOS|Chrome\//.test(ua) ? 'Chrome'
         : /FxiOS|Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : '';
-      const mobile = /iPhone|Android|Mobile/.test(ua);
-      return { name: browser ? `${device} · ${browser}` : device, mobile };
+      return { name: browser ? `${device} · ${browser}` : device, mobile: /iPhone|Android|Mobile/.test(ua) };
     }
-    function ago(isoStr) {
-      const s = Math.max(0, (Date.now() - Date.parse(isoStr)) / 1000);
+    function ago(iso) {
+      const s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
       if (s < 90) return 'indicə';
       if (s < 3600) return `${Math.round(s / 60)} dəq əvvəl`;
       if (s < 86400) return `${Math.round(s / 3600)} saat əvvəl`;
       return `${Math.round(s / 86400)} gün əvvəl`;
     }
-
     async function loadSessions() {
       $('sessions').innerHTML = '<div class="s-item"><div class="s-meta">Yüklənir…</div></div>';
       try {
         const { sessions } = await api('GET', '/api/sessions');
+        $('sessCount').textContent = sessions.length;
         $('sessions').innerHTML = sessions.map((s) => {
           const d = describeUA(s.user_agent);
-          return `
-            <div class="s-item">
+          return `<div class="s-item">
               <span class="s-icon">${icon(d.mobile ? 'phone' : 'laptop')}</span>
               <div>
                 <div class="s-name">${esc(d.name)}${s.current ? '<span class="pill-ok">Bu cihaz</span>' : ''}</div>
-                <div class="s-meta">${esc(s.location || 'Məkan məlum deyil')} · ${s.current ? 'aktiv' : 'son aktivlik ' + ago(s.last_seen)}</div>
+                <div class="s-meta">${esc(s.location || 'Məkan məlum deyil')} · ${s.current ? 'aktiv' : 'son aktivlik ' + ago(s.last_seen)} · giriş ${fmtDate(s.created_at)}</div>
               </div>
               ${s.current ? '' : `<button type="button" class="btn btn-ghost" data-end="${esc(s.id)}">Bitir</button>`}
             </div>`;
@@ -1172,18 +1522,11 @@
       try { await api('DELETE', `/api/sessions/${b.dataset.end}`); toast('Sessiya bitirildi'); loadSessions(); }
       catch (err) { toast(err.message, 'error'); b.disabled = false; }
     });
-
-    $('logoutBtn').addEventListener('click', async () => {
-      try { await api('POST', '/api/logout'); } catch {}
-      token = '';
-      store.set('');
-      showLogin('');
-    });
-    armable($('logoutAll'), '', async () => {
+    armable($('logoutAll'), async () => {
       try {
         await api('DELETE', '/api/sessions');
         token = '';
-        store.set('');
+        store.set(TOKEN_KEY, '');
         showLogin('Bütün cihazlardan çıxış edildi.');
       } catch (err) { toast(err.message, 'error'); }
     });
@@ -1191,9 +1534,8 @@
     // ================================================================
     //  СТАРТ
     // ================================================================
-    renderFilters();
     if (!token) showLogin('');
-    else api('GET', '/api/me').then(enterApp).catch((err) => { if (err.status !== 401) showLogin(err.message); });
+    else api('GET', '/api/me').then((d) => enterApp(d.session)).catch((err) => { if (err.status !== 401) showLogin(err.message); });
   </script>
 </body>
 </html>
