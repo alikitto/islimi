@@ -201,13 +201,27 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .header .icon-btn .icon, .header .header__wa .icon { width: 18px; height: 18px; }
   .header .header__wa { padding: 0; border-radius: 50%; }
   .header__wa span { display: none; }
+  /* категории — одной «капсулой» на всю ширину, пункты делят ширину между собой */
   .cats {
-    gap: 6px; padding-bottom: 12px;
-    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
-    mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
+    margin: 0 0 12px; padding: 3px; gap: 0;
+    background: rgba(255, 255, 255, .04); border: 1px solid rgba(216, 183, 127, .2); border-radius: 999px;
   }
-  .chip { height: 36px; padding: 0 14px; font-size: 13.5px; }
+  .chip {
+    flex: 1 1 auto; justify-content: center; gap: 6px;
+    height: 34px; padding: 0 clamp(5px, 1.7vw, 14px);
+    border-color: transparent; background: transparent;
+    font-size: clamp(11.5px, 3.3vw, 14px); white-space: nowrap;
+  }
+  .chip:hover { border-color: transparent; background: rgba(255, 255, 255, .06); }
   .chip__count { font-size: 11.5px; }
+}
+/* на телефоне счётчики и ромбик не помещаются — прячем, чтобы все 5 пунктов встали в ряд */
+@media (max-width: 639px) {
+  .cats .chip__count, .cats .chip .diamond { display: none; }
+}
+/* самые узкие телефоны (320 px): ещё плотнее, чтобы ряд не прокручивался */
+@media (max-width: 349px) {
+  .cats .chip { padding: 0 3px; font-size: 11px; }
 }
 @media (min-width: 1240px) { .header__call { display: none; } }
 @media (min-width: 1024px) { .header__wa span { display: inline; } }
@@ -654,6 +668,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
     border: 1px solid rgba(216, 183, 127, .22); background: rgba(255, 255, 255, .03); font-size: 13px;
   }
   .footer ul a:hover { border-color: var(--f-gold); }
+  .footer .footer__cats {
+    flex-wrap: nowrap; gap: 0; padding: 3px; max-width: 520px; margin: 0 auto;
+    border: 1px solid rgba(216, 183, 127, .22); border-radius: 999px; background: rgba(255, 255, 255, .03);
+  }
+  .footer .footer__cats li { flex: 1 1 auto; }
+  .footer .footer__cats a {
+    width: 100%; justify-content: center; height: 32px; padding: 0 clamp(5px, 1.6vw, 12px);
+    border: 0; background: transparent; font-size: clamp(11.5px, 3.3vw, 13.5px); white-space: nowrap;
+  }
+  .footer .footer__cats a:hover { background: rgba(255, 255, 255, .06); color: var(--f-gold); }
+  @media (max-width: 349px) { .footer .footer__cats a { padding: 0 3px; font-size: 11px; } }
   .footer .contact { gap: 7px; padding-left: 11px; }
   .footer .contact .icon { width: 15px; height: 15px; }
   .footer__grid > div:last-child { display: none; } /* Instagram и WhatsApp уже есть в контактах */
