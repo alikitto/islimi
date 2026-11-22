@@ -6,6 +6,7 @@
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#F6F5F3" />
   <title>Islimi · İdarəetmə</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23191714'/%3E%3Crect x='23' y='23' width='18' height='18' fill='%23c9a76f' transform='rotate(45 32 32)'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -141,9 +142,15 @@
     .login { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px;
       background: radial-gradient(1200px 500px at 50% -10%, var(--gold-soft), transparent 60%), var(--bg); }
     .login .card { width: 100%; max-width: 380px; padding: 32px 24px 24px; }
-    .wordmark { font-weight: 700; letter-spacing: .28em; font-size: 15px; }
-    .wordmark::after { content: '.'; color: var(--gold); }
-    .brand { display: flex; align-items: baseline; gap: 10px; }
+    /* Логотип: SVG-маска, цвет берётся из color */
+    .wordmark { display: inline-block; flex: none; width: 84px; aspect-ratio: 3 / 1; background: currentColor; color: var(--text);
+      -webkit-mask: url(/assets/logo-wordmark.svg) center / contain no-repeat; mask: url(/assets/logo-wordmark.svg) center / contain no-repeat; }
+    .wordmark--full { width: 176px; aspect-ratio: 2.237 / 1; -webkit-mask-image: url(/assets/logo.svg); mask-image: url(/assets/logo.svg); }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .login .brand { flex-direction: column; gap: 14px; text-align: center; }
+    .login .card { text-align: left; }
+    .login .brand + h1 { text-align: center; }
+    .login .brand ~ p.lead { text-align: center; }
     .brand .tag { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
     .login h1 { font-size: 24px; margin: 22px 0 4px; letter-spacing: -.01em; }
     .login p.lead { margin: 0 0 22px; color: var(--muted); }
@@ -152,7 +159,7 @@
     /* ---------- app shell ---------- */
     .sidebar { position: fixed; inset: 0 auto 0 0; width: var(--side-w); z-index: 40; background: var(--side); color: var(--side-text); display: none; flex-direction: column; padding: 22px 14px; }
     .sidebar .brand { padding: 0 10px 22px; }
-    .sidebar .wordmark { color: #fff; }
+    .sidebar .wordmark { color: #EFE7DA; width: 92px; }
     .sidebar .brand .tag { color: #A8A29E; }
     .side-cta { margin: 0 0 22px; }
     .side-cta .btn { width: 100%; background: var(--gold); color: var(--ink); }
@@ -507,7 +514,7 @@
   <!-- ============ ВХОД ============ -->
   <section class="login" id="loginView" hidden>
     <div class="card">
-      <div class="brand"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
+      <div class="brand"><span class="wordmark wordmark--full" role="img" aria-label="Islimi Jewelry"></span><span class="tag">İdarəetmə paneli</span></div>
       <h1>Xoş gəlmisiniz</h1>
       <p class="lead">Kataloqu idarə etmək üçün daxil olun.</p>
       <form id="loginForm" novalidate>
@@ -528,7 +535,7 @@
   <!-- ============ ПРИЛОЖЕНИЕ ============ -->
   <div id="appView" hidden>
     <aside class="sidebar" aria-label="Menyu">
-      <div class="brand"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
+      <div class="brand"><span class="wordmark" role="img" aria-label="Islimi"></span><span class="tag">Admin</span></div>
       <div class="side-cta"><a class="btn" href="#new" data-tab="new"><svg class="i"><use href="#i-plus"/></svg>Yeni məhsul</a></div>
       <div class="side-label">Kataloq</div>
       <nav class="side-nav">
@@ -547,7 +554,7 @@
 
     <div class="content">
       <header class="topbar" id="topbar">
-        <div class="brand mob"><span class="wordmark">ISLIMI</span><span class="tag">Admin</span></div>
+        <div class="brand mob"><span class="wordmark" role="img" aria-label="Islimi"></span><span class="tag">Admin</span></div>
         <div class="page-title">
           <div class="crumb">İdarəetmə</div>
           <h1 id="pageTitle">Məhsullar</h1>

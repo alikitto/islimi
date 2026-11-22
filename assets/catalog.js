@@ -1,0 +1,630 @@
+// Islimi — каталог. Общий скрипт для всех страниц каталога.
+// Данные: Worker upload-to-r2 → /api/items (D1). Категория страницы берётся из адреса.
+(() => {
+  'use strict';
+
+  const API_BASE = new URLSearchParams(location.search).has('localapi')
+    ? 'http://localhost:8787'                      // локальный wrangler dev: открыть страницу с ?localapi
+    : 'https://upload-to-r2.ramizagayev122.workers.dev';
+  const API_URL = API_BASE + '/api/items';
+  const WA_NUMBER = '994702920323';
+  const SITE_URL = 'https://catalog.islimi.az';
+
+  const CATS = [
+    { slug: '', name: 'Yeni', title: 'Yeni gələnlər', doc: 'Yeni | Kataloq — Islimi Jewelry' },
+    { slug: 'uzukler', name: 'Üzüklər' },
+    { slug: 'sirqalar', name: 'Sırgalar' },
+    { slug: 'qolbaqlar', name: 'Qolbaqlar' },
+    { slug: 'boyunbagilar', name: 'Boyunbağılar' },
+  ];
+  const HOME_LIMIT = 24;   // сколько товаров на главной («Yeni»)
+  const PAGE_SIZE = 12;    // сколько карточек добавлять за раз
+  const NEW_DAYS = 30;     // бейдж «Yeni» в категориях — для товаров моложе N дней
+
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const el = {
+    grid: $('#grid'),
+    status: $('#status'),
+    more: $('#more'),
+    sentinel: $('#sentinel'),
+    title: $('#pageTitle'),
+    meta: $('#pageMeta'),
+    search: $('#search'),
+    searchClear: $('#searchClear'),
+    cats: $('#cats'),
+    header: $('#header'),
+    eyebrow: $('#pageEyebrow'),
+    catalog: $('#catalog'),
+    tiles: $('#tiles'),
+    hero: $('#hero'),
+    heroShots: $('#heroShots'),
+    heroTag: $('#heroTag'),
+    heroCode: $('#heroCode'),
+    heroCat: $('#heroCat'),
+    heroWa: $('#heroWa'),
+    statTotal: $('#statTotal'),
+    statUpdated: $('#statUpdated'),
+    toTop: $('#toTop'),
+    toast: $('#toast'),
+    lb: $('#lb'),
+    lbVideo: $('#lbVideo'),
+    lbCat: $('#lbCat'),
+    lbCode: $('#lbCode'),
+    lbDate: $('#lbDate'),
+    lbWa: $('#lbWa'),
+    lbCopy: $('#lbCopy'),
+    lbShare: $('#lbShare'),
+    lbPrev: $('#lbPrev'),
+    lbNext: $('#lbNext'),
+    lbCounter: $('#lbCounter'),
+  };
+
+  const state = {
+    items: [],      // все товары, новые первыми
+    updated: null,
+    cat: null,
+    list: [],       // товары текущего вида (категория + поиск)
+    shown: 0,
+    query: '',
+    lbList: [],
+    lbIndex: -1,
+    loaded: false,
+  };
+
+  // ---------- Утилиты ----------
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const norm = (s) => String(s ?? '').toLowerCase().replace(/[\s\-_.]/g, '');
+
+  // Месяцы вручную: не во всех браузерах есть локаль «az» (Chrome показывает «2026 M11 23»)
+  const MONTHS = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avqust', 'sentyabr', 'oktyabr', 'noyabr', 'dekabr'];
+  const MONTHS_SHORT = ['yan', 'fev', 'mar', 'apr', 'may', 'iyn', 'iyl', 'avq', 'sen', 'okt', 'noy', 'dek'];
+  const fmtDate = (d) => (d && !isNaN(d) ? `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}` : '');
+
+  const waLink = (code) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Salam! Kod ${code}`)}`;
+  const itemUrl = (item) => `${SITE_URL}/${slugOf(item.category)}#${encodeURIComponent(item.code)}`;
+  const slugOf = (category) => (CATS.find((c) => c.name === category) || CATS[0]).slug;
+
+  const plural = (n) => `${n} məhsul`;
+
+  const ICON = {
+    wa: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.21 3.07.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.28-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>',
+    play: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
+  };
+  const DIAMOND = '<span class="diamond" aria-hidden="true"></span>';
+
+  // ---------- Тосты ----------
+
+  let toastTimer;
+  function toast(text) {
+    el.toast.textContent = text;
+    el.toast.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.toast.classList.remove('is-visible'), 1800);
+  }
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch { /* ignore */ }
+      ta.remove(); return ok;
+    }
+  }
+
+  // ---------- Маршрутизация (без перезагрузки между категориями) ----------
+
+  function catFromPath(pathname) {
+    const s = decodeURIComponent(pathname).replace(/^\/+|\/+$/g, '').replace(/\.html$/i, '').toLowerCase();
+    return CATS.find((c) => c.slug === s) || CATS[0];
+  }
+
+  function setCategory(cat) {
+    state.cat = cat;
+    const home = !cat.slug;
+    document.body.classList.toggle('is-home', home);
+    document.body.classList.toggle('is-cat', !home);
+    document.querySelectorAll('.home-only').forEach((n) => { n.hidden = !home; });
+    el.eyebrow.innerHTML = DIAMOND + (home ? 'Yeni kolleksiya' : 'Kataloq');
+    el.title.textContent = cat.title || cat.name;
+    document.title = cat.doc || `${cat.name} | Kataloq — Islimi Jewelry`;
+    el.cats.querySelectorAll('.chip').forEach((chip) => {
+      if (chip.dataset.slug === cat.slug) chip.setAttribute('aria-current', 'page');
+      else chip.removeAttribute('aria-current');
+    });
+    const active = el.cats.querySelector('[aria-current="page"]');
+    if (active) {
+      const left = active.offsetLeft - (el.cats.clientWidth - active.offsetWidth) / 2;
+      el.cats.scrollTo({ left, behavior: state.loaded ? 'smooth' : 'auto' });
+    }
+  }
+
+  function applyRoute() {
+    const cat = catFromPath(location.pathname);
+    if (cat !== state.cat) {
+      setCategory(cat);
+      if (state.loaded) {
+        el.search.value = ''; state.query = ''; el.searchClear.hidden = true;
+        render();
+      }
+    }
+    syncLightboxWithHash();
+  }
+
+  // Переход по категориям (кнопки в шапке и плитки на главной) — без перезагрузки
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[data-slug]');
+    if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    const cat = CATS.find((c) => c.slug === link.dataset.slug) || CATS[0];
+    if (cat === state.cat && !state.query) { scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); return; }
+    history.pushState(null, '', '/' + cat.slug + location.search);
+    if (cat === state.cat) { el.search.value = ''; state.query = ''; el.searchClear.hidden = true; render(); }
+    else applyRoute();
+    scrollTo({ top: 0, behavior: 'auto' });
+  });
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[data-scroll]');
+    if (!link) return;
+    e.preventDefault();
+    el.catalog.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  addEventListener('popstate', applyRoute);
+
+  // ---------- Данные ----------
+
+  function normalize(raw) {
+    const list = Array.isArray(raw) ? raw : (raw.items || []);
+    return list
+      .filter((i) => i && i.code && i.video)
+      .map((i) => ({
+        id: Number(i.id) || 0,
+        code: String(i.code).trim(),
+        video: String(i.video).trim(),
+        category: String(i.category || '').trim(),
+        pin: i.pin === true || Number(i.pin) === 1,
+        created: i.created_at ? new Date(i.created_at) : null,
+      }))
+      .sort((a, b) => b.id - a.id); // новые первыми
+  }
+
+  function computeList() {
+    const { cat, items } = state;
+    const q = norm(state.query);
+    const inCat = cat.slug ? items.filter((i) => i.category === cat.name) : items;
+    if (q) return inCat.filter((i) => norm(i.code).includes(q));
+    if (cat.slug) return inCat;
+    // «Yeni»: закреплённые сверху, затем самые свежие
+    return [...items.filter((i) => i.pin), ...items.filter((i) => !i.pin)].slice(0, HOME_LIMIT);
+  }
+
+  function updateCounts() {
+    el.cats.querySelectorAll('.chip').forEach((chip) => {
+      const cat = CATS.find((c) => c.slug === chip.dataset.slug);
+      const out = chip.querySelector('.chip__count');
+      if (!cat || !cat.slug || !out) return;
+      out.textContent = state.items.filter((i) => i.category === cat.name).length || '';
+    });
+  }
+
+  function updateMeta() {
+    if (state.query) {
+      el.meta.textContent = state.list.length ? `“${state.query}” üzrə ${state.list.length} nəticə` : '';
+      return;
+    }
+    const parts = [plural(state.list.length)];
+    if (state.updated) parts.push(`Yeniləndi ${fmtDate(state.updated)}`);
+    el.meta.textContent = parts.join(' · ');
+  }
+
+  // ---------- Карточки ----------
+
+  function cardHTML(item, index) {
+    const isNew = state.cat.slug && item.created && (Date.now() - item.created) < NEW_DAYS * 864e5;
+    const showPin = item.pin && !state.cat.slug && !state.query;
+    const badges = [
+      showPin ? `<span class="badge badge--pin">${DIAMOND}Seçilmiş</span>` : '',
+      isNew ? `<span class="badge">${DIAMOND}Yeni</span>` : '',
+    ].join('');
+    const code = esc(item.code);
+    return `
+      <article class="card" style="animation-delay:${Math.min(index % PAGE_SIZE, 8) * 40}ms">
+        ${badges ? `<div class="badges">${badges}</div>` : ''}
+        <button class="card__media media" type="button" data-index="${index}" aria-label="${code} — videoya bax">
+          <video muted playsinline loop preload="none" data-src="${esc(item.video)}"></video>
+          <span class="card__view" aria-hidden="true">${ICON.play}Bax</span>
+        </button>
+        <div class="card__body">
+          <div class="card__text">
+            <span class="card__code">${code}</span>
+            <span class="card__cat">${esc(item.category)}</span>
+          </div>
+          <a class="card__wa" href="${waLink(item.code)}" target="_blank" rel="noopener" aria-label="${code} — WhatsApp ilə sifariş et">${ICON.wa}</a>
+        </div>
+      </article>`;
+  }
+
+  function skeletonHTML(n) {
+    return Array.from({ length: n }, () => `
+      <div class="card is-skeleton" aria-hidden="true">
+        <div class="card__media"></div>
+        <div class="card__body"><div class="card__text"><div class="line" style="width:60%"></div><div class="line" style="width:36%;margin-top:8px"></div></div></div>
+      </div>`).join('');
+  }
+
+  // Видео: загружаем, когда карточка рядом с экраном; играем, только когда она видна.
+  const loader = new IntersectionObserver((entries) => {
+    for (const { isIntersecting, target: v } of entries) {
+      if (!isIntersecting || v.src) continue;
+      v.preload = 'auto';
+      v.src = v.dataset.src;
+      loader.unobserve(v);
+    }
+  }, { rootMargin: '400px 0px' });
+
+  const player = new IntersectionObserver((entries) => {
+    for (const { isIntersecting, target: v } of entries) {
+      if (isIntersecting && !reduceMotion && !document.hidden) v.play().catch(() => {});
+      else v.pause();
+    }
+  }, { threshold: 0.35 });
+
+  function wireVideo(v) {
+    const media = v.closest('.media') || v.parentElement;
+    const ready = () => media.classList.add('is-ready');
+    v.addEventListener('loadeddata', ready, { once: true });
+    v.addEventListener('playing', ready, { once: true });
+    v.addEventListener('error', ready, { once: true });
+    loader.observe(v);
+    player.observe(v);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) document.querySelectorAll('main video').forEach((v) => v.pause());
+  });
+
+  // ---------- Главная: первый экран, плитки категорий, цифры ----------
+
+  // Коллаж: закреплённый товар (или самый новый) + два новых из других категорий
+  function pickShowcase(items) {
+    const main = items.find((i) => i.pin) || items[0];
+    if (!main) return [];
+    const picked = [main];
+    const used = new Set([main.category]);
+    for (const i of items) {
+      if (picked.length === 3) break;
+      if (i !== main && !used.has(i.category)) { picked.push(i); used.add(i.category); }
+    }
+    for (const i of items) { if (picked.length === 3) break; if (!picked.includes(i)) picked.push(i); }
+    return picked;
+  }
+
+  function renderHome() {
+    const { items } = state;
+    const shots = pickShowcase(items);
+    el.heroShots.querySelectorAll('.shot').forEach((btn, n) => {
+      const item = shots[n];
+      if (!item) return;
+      const v = btn.querySelector('video');
+      v.dataset.src = item.video;
+      wireVideo(v);
+      btn.setAttribute('aria-label', `${item.code} — videoya bax`);
+      const code = btn.querySelector('.shot__code');
+      if (code) code.textContent = item.code;
+      const badge = btn.querySelector('.shot__badge');
+      if (badge) badge.hidden = !item.pin;
+      btn.onclick = () => openLightbox(shots, n);
+    });
+    if (shots[0]) {
+      el.heroCode.textContent = shots[0].code;
+      el.heroCat.textContent = shots[0].category;
+      el.heroWa.href = waLink(shots[0].code);
+      el.heroWa.setAttribute('aria-label', `${shots[0].code} — WhatsApp ilə sifariş et`);
+      el.heroTag.hidden = false;
+    }
+
+    el.tiles.querySelectorAll('.tile').forEach((tile) => {
+      const cat = CATS.find((c) => c.slug === tile.dataset.slug);
+      const inCat = items.filter((i) => i.category === cat.name);
+      tile.querySelector('[data-count]').textContent = `${inCat.length} model`;
+    });
+
+    el.statTotal.textContent = items.length;
+    const d = state.updated;
+    el.statUpdated.textContent = d && !isNaN(d) ? `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}` : '—';
+    el.hero.classList.remove('is-loading');
+  }
+
+  // Плавное появление блоков при прокрутке
+  const revealer = new IntersectionObserver((entries) => {
+    for (const { isIntersecting, target } of entries) {
+      if (!isIntersecting) continue;
+      target.classList.add('is-in');
+      revealer.unobserve(target);
+    }
+  }, { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach((n) => revealer.observe(n));
+
+  function appendPage() {
+    const next = state.list.slice(state.shown, state.shown + PAGE_SIZE);
+    if (!next.length) return;
+    const html = next.map((item, i) => cardHTML(item, state.shown + i)).join('');
+    el.grid.insertAdjacentHTML('beforeend', html);
+    const cards = el.grid.querySelectorAll('.card');
+    for (let i = state.shown; i < cards.length; i++) wireVideo(cards[i].querySelector('video'));
+    state.shown += next.length;
+    el.more.hidden = state.shown >= state.list.length;
+  }
+
+  function render() {
+    el.grid.querySelectorAll('video').forEach((v) => { loader.unobserve(v); player.unobserve(v); v.removeAttribute('src'); v.load(); });
+    el.grid.innerHTML = '';
+    el.status.innerHTML = '';
+    state.list = computeList();
+    state.shown = 0;
+    updateMeta();
+
+    if (!state.list.length) {
+      el.more.hidden = true;
+      if (state.query) {
+        const elsewhere = state.cat.slug ? state.items.filter((i) => norm(i.code).includes(norm(state.query))).length : 0;
+        el.status.innerHTML = `
+          <h2 class="status__title">Heç nə tapılmadı</h2>
+          <p>“${esc(state.query)}” kodu ${state.cat.slug ? 'bu kateqoriyada ' : ''}yoxdur.</p>
+          ${elsewhere ? `<button class="btn btn--ghost" type="button" data-search-all>Bütün kataloqda ${elsewhere} nəticə — göstər</button>` : ''}`;
+      } else {
+        el.status.innerHTML = '<h2 class="status__title">Hələ məhsul yoxdur</h2><p>Tezliklə yeniləri əlavə olunacaq.</p>';
+      }
+      return;
+    }
+    appendPage();
+  }
+
+  el.status.addEventListener('click', (e) => {
+    if (e.target.closest('[data-search-all]')) {
+      const q = state.query;
+      history.pushState(null, '', '/' + location.search);
+      setCategory(CATS[0]);
+      el.search.value = q; state.query = q;
+      render();
+    }
+    if (e.target.closest('[data-retry]')) load();
+  });
+
+  el.more.addEventListener('click', appendPage);
+
+  new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && state.loaded && state.shown < state.list.length) appendPage();
+  }, { rootMargin: '800px 0px' }).observe(el.sentinel);
+
+  el.grid.addEventListener('click', (e) => {
+    const media = e.target.closest('.card__media[data-index]');
+    if (media) openLightbox(state.list, Number(media.dataset.index));
+  });
+
+  // ---------- Поиск ----------
+
+  let searchTimer;
+  el.search.addEventListener('input', () => {
+    el.searchClear.hidden = !el.search.value;
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      const q = el.search.value.trim();
+      if (q === state.query) return;
+      state.query = q;
+      if (state.loaded) render();
+    }, 150);
+  });
+  el.search.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') el.search.blur();
+    if (e.key === 'Escape' && el.search.value) { el.search.value = ''; el.search.dispatchEvent(new Event('input')); }
+  });
+  el.searchClear.addEventListener('click', () => {
+    el.search.value = '';
+    el.search.dispatchEvent(new Event('input'));
+    el.search.focus();
+  });
+
+  // ---------- Просмотр товара ----------
+
+  let lastFocus = null;
+
+  function fillLightbox() {
+    const item = state.lbList[state.lbIndex];
+    if (!item) return;
+    el.lbVideo.src = item.video;
+    el.lbVideo.play().catch(() => {});
+    el.lbCat.textContent = item.category;
+    el.lbCode.textContent = item.code;
+    el.lbDate.textContent = item.created ? `Əlavə olunub: ${fmtDate(item.created)}` : '';
+    el.lbWa.href = waLink(item.code);
+    el.lbPrev.disabled = state.lbIndex <= 0;
+    el.lbNext.disabled = state.lbIndex >= state.lbList.length - 1;
+    el.lbCounter.textContent = `${state.lbIndex + 1} / ${state.lbList.length}`;
+    el.lbCounter.hidden = state.lbList.length < 2;
+  }
+
+  function showLightbox() {
+    if (!el.lb.hidden) return;
+    lastFocus = document.activeElement;
+    el.lb.hidden = false;
+    document.body.classList.add('no-scroll');
+    document.querySelectorAll('main video').forEach((v) => v.pause());
+    $('.lb__close', el.lb).focus({ preventScroll: true });
+  }
+
+  function hideLightbox() {
+    if (el.lb.hidden) return;
+    el.lb.hidden = true;
+    el.lbVideo.pause();
+    el.lbVideo.removeAttribute('src');
+    el.lbVideo.load();
+    document.body.classList.remove('no-scroll');
+    state.lbIndex = -1;
+    // снова запустить видимые видео
+    document.querySelectorAll('main video[data-src]').forEach((v) => { player.unobserve(v); player.observe(v); });
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  }
+
+  function openLightbox(list, index) {
+    state.lbList = list;
+    state.lbIndex = index;
+    fillLightbox();
+    showLightbox();
+    const hash = '#' + encodeURIComponent(list[index].code);
+    if (history.state && history.state.lb) history.replaceState({ lb: 1 }, '', hash);
+    else history.pushState({ lb: 1 }, '', hash);
+  }
+
+  function step(dir) {
+    const i = state.lbIndex + dir;
+    if (i < 0 || i >= state.lbList.length) return;
+    state.lbIndex = i;
+    fillLightbox();
+    history.replaceState(history.state, '', '#' + encodeURIComponent(state.lbList[i].code));
+  }
+
+  function closeLightbox() {
+    if (history.state && history.state.lb) history.back(); // popstate закроет окно
+    else { history.replaceState(null, '', location.pathname + location.search); hideLightbox(); }
+  }
+
+  function syncLightboxWithHash() {
+    const code = decodeURIComponent(location.hash.slice(1));
+    if (!code || !state.loaded) { hideLightbox(); return; }
+    if (!el.lb.hidden && state.lbList[state.lbIndex]?.code === code) return;
+    let idx = state.list.findIndex((i) => i.code === code);
+    let list = state.list;
+    if (idx < 0) {
+      const item = state.items.find((i) => i.code.toLowerCase() === code.toLowerCase());
+      if (!item) { hideLightbox(); return; }
+      list = [item]; idx = 0;
+    }
+    state.lbList = list; state.lbIndex = idx;
+    fillLightbox();
+    showLightbox();
+  }
+
+  el.lb.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeLightbox(); });
+  el.lbPrev.addEventListener('click', () => step(-1));
+  el.lbNext.addEventListener('click', () => step(1));
+  el.lbCopy.addEventListener('click', async () => {
+    const item = state.lbList[state.lbIndex];
+    if (item && await copyText(item.code)) toast('Kod kopyalandı');
+  });
+  el.lbShare.addEventListener('click', async () => {
+    const item = state.lbList[state.lbIndex];
+    if (!item) return;
+    const url = itemUrl(item);
+    if (navigator.share) {
+      try { await navigator.share({ title: `Islimi — ${item.code}`, url }); } catch { /* отменено */ }
+    } else if (await copyText(url)) toast('Link kopyalandı');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (el.lb.hidden) {
+      if (e.key === '/' && document.activeElement !== el.search && !/input|textarea/i.test(document.activeElement.tagName)) {
+        e.preventDefault(); el.search.focus();
+      }
+      return;
+    }
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') step(-1);
+    else if (e.key === 'ArrowRight') step(1);
+    else if (e.key === 'Tab') { // фокус не уходит из окна
+      const f = [...el.lb.querySelectorAll('button:not([disabled]):not([hidden]), a[href], video[controls]')].filter((n) => n.offsetParent);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  // свайп влево/вправо по видео в окне
+  let touchX = null, touchY = null;
+  const media = $('.lb__media', el.lb);
+  media.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; touchY = e.touches[0].clientY; }, { passive: true });
+  media.addEventListener('touchend', (e) => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    const dy = e.changedTouches[0].clientY - touchY;
+    touchX = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
+  }, { passive: true });
+
+  // ---------- Прокрутка: тень у категорий, кнопка «вверх» ----------
+
+  let ticking = false;
+  addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      el.header.classList.toggle('is-stuck', scrollY > 4);
+      el.toTop.classList.toggle('is-visible', scrollY > 900);
+      ticking = false;
+    });
+  }, { passive: true });
+  el.toTop.addEventListener('click', () => scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+
+  // Плавающие кнопки прячутся, когда виден низ подвала (там уже есть контакты)
+  const floating = $('.floating');
+  const footBottom = $('.footer__bottom');
+  if (floating && footBottom) {
+    new IntersectionObserver((entries) => {
+      floating.classList.toggle('is-away', entries[0].isIntersecting);
+    }).observe(footBottom);
+  }
+
+  // ---------- Подпись в подвале: прописывается при появлении и при наведении ----------
+
+  (function signature() {
+    const a = $('.footer .sig');
+    if (!a) return;
+    const play = () => { a.classList.remove('play'); void a.offsetWidth; a.classList.add('play'); };
+    const io = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      play(); io.disconnect();
+      a.addEventListener('pointerenter', play);
+    }, { threshold: 0.6 });
+    io.observe(a.querySelector('svg'));
+  })();
+
+  // ---------- Старт ----------
+
+  async function load() {
+    el.status.innerHTML = '';
+    el.grid.innerHTML = skeletonHTML(8);
+    el.meta.textContent = '';
+    try {
+      const res = await fetch(API_URL, { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      state.items = normalize(data);
+      state.updated = data.updated ? new Date(data.updated) : null;
+      state.loaded = true;
+      updateCounts();
+      renderHome();
+      render();
+      syncLightboxWithHash();
+    } catch (err) {
+      console.error(err);
+      el.grid.innerHTML = '';
+      if (!el.statTotal.textContent) el.statTotal.textContent = '—';
+      if (!el.statUpdated.textContent) el.statUpdated.textContent = '—';
+      el.status.innerHTML = `
+        <h2 class="status__title">Kataloq yüklənmədi</h2>
+        <p>İnternet bağlantısını yoxlayıb yenidən cəhd edin.</p>
+        <button class="btn btn--ghost" type="button" data-retry>Yenidən yüklə</button>`;
+    }
+  }
+
+  setCategory(catFromPath(location.pathname));
+  document.querySelectorAll('[data-year]').forEach((n) => { n.textContent = new Date().getFullYear(); });
+  load();
+})();
