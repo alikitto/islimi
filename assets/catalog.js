@@ -543,44 +543,87 @@
     else lbLoading.classList.remove('is-on');
   }
 
+  let lbAbort = null; // снимает обработчики прошлого товара
+
   function clearLow() {
+    if (lbAbort) { lbAbort.abort(); lbAbort = null; }
     lbLow.classList.remove('is-on');
     lbLow.pause();
     lbLow.removeAttribute('src');
     lbLow.load();
   }
 
+  // Сколько секунд уже скачано вперёд от момента t
+  function bufferedAhead(v, t) {
+    for (let i = 0; i < v.buffered.length; i++) {
+      if (v.buffered.start(i) <= t + 0.1 && v.buffered.end(i) >= t) return v.buffered.end(i) - t;
+    }
+    return 0;
+  }
+
+  // Полное видео показываем, только когда браузер уверен, что оно доиграет без
+  // остановок (canplaythrough). Если оно всё же застрянет (медленный интернет),
+  // поверх снова идёт лёгкая копия с плашкой — картинка не замирает.
   function setLightboxVideo(item) {
     const token = ++lbToken;
     clearLow();
     stopWarm();
     const v = el.lbVideo;
+    const mine = () => token === lbToken;
     setLoading(true);
-    // Полное видео не загрузилось — остаётся лёгкая копия, плашку убираем
-    v.addEventListener('error', () => { if (token === lbToken) setLoading(false); }, { once: true });
-    if (item.videoSm === item.video) {
-      v.addEventListener('playing', () => { if (token === lbToken) setLoading(false); }, { once: true });
-    } else {
-      lbLow.src = item.videoSm;
-      lbLow.classList.add('is-on');
-      lbLow.play().catch(() => {});
-      v.addEventListener('playing', () => {
-        if (token !== lbToken) return;
-        const done = () => {
-          if (token !== lbToken) return;
-          setLoading(false);
-          lbLow.classList.remove('is-on');
-          setTimeout(() => { if (token === lbToken) clearLow(); }, 400); // после затухания
-        };
-        const t = lbLow.currentTime;
-        if (lbLow.readyState >= 2 && Math.abs(v.currentTime - t) > 0.15) {
-          v.addEventListener('seeked', done, { once: true });
-          v.currentTime = t;
-        } else done();
-      }, { once: true });
-    }
     v.src = item.video;
     v.play().catch(() => {});
+
+    if (item.videoSm === item.video) { // лёгкой копии нет — просто ждём само видео
+      v.addEventListener('playing', () => { if (mine()) setLoading(false); }, { once: true });
+      v.addEventListener('error', () => { if (mine()) setLoading(false); }, { once: true });
+      return;
+    }
+
+    lbAbort = new AbortController();
+    const on = { signal: lbAbort.signal };
+    let full = false;   // сейчас видно полное видео
+    let swapping = false;
+
+    lbLow.src = item.videoSm;
+    lbLow.classList.add('is-on');
+    lbLow.play().catch(() => {});
+
+    const showFull = () => {
+      if (!mine() || full || swapping || v.readyState < 4) return;
+      swapping = true;
+      const finish = () => {
+        swapping = false;
+        if (!mine()) return;
+        full = true;
+        v.play().catch(() => {});
+        setLoading(false);
+        lbLow.classList.remove('is-on');
+        setTimeout(() => { if (mine() && full) lbLow.pause(); }, 400); // после затухания
+      };
+      // Догоняем лёгкую копию, только если этот кусок полного видео уже скачан
+      const t = lbLow.currentTime;
+      if (Math.abs(v.currentTime - t) > 0.15 && bufferedAhead(v, t) > 1) {
+        v.addEventListener('seeked', finish, { once: true, signal: lbAbort.signal });
+        v.currentTime = t;
+      } else finish();
+    };
+
+    const showLow = () => {
+      if (!mine() || !full || v.seeking) return;
+      full = false;
+      lbLow.currentTime = v.currentTime;
+      lbLow.play().catch(() => {});
+      lbLow.classList.add('is-on');
+      setLoading(true);
+    };
+
+    v.addEventListener('canplaythrough', showFull, on);
+    v.addEventListener('progress', showFull, on); // на случай, если canplaythrough уже был
+    v.addEventListener('waiting', showLow, on);
+    v.addEventListener('stalled', () => { if (v.readyState < 3) showLow(); }, on);
+    // Полное видео не загрузилось — остаётся лёгкая копия, плашку убираем
+    v.addEventListener('error', () => { if (mine()) setLoading(false); }, on);
   }
 
   // На компьютере полное видео начинаем качать заранее, пока курсор над карточкой
