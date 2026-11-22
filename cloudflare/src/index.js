@@ -6,6 +6,7 @@
 // Маршруты:
 //   GET    /api/items           — каталог JSON (публично)
 //   GET    /api/items.tsv       — каталог в формате бывшей Google-таблицы (публично, его читает сайт)
+//   POST   /api/items/:id/view  — +1 просмотр (публично; раз в сутки на посетителя и товар)
 //   POST   /api/login           — {password} → {token}; 5 ошибок за 15 мин → блокировка на 15 мин
 //   GET    /api/me              — текущая сессия                     (сессия)
 //   POST   /api/logout          — завершить текущую сессию           (сессия)
@@ -18,6 +19,8 @@
 //   PATCH  /api/items           — массово: {ids, patch:{category?, pin?}} (сессия)
 //   POST   /api/items/delete    — массово удалить: {ids}             (сессия)
 //   POST   /upload              — загрузить видео и добавить товар    (сессия)
+//                                  поля: file (1080 px), file_sm (540 px для карточек, необязательно),
+//                                  code, category, pin
 //
 // Сессия передаётся заголовком "Authorization: Bearer <token>".
 // Пароль — секрет UPLOAD_KEY. Его смена завершает все сессии.
@@ -32,6 +35,8 @@ const PUBLIC_BASE = 'https://video.islimi.az';
 const MAX_BYTES = 50 * 1024 * 1024; // после сжатия файл ~2–3 МБ
 const CATEGORIES = ['Üzüklər', 'Sırgalar', 'Qolbaqlar', 'Boyunbağılar'];
 const MEMORY_TTL_MS = 15_000; // кэш снимка каталога в памяти изолята
+const COLUMNS = 'id, code, video, video_sm, category, pin, created_at';
+const VIDEO_META = { contentType: 'video/mp4', cacheControl: 'public, max-age=31536000, immutable' };
 
 const SESSION_DAYS = 30;
 const TOUCH_EVERY_MS = 60 * 60 * 1000; // продлевать сессию не чаще раза в час
@@ -39,6 +44,9 @@ const MAX_FAILURES = 5;
 const LOCK_MS = 15 * 60 * 1000;
 
 let memo = null; // { at, json, tsv }
+let viewsMemo = null; // { at, map: {id: views} }
+const VIEWS_TTL_MS = 60_000;
+const VIEW_LOG_DAYS = 2;
 
 // ---------- HTTP helpers ----------
 
@@ -209,6 +217,11 @@ function validateItem(input, partial = false) {
     out.video = String(input.video || '').trim();
     if (!/^https:\/\/\S+$/.test(out.video)) throw new HttpError(400, 'Video linki yanlışdır');
   }
+  // Лёгкая копия для карточек каталога. Пусто → сайт берёт основное видео.
+  if (input.video_sm !== undefined) {
+    out.video_sm = String(input.video_sm || '').trim() || null;
+    if (out.video_sm && !/^https:\/\/\S+$/.test(out.video_sm)) throw new HttpError(400, 'Kiçik video linki yanlışdır');
+  }
   if (!partial || input.category !== undefined) {
     out.category = String(input.category || '').trim();
     if (!CATEGORIES.includes(out.category)) throw new HttpError(400, 'Kateqoriya yanlışdır');
@@ -221,7 +234,7 @@ function validateItem(input, partial = false) {
 
 async function rebuildSnapshot(env) {
   const { results } = await env.DB.prepare(
-    'SELECT id, code, video, category, pin, created_at FROM items ORDER BY id'
+    `SELECT ${COLUMNS} FROM items ORDER BY id`
   ).all();
   const snapshot = JSON.stringify({ updated: new Date().toISOString(), items: results });
   await env.DB.prepare(
@@ -239,6 +252,30 @@ async function getSnapshot(env) {
   return memo;
 }
 
+// Просмотры меняются постоянно, поэтому в снимок не входят: подмешиваются при отдаче
+async function getViews(env) {
+  if (viewsMemo && Date.now() - viewsMemo.at < VIEWS_TTL_MS) return viewsMemo.map;
+  const { results } = await env.DB.prepare('SELECT id, views FROM items WHERE views > 0').all();
+  const map = Object.fromEntries(results.map((r) => [r.id, r.views]));
+  viewsMemo = { at: Date.now(), map };
+  return map;
+}
+
+async function countView(request, env, id) {
+  const visitor = (request.headers.get('CF-Connecting-IP') || 'local') + '|' + (request.headers.get('User-Agent') || '');
+  const day = new Date().toISOString().slice(0, 10);
+  const key = (await sha256(`islimi-view:${visitor}|${id}|${day}`)).slice(0, 32);
+  const now = Date.now();
+  const fresh = await env.DB.prepare('INSERT OR IGNORE INTO view_log (key, at) VALUES (?1, ?2)').bind(key, now).run();
+  if (fresh.meta?.changes) {
+    await env.DB.prepare('UPDATE items SET views = views + 1 WHERE id = ?1').bind(id).run();
+    if (viewsMemo) viewsMemo.map[id] = (viewsMemo.map[id] || 0) + 1;
+  }
+  if (Math.random() < 0.02) {
+    await env.DB.prepare('DELETE FROM view_log WHERE at < ?1').bind(now - VIEW_LOG_DAYS * 86400000).run();
+  }
+}
+
 function toTsv(jsonText) {
   const clean = (s) => String(s ?? '').replace(/[\t\r\n]+/g, ' ');
   const lines = ['Kod\tVideo URL\tCategory\tPIN'];
@@ -250,8 +287,8 @@ function toTsv(jsonText) {
 
 async function insertItem(env, item) {
   const row = await env.DB.prepare(
-    'INSERT INTO items (code, video, category, pin) VALUES (?1, ?2, ?3, ?4) RETURNING id, code, video, category, pin, created_at'
-  ).bind(item.code, item.video, item.category, item.pin).first();
+    `INSERT INTO items (code, video, video_sm, category, pin) VALUES (?1, ?2, ?3, ?4, ?5) RETURNING ${COLUMNS}`
+  ).bind(item.code, item.video, item.video_sm ?? null, item.category, item.pin).first();
   await rebuildSnapshot(env);
   return row;
 }
@@ -264,8 +301,12 @@ async function handleUpload(request, env) {
 
   const file = formData.get('file');
   if (!file || typeof file === 'string') throw new HttpError(400, 'Fayl seçilməyib');
-  if (file.size > MAX_BYTES) throw new HttpError(413, 'Fayl çox böyükdür');
-  if (file.type && !file.type.startsWith('video/')) throw new HttpError(415, 'Yalnız video fayllar');
+  const small = formData.get('file_sm');
+  const hasSmall = small && typeof small !== 'string';
+  for (const f of hasSmall ? [file, small] : [file]) {
+    if (f.size > MAX_BYTES) throw new HttpError(413, 'Fayl çox böyükdür');
+    if (f.type && !f.type.startsWith('video/')) throw new HttpError(415, 'Yalnız video fayllar');
+  }
 
   // Сначала проверяем товар, чтобы не загружать видео впустую
   const item = validateItem({
@@ -273,11 +314,14 @@ async function handleUpload(request, env) {
   });
 
   const filename = `${Date.now()}-${safeFileName(file.name)}`;
-  await env.R2_BUCKET.put(filename, file, {
-    httpMetadata: { contentType: 'video/mp4', cacheControl: 'public, max-age=31536000, immutable' },
-  });
+  const smallName = filename.replace(/\.mp4$/, '-sm.mp4');
+  await Promise.all([
+    env.R2_BUCKET.put(filename, file, { httpMetadata: VIDEO_META }),
+    hasSmall && env.R2_BUCKET.put(smallName, small, { httpMetadata: VIDEO_META }),
+  ]);
   const url = `${PUBLIC_BASE}/${filename}`;
-  const saved = await insertItem(env, { ...item, video: url });
+  const video_sm = hasSmall ? `${PUBLIC_BASE}/${smallName}` : null;
+  const saved = await insertItem(env, { ...item, video: url, video_sm });
   return json(request, { success: true, url, item: saved });
 }
 
@@ -288,11 +332,22 @@ async function handleApi(request, env, path) {
   if (method === 'GET' && (path === '/api/items' || path === '/api/items.tsv')) {
     const snap = await getSnapshot(env);
     const cache = { 'Cache-Control': 'public, max-age=30' };
-    if (path === '/api/items') return json(request, JSON.parse(snap.json), 200, cache);
+    if (path === '/api/items') {
+      const data = JSON.parse(snap.json);
+      const views = await getViews(env);
+      for (const it of data.items) it.views = views[it.id] || 0;
+      return json(request, data, 200, cache);
+    }
     snap.tsv ??= toTsv(snap.json);
     return new Response(snap.tsv, {
       headers: { 'Content-Type': 'text/tab-separated-values; charset=utf-8', ...corsHeaders(request), ...cache },
     });
+  }
+
+  const vm = path.match(/^\/api\/items\/(\d+)\/view$/);
+  if (vm && method === 'POST') {
+    await countView(request, env, Number(vm[1]));
+    return new Response(null, { status: 204, headers: corsHeaders(request) });
   }
 
   if (method === 'POST' && path === '/api/login') {
@@ -341,6 +396,7 @@ async function handleApi(request, env, path) {
       const patch = validateItem(body.patch || {}, true);
       delete patch.code; // код у каждого товара свой
       delete patch.video;
+      delete patch.video_sm;
       const fields = Object.keys(patch);
       if (!fields.length) throw new HttpError(400, 'Dəyişiklik yoxdur');
       sql = `UPDATE items SET ${fields.map((f, i) => `${f} = ?${i + 1}`).join(', ')} WHERE id IN `;
@@ -370,11 +426,13 @@ async function handleApi(request, env, path) {
 
     if (method === 'PATCH') {
       const patch = validateItem(await request.json().catch(() => ({})), true);
+      // Новое основное видео — старая лёгкая копия к нему уже не подходит
+      if (patch.video !== undefined && patch.video_sm === undefined) patch.video_sm = null;
       const fields = Object.keys(patch);
       if (!fields.length) throw new HttpError(400, 'Dəyişiklik yoxdur');
       const sets = fields.map((f, i) => `${f} = ?${i + 1}`).join(', ');
       const row = await env.DB.prepare(
-        `UPDATE items SET ${sets} WHERE id = ?${fields.length + 1} RETURNING id, code, video, category, pin, created_at`
+        `UPDATE items SET ${sets} WHERE id = ?${fields.length + 1} RETURNING ${COLUMNS}`
       ).bind(...fields.map((f) => patch[f]), id).first();
       if (!row) throw new HttpError(404, 'Məhsul tapılmadı');
       await rebuildSnapshot(env);

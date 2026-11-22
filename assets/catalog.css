@@ -522,17 +522,34 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .badge--pin { background: var(--ink); color: #fff; box-shadow: none; }
 .badge--pin .diamond { background: var(--gold-2); }
 
-.card__body { display: flex; align-items: center; gap: 8px; padding: 12px 2px 0 4px; }
-.card__text { min-width: 0; flex: 1; }
-.card__code {
-  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-size: 14px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
-  font-variant-numeric: tabular-nums;
+.card { cursor: pointer; }
+.card__body { padding: 14px 4px 0; }
+.card__cat {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 5px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-ink);
 }
-.card__cat { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
-@media (min-width: 720px) { .card__code { font-size: 15px; } .card__cat { font-size: 13px; } }
+.card__cat .diamond { width: 4px; height: 4px; }
+.card__row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.card__code {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: var(--font-serif); font-size: 21px; line-height: 1.1; font-weight: 600;
+  letter-spacing: .02em; text-transform: uppercase; font-variant-numeric: lining-nums;
+  transition: color .25s;
+}
+.card__views {
+  flex: none; display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.card__views[hidden] { display: none; }
+.card__views .icon { width: 15px; height: 15px; transform: translateY(.5px); }
+@media (min-width: 720px) {
+  .card__body { padding-top: 16px; }
+  .card__code { font-size: 23px; }
+  .card__views { font-size: 13px; }
+}
+@media (hover: hover) { .card:hover .card__code { color: var(--gold-ink); } }
 
-/* WhatsApp у товара — в стиле кнопок шапки: золотая обводка, при наведении заливка */
+/* WhatsApp в плашке на первом экране — в стиле кнопок шапки: золотая обводка, при наведении заливка */
 .card__wa {
   flex: none; display: grid; place-items: center;
   width: 40px; height: 40px; border-radius: 50%;
@@ -543,7 +560,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .card__wa:active { transform: scale(.92); }
 .card__wa .icon { width: 19px; height: 19px; }
 
-.card.is-skeleton { animation: none; }
+.card.is-skeleton { animation: none; cursor: default; }
 .card.is-skeleton .card__media { cursor: default; box-shadow: none; }
 .card.is-skeleton .line { height: 10px; border-radius: 6px; background: var(--line-2); }
 .card.is-skeleton .card__body { padding-top: 16px; }
@@ -751,6 +768,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .lb__media { position: relative; background: #fff; aspect-ratio: 1 / 1; max-height: calc(100vh - 48px); }
 .lb__media video { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.lb__low { /* лёгкая копия поверх полного видео, пока то грузится */
+  position: absolute; top: 0; left: 0; /* у <video> top+bottom не растягивают — только явная высота */
+  pointer-events: none; opacity: 0; transition: opacity .35s var(--ease);
+}
+.lb__low.is-on { opacity: 1; transition: none; } /* появляется сразу, уходит плавно */
 .lb__info { display: flex; flex-direction: column; padding: 40px 30px 30px; border-left: 1px solid var(--line-2); background: linear-gradient(180deg, #fff, #fcfaf7); }
 .lb__cat { margin-bottom: 12px; }
 .lb__code {
@@ -808,6 +830,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
     animation: sheet-in .36s var(--ease) both;
   }
   .lb__media { aspect-ratio: auto; height: min(100vw, 58vh); max-height: none; padding-top: env(safe-area-inset-top); }
+  .lb__low { top: env(safe-area-inset-top); height: calc(100% - env(safe-area-inset-top)); }
   .lb__close { top: calc(12px + env(safe-area-inset-top)); right: 12px; }
   .lb__info { border-left: 0; border-top: 1px solid var(--line-2); padding: 24px var(--gutter) calc(20px + env(safe-area-inset-bottom)); }
   .lb__code { font-size: 40px; }

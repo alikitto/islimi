@@ -282,6 +282,9 @@
     .tbl .c-check { width: 44px; padding-right: 0; }
     .tbl .c-thumb { width: 76px; }
     .tbl .c-pin { width: 80px; }
+    .tbl .c-views { width: 96px; font-variant-numeric: tabular-nums; }
+    .views { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .views svg.i { width: 14px; height: 14px; }
     .tbl .c-date { width: 140px; white-space: nowrap; }
     .tbl .c-actions { width: 140px; text-align: right; white-space: nowrap; }
     .tbl .code { font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -611,6 +614,7 @@
                     <th><button type="button" data-sort="code">Kod <svg class="i"><use href="#i-sort"/></svg></button></th>
                     <th><button type="button" data-sort="category">Kateqoriya <svg class="i"><use href="#i-sort"/></svg></button></th>
                     <th class="c-pin"><button type="button" data-sort="pin">PIN <svg class="i"><use href="#i-sort"/></svg></button></th>
+                    <th class="c-views"><button type="button" data-sort="views">Baxış <svg class="i"><use href="#i-sort"/></svg></button></th>
                     <th class="c-date"><button type="button" data-sort="id">Əlavə edilib <svg class="i"><use href="#i-sort"/></svg></button></th>
                     <th class="c-actions"><span class="sr">Əməliyyatlar</span></th>
                   </tr>
@@ -803,6 +807,8 @@
     const CAT_COLORS = { 'Üzüklər': '#D4AF37', 'Sırgalar': '#C2410C', 'Qolbaqlar': '#0F766E', 'Boyunbağılar': '#6D28D9' };
     const OUTPUT_SIZE = 1080;
     const BITRATE = 1_200_000;
+    const SMALL_SIZE = 540;        // лёгкая копия для карточек каталога
+    const SMALL_BITRATE = 350_000;
     const FRAME_RATE = 30;
     const MOBILE_PAGE = 30;
     const TOKEN_KEY = 'islimi-session';
@@ -949,11 +955,12 @@
     $('pageSize').value = String(view.size);
 
     async function loadItems() {
-      $('tbody').innerHTML = Array.from({ length: 8 }, () => '<tr><td colspan="7" class="skel" style="height:68px"></td></tr>').join('');
+      $('tbody').innerHTML = Array.from({ length: 8 }, () => '<tr><td colspan="8" class="skel" style="height:68px"></td></tr>').join('');
       $('mlist').innerHTML = Array.from({ length: 6 }, () => '<div class="m-row"><div class="thumb skel"></div><div class="info"><div class="skel" style="height:14px;width:40%;border-radius:4px"></div><div class="skel" style="height:12px;width:60%;border-radius:4px"></div></div></div>').join('');
       try {
         const res = await fetch(API + '/api/items', { cache: 'no-store' });
         items = (await res.json()).items;
+        for (const it of items) it.views = Number(it.views) || 0;
         renderProducts();
         renderRecent();
         renderCatTiles($('catTiles'), tileValue($('catTiles')) || prefs.lastCat || '', true); // с количеством товаров
@@ -961,7 +968,7 @@
         validateNew();
       } catch {
         const err = `<div class="empty">${icon('alert')}<div>Məhsulları yükləmək alınmadı</div></div>`;
-        $('tbody').innerHTML = `<tr><td colspan="7">${err}</td></tr>`;
+        $('tbody').innerHTML = `<tr><td colspan="8">${err}</td></tr>`;
         $('mlist').innerHTML = err;
       }
     }
@@ -1037,9 +1044,11 @@
         thumbs.unobserve(e.target);
       }
     }, { rootMargin: '300px' });
-    const thumb = (it) => seenThumbs.has(it.video)
-      ? `<video muted playsinline preload="metadata" src="${esc(it.video)}#t=0.5"></video>`
-      : `<video muted playsinline preload="metadata" data-src="${esc(it.video)}"></video>`;
+    const thumbSrc = (it) => it.video_sm || it.video;
+    const thumb = (it) => seenThumbs.has(thumbSrc(it))
+      ? `<video muted playsinline preload="metadata" src="${esc(thumbSrc(it))}#t=0.5"></video>`
+      : `<video muted playsinline preload="metadata" data-src="${esc(thumbSrc(it))}"></video>`;
+    const viewsCell = (it) => `<span class="views" title="${it.views || 0} baxış">${icon('eye')}${it.views || 0}</span>`;
     const observeThumbs = (root) => root.querySelectorAll('video[data-src]').forEach((v) => thumbs.observe(v));
     const empty = () => `<div class="empty">${icon('search')}<div>Heç nə tapılmadı</div>${view.q || view.cat || view.pin ? '<div style="margin-top:10px"><button type="button" class="btn btn-ghost" data-reset>Filtrləri sıfırla</button></div>' : ''}</div>`;
     document.querySelector('[data-view="products"]').addEventListener('click', (e) => {
@@ -1079,7 +1088,7 @@
         $('grid').innerHTML = pageItems.length ? pageItems.map((it) => `
           <button type="button" class="p-card" data-id="${it.id}">
             <div class="p-media">${thumb(it)}${it.pin ? `<span class="badge-pin">${icon('pin')}PIN</span>` : ''}</div>
-            <div class="p-body"><span class="p-code">${esc(it.code)}</span><span class="p-meta">${catPill(it.category)}<span>${fmtDate(it.created_at)}</span></span></div>
+            <div class="p-body"><span class="p-code">${esc(it.code)}</span><span class="p-meta">${catPill(it.category)}${viewsCell(it)}<span>${fmtDate(it.created_at)}</span></span></div>
           </button>`).join('') : `<div style="grid-column:1/-1">${empty()}</div>`;
         observeThumbs($('grid'));
       } else if (desktop) {
@@ -1090,13 +1099,14 @@
             <td><span class="code">${esc(it.code)}</span><span class="id">#${it.id}</span></td>
             <td>${catPill(it.category)}</td>
             <td class="c-pin"><input type="checkbox" class="toggle sm" data-act="pin" ${it.pin ? 'checked' : ''} aria-label="PIN ${esc(it.code)}" /></td>
+            <td class="c-views">${viewsCell(it)}</td>
             <td class="c-date muted">${fmtDate(it.created_at)}</td>
             <td class="c-actions">
               <button type="button" class="icon-btn" data-act="edit" aria-label="Redaktə et" title="Redaktə et">${icon('edit')}</button>
               <a class="icon-btn" href="${esc(it.video)}" target="_blank" rel="noopener" aria-label="Videonu aç" title="Videonu aç">${icon('external')}</a>
               <button type="button" class="icon-btn" data-act="delete" aria-label="Sil" title="Sil">${icon('trash')}</button>
             </td>
-          </tr>`).join('') : `<tr><td colspan="7">${empty()}</td></tr>`;
+          </tr>`).join('') : `<tr><td colspan="8">${empty()}</td></tr>`;
         observeThumbs($('tbody'));
       } else {
         $('mlist').innerHTML = pageItems.length ? pageItems.map((it) => `
@@ -1104,7 +1114,7 @@
             <span class="thumb">${thumb(it)}</span>
             <div class="info">
               <span class="code">${esc(it.code)}${it.pin ? icon('pin') : ''}</span>
-              <span class="sub">${catPill(it.category)}<span>${fmtDate(it.created_at)}</span></span>
+              <span class="sub">${catPill(it.category)}${viewsCell(it)}<span>${fmtDate(it.created_at)}</span></span>
             </div>
             <label class="pin-cell" data-act="pin-cell"><input type="checkbox" class="toggle sm" data-act="pin" ${it.pin ? 'checked' : ''} aria-label="PIN ${esc(it.code)}" />PIN</label>
           </div>`).join('') : empty();
@@ -1160,7 +1170,7 @@
       const b = e.target.closest('[data-sort]');
       if (!b) return;
       const key = b.dataset.sort;
-      view.sort = view.sort.key === key ? { key, dir: view.sort.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: key === 'id' || key === 'pin' ? 'desc' : 'asc' };
+      view.sort = view.sort.key === key ? { key, dir: view.sort.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: key === 'id' || key === 'pin' || key === 'views' ? 'desc' : 'asc' };
       prefs.sort = view.sort; savePrefs();
       renderProducts();
     });
@@ -1592,15 +1602,33 @@
         return new Blob([output.target.buffer], { type: 'video/mp4' });
       } finally { input.dispose?.(); }
     }
+    // Лёгкая копия для карточек: из уже сжатого квадратного видео, без обрезки
+    async function compressSmall(source, onProgress) {
+      const quality = new Quality({ bitrate: SMALL_BITRATE, bitrateMode: 'variable' });
+      const video = {
+        codec: 'avc', frameRate: FRAME_RATE, quality, forceTranscode: true, keyFrameInterval: 2,
+        width: SMALL_SIZE, height: SMALL_SIZE, fit: 'fill',
+      };
+      const input = new Input({ source: new BlobSource(source), formats: ALL_FORMATS });
+      const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target: new BufferTarget() });
+      try {
+        const conversion = await Conversion.init({ input, output, video, audio: { discard: true }, tracks: 'primary' });
+        if (!conversion.isValid) throw new Error('Kiçik video hazırlana bilmədi');
+        conversion.onProgress = onProgress;
+        await conversion.execute();
+        return new Blob([output.target.buffer], { type: 'video/mp4' });
+      } finally { input.dispose?.(); }
+    }
     function fileNameFor(code) {
       const base = code.trim().toUpperCase().replace(/[^A-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'video';
       const d = new Date(), p = (n) => String(n).padStart(2, '0');
       return `${base}_${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}-${p(d.getMinutes())}-${p(d.getSeconds())}.mp4`;
     }
-    function uploadBlob(blob, filename, onProgress) {
+    function uploadBlob(blob, small, filename, onProgress) {
       return new Promise((resolve, reject) => {
         const form = new FormData();
         form.append('file', blob, filename);
+        if (small) form.append('file_sm', small, filename.replace(/\.mp4$/, '-sm.mp4'));
         form.append('code', $('code').value.trim());
         form.append('category', tileValue($('catTiles')));
         if ($('pin').checked) form.append('pin', '1');
@@ -1629,12 +1657,15 @@
       $('submitBtnM').textContent = busy ? 'Gözləyin…' : 'Əlavə et';
       validateNew();
     }
+    // Доли общего прогресса: сжатие 1080 → 0–70 %, копия 540 → 70–85 %, загрузка → 85–100 %
+    const STAGES = { compress: [0, 0.7], small: [0.7, 0.15], upload: [0.85, 0.15] };
     function setProgress(stage, fraction) {
-      const total = stage === 'compress' ? fraction * 0.85 : 0.85 + fraction * 0.15;
+      const [from, span] = STAGES[stage];
+      const total = from + fraction * span;
       const pct = Math.round(total * 100);
       $('ring').style.setProperty('--p', pct);
       $('ringPct').textContent = pct + '%';
-      $('busyLabel').textContent = stage === 'compress' ? 'Video sıxılır…' : 'Yüklənir…';
+      $('busyLabel').textContent = stage === 'upload' ? 'Yüklənir…' : 'Video sıxılır…';
       $('busySub').textContent = 'Səhifəni bağlamayın';
     }
     async function submitNew() {
@@ -1644,7 +1675,9 @@
       setProgress('compress', 0);
       try {
         const blob = await compress((p) => setProgress('compress', p));
-        const data = await uploadBlob(blob, fileNameFor($('code').value), (p) => setProgress('upload', p));
+        // Копия для карточек не обязательна: если не вышла, сайт покажет основное видео
+        const small = await compressSmall(blob, (p) => setProgress('small', p)).catch((err) => { console.warn(err); return null; });
+        const data = await uploadBlob(blob, small, fileNameFor($('code').value), (p) => setProgress('upload', p));
         showSuccess(blob, data);
       } catch (err) {
         $('upError').textContent = err.message;
@@ -1666,7 +1699,7 @@
         `<span class="pill"><b>${esc(data.item.code)}</b> · ${esc(data.item.category)}${data.item.pin ? ' · PIN' : ''}</span>` +
         `<span class="pill">${fmtMB(up.file.size)} → <b>${fmtMB(blob.size)}</b> (${ratio}× kiçik)</span>`;
       $('againNote').textContent = `Növbəti məhsul üçün kateqoriya yadda qalır: ${data.item.category}.`;
-      items.push(data.item);
+      items.push({ ...data.item, views: 0 });
       renderProducts();
       renderCatTiles($('catTiles'), tileValue($('catTiles')), true);
       $('newForm').hidden = true;
@@ -1702,7 +1735,7 @@
       btn.disabled = true;
       try {
         const { item } = await api('POST', '/api/items', { code, video: e.target.video.value, category, pin: $('pin').checked });
-        items.push(item);
+        items.push({ ...item, views: 0 });
         e.target.reset();
         resetNew();
         renderProducts();

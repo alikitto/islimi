@@ -92,6 +92,7 @@
   const ICON = {
     wa: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.21 3.07.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.28-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>',
     play: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
+    eye: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>',
   };
   const DIAMOND = '<span class="diamond" aria-hidden="true"></span>';
 
@@ -206,8 +207,10 @@
         id: Number(i.id) || 0,
         code: String(i.code).trim(),
         video: String(i.video).trim(),
+        videoSm: String(i.video_sm || '').trim() || String(i.video).trim(), // лёгкая копия 540 px для карточек
         category: String(i.category || '').trim(),
         pin: i.pin === true || Number(i.pin) === 1,
+        views: Math.max(0, Number(i.views) || 0),
         created: i.created_at ? new Date(i.created_at) : null,
       }))
       .sort((a, b) => b.id - a.id); // новые первыми
@@ -252,21 +255,33 @@
       isNew ? `<span class="badge">${DIAMOND}Yeni</span>` : '',
     ].join('');
     const code = esc(item.code);
+    // Категорию показываем только в смешанных списках («Yeni», поиск) — в разделе она и так понятна
+    const showCat = !state.cat.slug || state.query;
     return `
-      <article class="card" style="animation-delay:${Math.min(index % PAGE_SIZE, 8) * 40}ms">
+      <article class="card" data-index="${index}" data-id="${item.id}" style="animation-delay:${Math.min(index % PAGE_SIZE, 8) * 40}ms">
         ${badges ? `<div class="badges">${badges}</div>` : ''}
-        <button class="card__media media" type="button" data-index="${index}" aria-label="${code} — videoya bax">
-          <video muted playsinline loop preload="none" data-src="${esc(item.video)}"></video>
+        <button class="card__media media" type="button" aria-label="${code} — videoya bax">
+          <video muted playsinline loop preload="none" data-src="${esc(item.videoSm)}"></video>
           <span class="card__view" aria-hidden="true">${ICON.play}Bax</span>
         </button>
         <div class="card__body">
-          <div class="card__text">
+          ${showCat ? `<span class="card__cat">${DIAMOND}${esc(item.category)}</span>` : ''}
+          <div class="card__row">
             <span class="card__code">${code}</span>
-            <span class="card__cat">${esc(item.category)}</span>
+            ${viewsHTML(item)}
           </div>
-          <a class="card__wa" href="${waLink(item.code)}" target="_blank" rel="noopener" aria-label="${code} — WhatsApp ilə sifariş et">${ICON.wa}</a>
         </div>
       </article>`;
+  }
+
+  // Просмотры: «128», «1,2 min». Ноль не показываем — у нового товара это выглядит пусто.
+  const compact = (() => {
+    try { return new Intl.NumberFormat('az', { notation: 'compact', maximumFractionDigits: 1 }); } catch { return null; }
+  })();
+  const fmtViews = (n) => (n < 1000 || !compact ? String(n) : compact.format(n));
+  const viewsWord = (n) => `${n} baxış`;
+  function viewsHTML(item) {
+    return `<span class="card__views"${item.views ? '' : ' hidden'} title="${viewsWord(item.views)}" aria-label="${viewsWord(item.views)}">${ICON.eye}<span>${fmtViews(item.views)}</span></span>`;
   }
 
   function skeletonHTML(n) {
@@ -277,7 +292,11 @@
       </div>`).join('');
   }
 
-  // Видео: загружаем, когда карточка рядом с экраном; играем, только когда она видна.
+  // Видео: загружаем, когда карточка рядом с экраном; играем, только когда она видна;
+  // выгружаем, когда она ушла далеко — иначе при долгой прокрутке в памяти копятся
+  // сотни буферов и телефон перезагружает вкладку.
+  const mediaOf = (v) => v.closest('.media') || v.parentElement;
+
   const loader = new IntersectionObserver((entries) => {
     for (const { isIntersecting, target: v } of entries) {
       if (!isIntersecting || v.src) continue;
@@ -289,23 +308,48 @@
 
   const player = new IntersectionObserver((entries) => {
     for (const { isIntersecting, target: v } of entries) {
-      if (isIntersecting && !reduceMotion && !document.hidden) v.play().catch(() => {});
+      if (isIntersecting && !reduceMotion && !document.hidden && el.lb.hidden) v.play().catch(() => {});
       else v.pause();
     }
   }, { threshold: 0.35 });
 
+  // Запас больше, чем у loader, чтобы видео у края зоны не грузилось и не выгружалось по кругу
+  const unloader = new IntersectionObserver((entries) => {
+    for (const { isIntersecting, target: v } of entries) {
+      if (isIntersecting || !v.src) continue;
+      v.pause();
+      v.removeAttribute('src');
+      v.preload = 'none';
+      v.load(); // освобождает буфер и декодер
+      mediaOf(v).classList.remove('is-ready');
+      loader.observe(v); // загрузится снова, когда карточка вернётся
+    }
+  }, { rootMargin: '250% 0px' });
+
   function wireVideo(v) {
-    const media = v.closest('.media') || v.parentElement;
-    const ready = () => media.classList.add('is-ready');
-    v.addEventListener('loadeddata', ready, { once: true });
-    v.addEventListener('playing', ready, { once: true });
-    v.addEventListener('error', ready, { once: true });
+    const media = mediaOf(v);
+    const ready = () => { if (v.src) media.classList.add('is-ready'); };
+    v.addEventListener('loadeddata', ready);
+    v.addEventListener('playing', ready);
+    v.addEventListener('error', ready);
     loader.observe(v);
     player.observe(v);
+    unloader.observe(v);
+  }
+
+  function unwireVideo(v) {
+    loader.unobserve(v); player.unobserve(v); unloader.unobserve(v);
+    v.removeAttribute('src'); v.load();
+  }
+
+  // Заново проверить видимость: player сразу запустит то, что на экране
+  function resumeVisible() {
+    document.querySelectorAll('main video[data-src]').forEach((v) => { player.unobserve(v); player.observe(v); });
   }
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) document.querySelectorAll('main video').forEach((v) => v.pause());
+    else if (el.lb.hidden) resumeVisible(); // вернулись из WhatsApp или другой вкладки
   });
 
   // ---------- Главная: первый экран, плитки категорий, цифры ----------
@@ -331,7 +375,7 @@
       const item = shots[n];
       if (!item) return;
       const v = btn.querySelector('video');
-      v.dataset.src = item.video;
+      v.dataset.src = n === 0 ? item.video : item.videoSm; // большой кадр — в полном качестве
       wireVideo(v);
       btn.setAttribute('aria-label', `${item.code} — videoya bax`);
       const code = btn.querySelector('.shot__code');
@@ -379,10 +423,15 @@
     for (let i = state.shown; i < cards.length; i++) wireVideo(cards[i].querySelector('video'));
     state.shown += next.length;
     el.more.hidden = state.shown >= state.list.length;
+    // Наблюдатель срабатывает только при входе в зону. Если метка после догрузки
+    // так и осталась у экрана (быстрая прокрутка, высокий экран), нового события
+    // не будет — переподписка заставит проверить её ещё раз.
+    pager.unobserve(el.sentinel);
+    pager.observe(el.sentinel);
   }
 
   function render() {
-    el.grid.querySelectorAll('video').forEach((v) => { loader.unobserve(v); player.unobserve(v); v.removeAttribute('src'); v.load(); });
+    el.grid.querySelectorAll('video').forEach(unwireVideo);
     el.grid.innerHTML = '';
     el.status.innerHTML = '';
     state.list = computeList();
@@ -418,13 +467,14 @@
 
   el.more.addEventListener('click', appendPage);
 
-  new IntersectionObserver((entries) => {
+  const pager = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting && state.loaded && state.shown < state.list.length) appendPage();
-  }, { rootMargin: '800px 0px' }).observe(el.sentinel);
+  }, { rootMargin: '800px 0px' });
+  pager.observe(el.sentinel);
 
   el.grid.addEventListener('click', (e) => {
-    const media = e.target.closest('.card__media[data-index]');
-    if (media) openLightbox(state.list, Number(media.dataset.index));
+    const card = e.target.closest('.card[data-index]');
+    if (card) openLightbox(state.list, Number(card.dataset.index));
   });
 
   // ---------- Поиск ----------
@@ -454,14 +504,117 @@
 
   let lastFocus = null;
 
+  // Окно открывается мгновенно: сверху сразу играет лёгкая копия (она уже скачана
+  // для карточки), под ней грузится полное видео и, когда готово, плавно её сменяет
+  // с того же момента ролика.
+  const lbLow = document.createElement('video');
+  lbLow.className = 'lb__low';
+  lbLow.muted = true; lbLow.loop = true; lbLow.playsInline = true;
+  lbLow.setAttribute('playsinline', '');
+  lbLow.setAttribute('aria-hidden', 'true');
+  el.lbVideo.after(lbLow);
+  let lbToken = 0;
+
+  function clearLow() {
+    lbLow.classList.remove('is-on');
+    lbLow.pause();
+    lbLow.removeAttribute('src');
+    lbLow.load();
+  }
+
+  function setLightboxVideo(item) {
+    const token = ++lbToken;
+    clearLow();
+    stopWarm();
+    const v = el.lbVideo;
+    if (item.videoSm !== item.video) {
+      lbLow.src = item.videoSm;
+      lbLow.classList.add('is-on');
+      lbLow.play().catch(() => {});
+      v.addEventListener('playing', () => {
+        if (token !== lbToken) return;
+        const done = () => {
+          if (token !== lbToken) return;
+          lbLow.classList.remove('is-on');
+          setTimeout(() => { if (token === lbToken) clearLow(); }, 400); // после затухания
+        };
+        const t = lbLow.currentTime;
+        if (lbLow.readyState >= 2 && Math.abs(v.currentTime - t) > 0.15) {
+          v.addEventListener('seeked', done, { once: true });
+          v.currentTime = t;
+        } else done();
+      }, { once: true });
+    }
+    v.src = item.video;
+    v.play().catch(() => {});
+  }
+
+  // На компьютере полное видео начинаем качать заранее, пока курсор над карточкой
+  const warm = document.createElement('video');
+  warm.muted = true;
+  let warmTimer = 0;
+  function stopWarm() {
+    clearTimeout(warmTimer);
+    if (!warm.src) return;
+    warm.removeAttribute('src');
+    warm.load();
+  }
+  el.grid.addEventListener('pointerover', (e) => {
+    const media = e.target.closest('.card[data-index]');
+    if (!media || e.pointerType !== 'mouse' || media.contains(e.relatedTarget)) return;
+    clearTimeout(warmTimer);
+    warmTimer = setTimeout(() => {
+      const item = state.list[Number(media.dataset.index)];
+      if (!item || item.videoSm === item.video || warm.src === item.video) return;
+      warm.preload = 'auto';
+      warm.src = item.video;
+    }, 200);
+  });
+  el.grid.addEventListener('pointerout', (e) => {
+    const media = e.target.closest('.card[data-index]');
+    if (media && !media.contains(e.relatedTarget)) clearTimeout(warmTimer);
+  });
+
+  function showLightboxMeta(item) {
+    const parts = [];
+    if (item.created) parts.push(`Əlavə olunub: ${fmtDate(item.created)}`);
+    if (item.views) parts.push(viewsWord(item.views));
+    el.lbDate.textContent = parts.join(' · ');
+  }
+
+  // Просмотр = открытие окна товара. Браузер засчитывает товар раз в сутки
+  // (сервер ещё раз проверяет по IP), открытия из админки не считаются.
+  const VIEWED_KEY = 'islimi-viewed';
+  function countView(item) {
+    if (!item.id) return;
+    let seen = {};
+    try {
+      if (localStorage.getItem('islimi-session')) return; // это владелец каталога
+      seen = JSON.parse(localStorage.getItem(VIEWED_KEY) || '{}') || {};
+    } catch { /* без хранилища считаем каждый раз — сервер всё равно отсеет повторы */ }
+    const now = Date.now();
+    for (const id in seen) if (now - seen[id] > 864e5) delete seen[id];
+    if (seen[item.id]) return;
+    seen[item.id] = now;
+    try { localStorage.setItem(VIEWED_KEY, JSON.stringify(seen)); } catch {}
+    fetch(`${API_BASE}/api/items/${item.id}/view`, { method: 'POST', mode: 'no-cors', keepalive: true }).catch(() => {});
+    item.views += 1;
+    el.grid.querySelectorAll(`.card[data-id="${item.id}"] .card__views`).forEach((n) => {
+      n.hidden = false;
+      n.title = viewsWord(item.views);
+      n.setAttribute('aria-label', viewsWord(item.views));
+      n.lastElementChild.textContent = fmtViews(item.views);
+    });
+  }
+
   function fillLightbox() {
     const item = state.lbList[state.lbIndex];
     if (!item) return;
-    el.lbVideo.src = item.video;
-    el.lbVideo.play().catch(() => {});
+    setLightboxVideo(item);
     el.lbCat.textContent = item.category;
     el.lbCode.textContent = item.code;
-    el.lbDate.textContent = item.created ? `Əlavə olunub: ${fmtDate(item.created)}` : '';
+    countView(item);
+    showLightboxMeta(item);
     el.lbWa.href = waLink(item.code);
     el.lbPrev.disabled = state.lbIndex <= 0;
     el.lbNext.disabled = state.lbIndex >= state.lbList.length - 1;
@@ -481,13 +634,14 @@
   function hideLightbox() {
     if (el.lb.hidden) return;
     el.lb.hidden = true;
+    lbToken++;
+    clearLow();
     el.lbVideo.pause();
     el.lbVideo.removeAttribute('src');
     el.lbVideo.load();
     document.body.classList.remove('no-scroll');
     state.lbIndex = -1;
-    // снова запустить видимые видео
-    document.querySelectorAll('main video[data-src]').forEach((v) => { player.unobserve(v); player.observe(v); });
+    resumeVisible(); // снова запустить видимые видео
     if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   }
 

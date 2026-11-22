@@ -5,8 +5,10 @@ CREATE TABLE IF NOT EXISTS items (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   code       TEXT    NOT NULL,
   video      TEXT    NOT NULL,
+  video_sm   TEXT,             -- лёгкая копия 540 px для карточек; NULL → берётся video
   category   TEXT    NOT NULL,
   pin        INTEGER NOT NULL DEFAULT 0,
+  views      INTEGER NOT NULL DEFAULT 0, -- просмотры на сайте, см. view_log
   created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
 );
 
@@ -38,4 +40,10 @@ CREATE TABLE IF NOT EXISTS login_failures (
   ip_hash  TEXT PRIMARY KEY,
   count    INTEGER NOT NULL,
   first_at INTEGER NOT NULL
+);
+
+-- Защита счётчика просмотров: посетитель (IP + браузер) засчитывается раз в сутки на товар.
+CREATE TABLE IF NOT EXISTS view_log (
+  key TEXT PRIMARY KEY,
+  at  INTEGER NOT NULL
 );
