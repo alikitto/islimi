@@ -235,6 +235,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .header .icon-btn .icon, .header .header__wa .icon { width: 18px; height: 18px; }
   .header .header__wa { padding: 0; border-radius: 50%; }
   .header__wa span { display: none; }
+  .chip { height: 40px; }
 }
 /* на телефоне счётчики и ромбик не помещаются — прячем, чтобы все 5 пунктов встали в ряд */
 @media (max-width: 639px) {
@@ -479,6 +480,28 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .search__clear:hover { background: var(--line-2); color: var(--ink); }
 
+.intro__tools { display: grid; gap: 12px; }
+
+/* Сортировка: в разделах и в результатах поиска */
+.sort { display: flex; align-items: center; gap: 6px; }
+.sort__label {
+  margin-right: auto; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+}
+.sort__btn {
+  height: 40px; padding: 0 15px; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); color: var(--ink-2); font-size: 13px; font-weight: 500; white-space: nowrap;
+  -webkit-user-select: none; user-select: none;
+  transition: background-color .2s, border-color .2s, color .2s, transform .15s var(--ease);
+}
+.sort__btn:active { transform: scale(.95); }
+.sort__btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+@media (hover: hover) { .sort__btn[aria-pressed="false"]:hover { border-color: var(--ink-2); color: var(--ink); } }
+@media (min-width: 820px) {
+  .sort { justify-content: flex-end; }
+  .sort__label { margin-right: 4px; }
+  .sort__btn { height: 36px; }
+}
+
 /* ---------- Сетка товаров ---------- */
 
 .grid { display: grid; gap: 22px 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -694,7 +717,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .footer h4 { display: none; }
   .footer ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
   .footer ul a {
-    display: inline-flex; align-items: center; height: 34px; padding: 0 13px; border-radius: 999px;
+    display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: 999px;
     border: 1px solid rgba(216, 183, 127, .22); background: rgba(255, 255, 255, .03); font-size: 13px;
   }
   @media (hover: hover) { .footer ul a:hover { border-color: var(--f-gold); } }
@@ -706,7 +729,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   }
   .footer .footer__cats li { flex: 1 1 auto; }
   .footer .footer__cats a {
-    width: 100%; justify-content: center; height: 32px; padding: 0 clamp(5px, 1.6vw, 12px);
+    width: 100%; justify-content: center; height: 40px; padding: 0 clamp(5px, 1.6vw, 12px);
     border: 0; background: transparent; font-size: clamp(11.5px, 3.3vw, 13.5px); white-space: nowrap;
   }
   @media (hover: hover) { .footer .footer__cats a:hover { background: rgba(255, 255, 255, .06); color: var(--f-gold); } }

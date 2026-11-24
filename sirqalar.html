@@ -24,8 +24,8 @@
   <link rel="preconnect" href="https://video.islimi.az" />
   <link rel="preload" href="/assets/fonts/cormorant-garamond-v4.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/assets/fonts/inter-v4.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/assets/catalog.css?v=b39f0942" />
-  <script defer src="/assets/catalog.js?v=03553fa8"></script>
+  <link rel="stylesheet" href="/assets/catalog.css?v=02493717" />
+  <script defer src="/assets/catalog.js?v=e8c4ee7c"></script>
 
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -127,11 +127,19 @@
           <h1 class="intro__title" id="pageTitle">Sırgalar</h1>
           <p class="intro__meta" id="pageMeta" aria-live="polite"></p>
         </div>
-        <label class="search" role="search">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input id="search" type="search" placeholder="Kod ilə axtar, məs. un0200" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Kod ilə axtar" />
-          <button class="search__clear" id="searchClear" type="button" aria-label="Təmizlə" hidden><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-        </label>
+        <div class="intro__tools">
+          <label class="search" role="search">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="search" type="search" placeholder="Kod ilə axtar, məs. un0200" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Kod ilə axtar" />
+            <button class="search__clear" id="searchClear" type="button" aria-label="Təmizlə" hidden><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+          </label>
+          <div class="sort" id="sort" role="group" aria-label="Sıralama">
+            <span class="sort__label">Sırala</span>
+            <button class="sort__btn" type="button" data-sort="new" aria-pressed="true">Yeni</button>
+            <button class="sort__btn" type="button" data-sort="pop" aria-pressed="false">Populyar</button>
+            <button class="sort__btn" type="button" data-sort="code" aria-pressed="false">Kod</button>
+          </div>
+        </div>
       </div>
 
       <div class="grid" id="grid"></div>

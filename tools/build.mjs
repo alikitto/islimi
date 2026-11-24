@@ -35,6 +35,7 @@ for (const page of pages) {
     url: `${SITE}/${page.slug}`,
     bodyClass: home ? 'is-home' : 'is-cat',
     homeHidden: home ? '' : ' hidden',
+    sortHidden: home ? ' hidden' : '', // на главной сортировка появляется только в поиске
     eyebrow: home ? 'Yeni kolleksiya' : 'Kataloq',
     h: home ? 'h2' : 'h1', // на главной h1 — в первом экране
     heading: escAttr(page.heading),

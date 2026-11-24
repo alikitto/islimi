@@ -18,8 +18,10 @@
     { slug: 'boyunbagilar', name: 'Boyunbağılar' },
   ];
   const HOME_LIMIT = 24;   // сколько товаров на главной («Yeni»)
+  const NEW_COUNT = 24;    // бейдж «Yeni» в разделах — у стольких последних добавленных товаров
   const PAGE_SIZE = 12;    // сколько карточек добавлять за раз
-  const NEW_DAYS = 30;     // бейдж «Yeni» в категориях — для товаров моложе N дней
+  const SORTS = ['new', 'pop', 'code'];
+  const SORT_KEY = 'islimi-sort';
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -33,6 +35,7 @@
     meta: $('#pageMeta'),
     search: $('#search'),
     searchClear: $('#searchClear'),
+    sort: $('#sort'),
     cats: $('#cats'),
     header: $('#header'),
     eyebrow: $('#pageEyebrow'),
@@ -58,7 +61,9 @@
 
   const state = {
     items: [],      // все товары, новые первыми
-    updated: null,
+    updated: null,   // дата последнего добавленного товара
+    newIds: new Set(), // товары с бейджем «Yeni»
+    sort: (() => { try { const v = sessionStorage.getItem(SORT_KEY); return SORTS.includes(v) ? v : 'new'; } catch { return 'new'; } })(),
     stamp: '',      // метка версии каталога (data.updated), чтобы не перерисовывать тот же
     cat: null,
     list: [],       // товары текущего вида (категория + поиск)
@@ -139,6 +144,7 @@
       el.cats.scrollTo({ left, behavior: state.loaded ? 'smooth' : 'auto' });
     }
     movePill(state.loaded && !reduceMotion);
+    syncSort();
   }
 
   // Золотая «таблетка» под выбранной категорией: плавно переезжает между пунктами
@@ -212,15 +218,36 @@
       .sort((a, b) => b.id - a.id); // новые первыми
   }
 
+  const byCode = (a, b) => a.code.localeCompare(b.code, 'en', { numeric: true, sensitivity: 'base' });
+  function sorted(list) {
+    if (state.sort === 'pop') return [...list].sort((a, b) => b.views - a.views || b.id - a.id);
+    if (state.sort === 'code') return [...list].sort(byCode);
+    return list; // state.items уже идут от новых к старым
+  }
+
   function computeList() {
     const { cat, items } = state;
     const q = norm(state.query);
     const inCat = cat.slug ? items.filter((i) => i.category === cat.name) : items;
-    if (q) return inCat.filter((i) => norm(i.code).includes(q));
-    if (cat.slug) return inCat;
+    if (q) return sorted(inCat.filter((i) => norm(i.code).includes(q)));
+    if (cat.slug) return sorted(inCat);
     // «Yeni»: закреплённые сверху, затем самые свежие
     return [...items.filter((i) => i.pin), ...items.filter((i) => !i.pin)].slice(0, HOME_LIMIT);
   }
+
+  // Сортировка видна в разделах и в результатах поиска; на главной без поиска — нет
+  function syncSort() {
+    el.sort.hidden = !(state.cat.slug || state.query);
+    el.sort.querySelectorAll('[data-sort]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sort === state.sort)));
+  }
+  el.sort.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-sort]');
+    if (!btn || btn.dataset.sort === state.sort) return;
+    state.sort = btn.dataset.sort;
+    try { sessionStorage.setItem(SORT_KEY, state.sort); } catch { /* без хранилища — только до перезагрузки */ }
+    syncSort();
+    if (state.loaded) render();
+  });
 
   function updateCounts() {
     el.cats.querySelectorAll('.chip').forEach((chip) => {
@@ -244,7 +271,8 @@
   // ---------- Карточки ----------
 
   function cardHTML(item, index) {
-    const isNew = state.cat.slug && item.created && (Date.now() - item.created) < NEW_DAYS * 864e5;
+    // На главной без поиска все товары новые — бейдж там не нужен
+    const isNew = (state.cat.slug || state.query) && state.newIds.has(item.id);
     const showPin = item.pin && !state.cat.slug && !state.query;
     const badges = [
       showPin ? `<span class="badge badge--pin">${DIAMOND}Seçilmiş</span>` : '',
@@ -412,6 +440,7 @@
     el.status.innerHTML = '';
     state.list = computeList();
     state.shown = 0;
+    syncSort();
     updateMeta();
 
     if (!state.list.length) {
@@ -840,7 +869,8 @@
   function applyData(data) {
     const keep = state.loaded ? state.shown : 0;
     state.items = normalize(data);
-    state.updated = data.updated ? new Date(data.updated) : null;
+    state.newIds = new Set(state.items.slice(0, NEW_COUNT).map((i) => i.id));
+    state.updated = state.items[0]?.created || null; // «yenilənib» — когда добавлен последний товар
     state.stamp = data.updated || '';
     state.loaded = true;
     updateCounts();
