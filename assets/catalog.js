@@ -3,8 +3,10 @@
 (() => {
   'use strict';
 
-  const API_BASE = new URLSearchParams(location.search).has('localapi')
-    ? 'http://localhost:8787'                      // локальный wrangler dev: открыть страницу с ?localapi
+  // Локальный wrangler dev: открыть страницу с ?localapi=<порт> (без числа — 8787)
+  const LOCAL_API = new URLSearchParams(location.search).get('localapi');
+  const API_BASE = LOCAL_API !== null
+    ? `http://localhost:${/^\d+$/.test(LOCAL_API) ? LOCAL_API : 8787}`
     : 'https://upload-to-r2.ramizagayev122.workers.dev';
   const API_URL = API_BASE + '/api/items';
   const WA_NUMBER = '994702920323';
@@ -222,6 +224,7 @@
         code: String(i.code).trim(),
         video: String(i.video).trim(),
         videoSm: String(i.video_sm || '').trim() || String(i.video).trim(), // лёгкая копия 540 px для карточек
+        poster: String(i.poster || '').trim(), // первый кадр, JPEG 640 px
         category: String(i.category || '').trim(),
         pin: i.pin === true || Number(i.pin) === 1,
         views: Math.max(0, Number(i.views) || 0),
@@ -297,8 +300,9 @@
       <article class="card" data-index="${index}" data-id="${item.id}" style="animation-delay:${Math.min(index % PAGE_SIZE, 8) * 40}ms">
         ${badges ? `<div class="badges">${badges}</div>` : ''}
         ${pickBtnHTML(item)}
-        <button class="card__media media" type="button" aria-label="${code} — videoya bax">
-          <video muted playsinline loop preload="none" data-src="${esc(item.videoSm)}"></video>
+        <button class="card__media media${item.poster ? ' has-poster' : ''}" type="button" aria-label="${code} — videoya bax">
+          ${item.poster ? `<img class="card__poster" src="${esc(item.poster)}" alt="" width="640" height="640" loading="lazy" decoding="async">` : ''}
+          <video muted playsinline loop preload="none" data-src="${esc(item.videoSm)}"${item.poster ? ' data-poster' : ''}></video>
           <span class="card__view" aria-hidden="true">${ICON.play}Bax</span>
         </button>
         <div class="card__body">
@@ -331,7 +335,8 @@
 
   // Видео: загружаем, когда карточка рядом с экраном; играем, только когда она видна;
   // выгружаем, когда она ушла далеко — иначе при долгой прокрутке в памяти копятся
-  // сотни буферов и телефон перезагружает вкладку.
+  // сотни буферов и телефон перезагружает вкладку. У карточки с постером картинка
+  // видна сразу, поэтому её видео качаем, только когда карточка уже на экране.
   const mediaOf = (v) => v.closest('.media') || v.parentElement;
 
   // Пока страницу быстро листают, карточки пролетают мимо — их видео не качаем.
@@ -347,15 +352,18 @@
     if (flinging()) { pending.set(v, setTimeout(() => startLoad(v), RECHECK)); return; }
     v.preload = 'auto';
     v.src = v.dataset.src;
-    loader.unobserve(v);
+    loaderFor(v).unobserve(v);
   }
-  const loader = new IntersectionObserver((entries) => {
+  function onLoaderEntries(entries) {
     for (const { isIntersecting, target: v } of entries) {
       if (v.src) continue;
       if (!isIntersecting) { clearTimeout(pending.get(v)); pending.delete(v); continue; }
       if (!pending.has(v)) startLoad(v);
     }
-  }, { rootMargin: '400px 0px' });
+  }
+  const loader = new IntersectionObserver(onLoaderEntries, { rootMargin: '400px 0px' });
+  const loaderOnScreen = new IntersectionObserver(onLoaderEntries, { rootMargin: '0px' });
+  const loaderFor = (v) => ('poster' in v.dataset ? loaderOnScreen : loader);
 
   const player = new IntersectionObserver((entries) => {
     for (const { isIntersecting, target: v } of entries) {
@@ -373,7 +381,7 @@
       v.preload = 'none';
       v.load(); // освобождает буфер и декодер
       mediaOf(v).classList.remove('is-ready');
-      loader.observe(v); // загрузится снова, когда карточка вернётся
+      loaderFor(v).observe(v); // загрузится снова, когда карточка вернётся
     }
   }, { rootMargin: '250% 0px' });
 
@@ -383,14 +391,14 @@
     v.addEventListener('loadeddata', ready);
     v.addEventListener('playing', ready);
     v.addEventListener('error', ready);
-    loader.observe(v);
+    loaderFor(v).observe(v);
     player.observe(v);
     unloader.observe(v);
   }
 
   function unwireVideo(v) {
     clearTimeout(pending.get(v)); pending.delete(v);
-    loader.unobserve(v); player.unobserve(v); unloader.unobserve(v);
+    loaderFor(v).unobserve(v); player.unobserve(v); unloader.unobserve(v);
     v.removeAttribute('src'); v.load();
   }
 
@@ -577,6 +585,9 @@
     const v = el.lbVideo;
     const mine = () => token === lbToken;
     setLoading(true);
+    // Постер виден сразу, пока не пошло видео
+    if (item.poster) { v.poster = item.poster; lbLow.poster = item.poster; }
+    else { v.removeAttribute('poster'); lbLow.removeAttribute('poster'); }
     v.src = item.video;
     v.play().catch(() => {});
 
@@ -728,6 +739,7 @@
     setLoading(false);
     el.lbVideo.pause();
     el.lbVideo.removeAttribute('src');
+    el.lbVideo.removeAttribute('poster');
     el.lbVideo.load();
     document.body.classList.remove('no-scroll');
     state.lbIndex = -1;

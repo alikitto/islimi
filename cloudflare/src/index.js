@@ -20,7 +20,7 @@
 //   POST   /api/items/delete    — массово удалить: {ids}             (сессия)
 //   POST   /upload              — загрузить видео и добавить товар    (сессия)
 //                                  поля: file (1080 px), file_sm (540 px для карточек, необязательно),
-//                                  code, category, pin
+//                                  file_poster (JPEG 640 px, первый кадр, необязательно), code, category, pin
 //
 // Сессия передаётся заголовком "Authorization: Bearer <token>".
 // Пароль — секрет UPLOAD_KEY. Его смена завершает все сессии.
@@ -35,8 +35,10 @@ const PUBLIC_BASE = 'https://video.islimi.az';
 const MAX_BYTES = 50 * 1024 * 1024; // после сжатия файл ~2–3 МБ
 const CATEGORIES = ['Üzüklər', 'Sırgalar', 'Qolbaqlar', 'Boyunbağılar'];
 const MEMORY_TTL_MS = 15_000; // кэш снимка каталога в памяти изолята
-const COLUMNS = 'id, code, video, video_sm, category, pin, created_at';
+const COLUMNS = 'id, code, video, video_sm, poster, category, pin, created_at';
 const VIDEO_META = { contentType: 'video/mp4', cacheControl: 'public, max-age=31536000, immutable' };
+const POSTER_META = { contentType: 'image/jpeg', cacheControl: 'public, max-age=31536000, immutable' };
+const MAX_POSTER_BYTES = 2 * 1024 * 1024;
 
 const SESSION_DAYS = 30;
 const TOUCH_EVERY_MS = 60 * 60 * 1000; // продлевать сессию не чаще раза в час
@@ -222,6 +224,11 @@ function validateItem(input, partial = false) {
     out.video_sm = String(input.video_sm || '').trim() || null;
     if (out.video_sm && !/^https:\/\/\S+$/.test(out.video_sm)) throw new HttpError(400, 'Kiçik video linki yanlışdır');
   }
+  // Постер (первый кадр). Пусто → карточка без картинки, пока грузится видео.
+  if (input.poster !== undefined) {
+    out.poster = String(input.poster || '').trim() || null;
+    if (out.poster && !/^https:\/\/\S+$/.test(out.poster)) throw new HttpError(400, 'Şəkil linki yanlışdır');
+  }
   if (!partial || input.category !== undefined) {
     out.category = String(input.category || '').trim();
     if (!CATEGORIES.includes(out.category)) throw new HttpError(400, 'Kateqoriya yanlışdır');
@@ -287,10 +294,69 @@ function toTsv(jsonText) {
 
 async function insertItem(env, item) {
   const row = await env.DB.prepare(
-    `INSERT INTO items (code, video, video_sm, category, pin) VALUES (?1, ?2, ?3, ?4, ?5) RETURNING ${COLUMNS}`
-  ).bind(item.code, item.video, item.video_sm ?? null, item.category, item.pin).first();
+    `INSERT INTO items (code, video, video_sm, poster, category, pin) VALUES (?1, ?2, ?3, ?4, ?5, ?6) RETURNING ${COLUMNS}`
+  ).bind(item.code, item.video, item.video_sm ?? null, item.poster ?? null, item.category, item.pin).first();
   await rebuildSnapshot(env);
   return row;
+}
+
+// ---------- Временные служебные адреса ----------
+// Работают, только пока задан секрет MAINT_KEY (заголовок X-Maint-Key); без него — 404.
+// После работ: удалить этот блок и секрет (wrangler secret delete MAINT_KEY).
+//   PUT  /api/maint/file?id=N&kind=poster|sm — тело запроса: JPEG постер или MP4 лёгкая копия
+//   POST /api/maint/rebuild                   — пересобрать снимок каталога
+//   POST /api/maint/video-meta?cursor=…       — исправить тип и кэш у старых видео (порция из 20 объектов)
+
+const MAINT_KINDS = {
+  poster: { suffix: '-poster.jpg', meta: POSTER_META, column: 'poster', max: MAX_POSTER_BYTES },
+  sm: { suffix: '-sm.mp4', meta: VIDEO_META, column: 'video_sm', max: MAX_BYTES },
+};
+
+async function handleMaint(request, env, path, url) {
+  if (!env.MAINT_KEY || !safeEqual(request.headers.get('X-Maint-Key') || '', env.MAINT_KEY)) {
+    throw new HttpError(404, 'Not found');
+  }
+  const method = request.method;
+
+  if (method === 'PUT' && path === '/api/maint/file') {
+    const id = Number(url.searchParams.get('id'));
+    const spec = MAINT_KINDS[url.searchParams.get('kind')];
+    if (!spec || !Number.isInteger(id) || id <= 0) throw new HttpError(400, 'id / kind');
+    const row = await env.DB.prepare('SELECT video FROM items WHERE id = ?1').bind(id).first();
+    if (!row) throw new HttpError(404, 'Məhsul tapılmadı');
+    if (!row.video.startsWith(PUBLIC_BASE + '/')) throw new HttpError(400, 'Video R2-də deyil');
+    const body = await request.arrayBuffer();
+    if (!body.byteLength || body.byteLength > spec.max) throw new HttpError(413, 'Fayl ölçüsü yanlışdır');
+    const name = row.video.slice(PUBLIC_BASE.length + 1).replace(/\.mp4$/i, '') + spec.suffix;
+    await env.R2_BUCKET.put(name, body, { httpMetadata: spec.meta });
+    const publicUrl = `${PUBLIC_BASE}/${name}`;
+    await env.DB.prepare(`UPDATE items SET ${spec.column} = ?1 WHERE id = ?2`).bind(publicUrl, id).run();
+    return json(request, { success: true, id, url: publicUrl });
+  }
+
+  if (method === 'POST' && path === '/api/maint/rebuild') {
+    await rebuildSnapshot(env);
+    return json(request, { success: true });
+  }
+
+  if (method === 'POST' && path === '/api/maint/video-meta') {
+    const list = await env.R2_BUCKET.list({
+      cursor: url.searchParams.get('cursor') || undefined, limit: 20, include: ['httpMetadata', 'customMetadata'],
+    });
+    const fixed = [];
+    for (const obj of list.objects) { // по одному: в памяти не больше одного файла
+      if (!/\.mp4$/i.test(obj.key)) continue;
+      const m = obj.httpMetadata || {};
+      if (m.contentType === VIDEO_META.contentType && m.cacheControl === VIDEO_META.cacheControl) continue;
+      const full = await env.R2_BUCKET.get(obj.key);
+      if (!full) continue;
+      await env.R2_BUCKET.put(obj.key, await full.arrayBuffer(), { httpMetadata: VIDEO_META, customMetadata: obj.customMetadata });
+      fixed.push(obj.key);
+    }
+    return json(request, { success: true, scanned: list.objects.length, fixed, cursor: list.truncated ? list.cursor : null });
+  }
+
+  throw new HttpError(404, 'Not found');
 }
 
 // ---------- Handlers ----------
@@ -307,6 +373,10 @@ async function handleUpload(request, env) {
     if (f.size > MAX_BYTES) throw new HttpError(413, 'Fayl çox böyükdür');
     if (f.type && !f.type.startsWith('video/')) throw new HttpError(415, 'Yalnız video fayllar');
   }
+  // Постер необязателен: неподходящий файл просто пропускаем, товар всё равно добавляется
+  const poster = formData.get('file_poster');
+  const hasPoster = poster && typeof poster !== 'string' && poster.size > 0 && poster.size <= MAX_POSTER_BYTES
+    && (!poster.type || poster.type === 'image/jpeg');
 
   // Сначала проверяем товар, чтобы не загружать видео впустую
   const item = validateItem({
@@ -315,18 +385,23 @@ async function handleUpload(request, env) {
 
   const filename = `${Date.now()}-${safeFileName(file.name)}`;
   const smallName = filename.replace(/\.mp4$/, '-sm.mp4');
+  const posterName = filename.replace(/\.mp4$/, '-poster.jpg');
   await Promise.all([
     env.R2_BUCKET.put(filename, file, { httpMetadata: VIDEO_META }),
     hasSmall && env.R2_BUCKET.put(smallName, small, { httpMetadata: VIDEO_META }),
+    hasPoster && env.R2_BUCKET.put(posterName, poster, { httpMetadata: POSTER_META }),
   ]);
   const url = `${PUBLIC_BASE}/${filename}`;
   const video_sm = hasSmall ? `${PUBLIC_BASE}/${smallName}` : null;
-  const saved = await insertItem(env, { ...item, video: url, video_sm });
+  const posterUrl = hasPoster ? `${PUBLIC_BASE}/${posterName}` : null;
+  const saved = await insertItem(env, { ...item, video: url, video_sm, poster: posterUrl });
   return json(request, { success: true, url, item: saved });
 }
 
-async function handleApi(request, env, path) {
+async function handleApi(request, env, path, url) {
   const method = request.method;
+
+  if (path.startsWith('/api/maint/')) return handleMaint(request, env, path, url);
 
   // --- публичное ---
   if (method === 'GET' && (path === '/api/items' || path === '/api/items.tsv')) {
@@ -397,6 +472,7 @@ async function handleApi(request, env, path) {
       delete patch.code; // код у каждого товара свой
       delete patch.video;
       delete patch.video_sm;
+      delete patch.poster;
       const fields = Object.keys(patch);
       if (!fields.length) throw new HttpError(400, 'Dəyişiklik yoxdur');
       sql = `UPDATE items SET ${fields.map((f, i) => `${f} = ?${i + 1}`).join(', ')} WHERE id IN `;
@@ -426,8 +502,9 @@ async function handleApi(request, env, path) {
 
     if (method === 'PATCH') {
       const patch = validateItem(await request.json().catch(() => ({})), true);
-      // Новое основное видео — старая лёгкая копия к нему уже не подходит
+      // Новое основное видео — старые лёгкая копия и постер к нему уже не подходят
       if (patch.video !== undefined && patch.video_sm === undefined) patch.video_sm = null;
+      if (patch.video !== undefined && patch.poster === undefined) patch.poster = null;
       const fields = Object.keys(patch);
       if (!fields.length) throw new HttpError(400, 'Dəyişiklik yoxdur');
       const sets = fields.map((f, i) => `${f} = ?${i + 1}`).join(', ');
@@ -452,14 +529,15 @@ async function handleApi(request, env, path) {
 
 export default {
   async fetch(request, env) {
-    const path = new URL(request.url).pathname.replace(/\/+$/, '') || '/';
+    const url = new URL(request.url);
+    const path = url.pathname.replace(/\/+$/, '') || '/';
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
     }
 
     try {
-      if (path.startsWith('/api/')) return await handleApi(request, env, path);
+      if (path.startsWith('/api/')) return await handleApi(request, env, path, url);
       if (request.method === 'POST' && path === '/upload') return await handleUpload(request, env);
       return new Response('Method not allowed', { status: 405, headers: corsHeaders(request) });
     } catch (err) {

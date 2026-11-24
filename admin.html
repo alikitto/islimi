@@ -290,7 +290,7 @@
     .tbl .code { font-weight: 600; font-variant-numeric: tabular-nums; }
     .tbl .id { color: var(--muted); font-size: 12px; font-weight: 500; margin-left: 8px; }
     .thumb { position: relative; width: 52px; height: 52px; border-radius: 10px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); display: block; flex: none; }
-    .thumb video { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .thumb video, .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
 
     /* мобильный список */
     .m-list { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
@@ -310,7 +310,7 @@
     .p-card { display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; transition: box-shadow .2s; }
     .p-card:hover { box-shadow: var(--shadow); }
     .p-media { position: relative; aspect-ratio: 1; background: var(--surface-2); }
-    .p-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .p-media video, .p-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .p-media .badge-pin { position: absolute; top: 8px; left: 8px; }
     .p-body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 5px; }
     .p-code { font-weight: 600; font-size: 14.5px; }
@@ -798,7 +798,7 @@
   <script type="module">
     import {
       Input, Output, Conversion, BlobSource, BufferTarget, Mp4OutputFormat,
-      ALL_FORMATS, Quality, canEncodeVideo,
+      ALL_FORMATS, Quality, canEncodeVideo, CanvasSink,
     } from 'https://cdn.jsdelivr.net/npm/mediabunny@1.65.2/dist/bundles/mediabunny.min.mjs';
 
     // ===== Настройки =====
@@ -809,6 +809,8 @@
     const BITRATE = 1_200_000;
     const SMALL_SIZE = 540;        // лёгкая копия для карточек каталога
     const SMALL_BITRATE = 350_000;
+    const POSTER_SIZE = 640;       // постер карточки: первый кадр, JPEG
+    const POSTER_QUALITY = 0.82;
     const FRAME_RATE = 30;
     const MOBILE_PAGE = 30;
     const TOKEN_KEY = 'islimi-session';
@@ -1045,7 +1047,9 @@
       }
     }, { rootMargin: '300px' });
     const thumbSrc = (it) => it.video_sm || it.video;
-    const thumb = (it) => seenThumbs.has(thumbSrc(it))
+    const thumb = (it) => it.poster
+      ? `<img src="${esc(it.poster)}" alt="" loading="lazy" decoding="async">`
+      : seenThumbs.has(thumbSrc(it))
       ? `<video muted playsinline preload="metadata" src="${esc(thumbSrc(it))}#t=0.5"></video>`
       : `<video muted playsinline preload="metadata" data-src="${esc(thumbSrc(it))}"></video>`;
     const viewsCell = (it) => `<span class="views" title="${it.views || 0} baxış">${icon('eye')}${it.views || 0}</span>`;
@@ -1619,16 +1623,55 @@
         return new Blob([output.target.buffer], { type: 'video/mp4' });
       } finally { input.dispose?.(); }
     }
+    // Постер: первый кадр готового 1080-видео → JPEG 640×640. Тот же кадр, с которого
+    // начинается ролик, поэтому на сайте смена картинки на видео незаметна.
+    const canvasToJpeg = (c) => (c.convertToBlob
+      ? c.convertToBlob({ type: 'image/jpeg', quality: POSTER_QUALITY })
+      : new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('JPEG alınmadı'))), 'image/jpeg', POSTER_QUALITY)));
+    async function makePoster(source) {
+      try {
+        const input = new Input({ source: new BlobSource(source), formats: ALL_FORMATS });
+        try {
+          const track = await input.getPrimaryVideoTrack();
+          if (!track) throw new Error('Video yoxdur');
+          const sink = new CanvasSink(track, { width: POSTER_SIZE, height: POSTER_SIZE, fit: 'cover' });
+          const frame = await sink.getCanvas(await track.getFirstTimestamp());
+          if (!frame) throw new Error('Kadr alınmadı');
+          return await canvasToJpeg(frame.canvas);
+        } finally { input.dispose?.(); }
+      } catch (err) {
+        console.warn('CanvasSink:', err);
+        return posterViaVideo(source); // запасной путь — через <video>
+      }
+    }
+    function posterViaVideo(source) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(source);
+        const v = document.createElement('video');
+        const done = (fn, arg) => { URL.revokeObjectURL(url); v.removeAttribute('src'); v.load(); fn(arg); };
+        v.muted = true; v.playsInline = true; v.preload = 'auto';
+        v.onerror = () => done(reject, new Error('Şəkil hazırlana bilmədi'));
+        v.onloadeddata = () => {
+          const c = document.createElement('canvas');
+          c.width = c.height = POSTER_SIZE;
+          const side = Math.min(v.videoWidth, v.videoHeight);
+          c.getContext('2d').drawImage(v, (v.videoWidth - side) / 2, (v.videoHeight - side) / 2, side, side, 0, 0, POSTER_SIZE, POSTER_SIZE);
+          canvasToJpeg(c).then((b) => done(resolve, b), (e) => done(reject, e));
+        };
+        v.src = url;
+      });
+    }
     function fileNameFor(code) {
       const base = code.trim().toUpperCase().replace(/[^A-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'video';
       const d = new Date(), p = (n) => String(n).padStart(2, '0');
       return `${base}_${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}-${p(d.getMinutes())}-${p(d.getSeconds())}.mp4`;
     }
-    function uploadBlob(blob, small, filename, onProgress) {
+    function uploadBlob(blob, small, poster, filename, onProgress) {
       return new Promise((resolve, reject) => {
         const form = new FormData();
         form.append('file', blob, filename);
         if (small) form.append('file_sm', small, filename.replace(/\.mp4$/, '-sm.mp4'));
+        if (poster) form.append('file_poster', poster, filename.replace(/\.mp4$/, '-poster.jpg'));
         form.append('code', $('code').value.trim());
         form.append('category', tileValue($('catTiles')));
         if ($('pin').checked) form.append('pin', '1');
@@ -1677,7 +1720,9 @@
         const blob = await compress((p) => setProgress('compress', p));
         // Копия для карточек не обязательна: если не вышла, сайт покажет основное видео
         const small = await compressSmall(blob, (p) => setProgress('small', p)).catch((err) => { console.warn(err); return null; });
-        const data = await uploadBlob(blob, small, fileNameFor($('code').value), (p) => setProgress('upload', p));
+        // Постер тоже не обязателен: без него карточка просто ждёт видео, как раньше
+        const poster = await makePoster(blob).catch((err) => { console.warn(err); return null; });
+        const data = await uploadBlob(blob, small, poster, fileNameFor($('code').value), (p) => setProgress('upload', p));
         showSuccess(blob, data);
       } catch (err) {
         $('upError').textContent = err.message;

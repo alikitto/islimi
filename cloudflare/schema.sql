@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS items (
   code       TEXT    NOT NULL,
   video      TEXT    NOT NULL,
   video_sm   TEXT,             -- лёгкая копия 540 px для карточек; NULL → берётся video
+  poster     TEXT,             -- JPEG 640×640, первый кадр видео (карточки, превью ссылок); NULL → нет
   category   TEXT    NOT NULL,
   pin        INTEGER NOT NULL DEFAULT 0,
   views      INTEGER NOT NULL DEFAULT 0, -- просмотры на сайте, см. view_log
