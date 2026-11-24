@@ -306,65 +306,6 @@ async function insertItem(env, item) {
   return row;
 }
 
-// ---------- Временные служебные адреса ----------
-// Работают, только пока задан секрет MAINT_KEY (заголовок X-Maint-Key); без него — 404.
-// После работ: удалить этот блок и секрет (wrangler secret delete MAINT_KEY).
-//   PUT  /api/maint/file?id=N&kind=poster|sm — тело запроса: JPEG постер или MP4 лёгкая копия
-//   POST /api/maint/rebuild                   — пересобрать снимок каталога
-//   POST /api/maint/video-meta?cursor=…       — исправить тип и кэш у старых видео (порция из 20 объектов)
-
-const MAINT_KINDS = {
-  poster: { suffix: '-poster.jpg', meta: POSTER_META, column: 'poster', max: MAX_POSTER_BYTES },
-  sm: { suffix: '-sm.mp4', meta: VIDEO_META, column: 'video_sm', max: MAX_BYTES },
-};
-
-async function handleMaint(request, env, path, url) {
-  if (!env.MAINT_KEY || !safeEqual(request.headers.get('X-Maint-Key') || '', env.MAINT_KEY)) {
-    throw new HttpError(404, 'Not found');
-  }
-  const method = request.method;
-
-  if (method === 'PUT' && path === '/api/maint/file') {
-    const id = Number(url.searchParams.get('id'));
-    const spec = MAINT_KINDS[url.searchParams.get('kind')];
-    if (!spec || !Number.isInteger(id) || id <= 0) throw new HttpError(400, 'id / kind');
-    const row = await env.DB.prepare('SELECT video FROM items WHERE id = ?1').bind(id).first();
-    if (!row) throw new HttpError(404, 'Məhsul tapılmadı');
-    if (!row.video.startsWith(PUBLIC_BASE + '/')) throw new HttpError(400, 'Video R2-də deyil');
-    const body = await request.arrayBuffer();
-    if (!body.byteLength || body.byteLength > spec.max) throw new HttpError(413, 'Fayl ölçüsü yanlışdır');
-    const name = row.video.slice(PUBLIC_BASE.length + 1).replace(/\.mp4$/i, '') + spec.suffix;
-    await env.R2_BUCKET.put(name, body, { httpMetadata: spec.meta });
-    const publicUrl = `${PUBLIC_BASE}/${name}`;
-    await env.DB.prepare(`UPDATE items SET ${spec.column} = ?1 WHERE id = ?2`).bind(publicUrl, id).run();
-    return json(request, { success: true, id, url: publicUrl });
-  }
-
-  if (method === 'POST' && path === '/api/maint/rebuild') {
-    await rebuildSnapshot(env);
-    return json(request, { success: true });
-  }
-
-  if (method === 'POST' && path === '/api/maint/video-meta') {
-    const list = await env.R2_BUCKET.list({
-      cursor: url.searchParams.get('cursor') || undefined, limit: 20, include: ['httpMetadata', 'customMetadata'],
-    });
-    const fixed = [];
-    for (const obj of list.objects) { // по одному: в памяти не больше одного файла
-      if (!/\.mp4$/i.test(obj.key)) continue;
-      const m = obj.httpMetadata || {};
-      if (m.contentType === VIDEO_META.contentType && m.cacheControl === VIDEO_META.cacheControl) continue;
-      const full = await env.R2_BUCKET.get(obj.key);
-      if (!full) continue;
-      await env.R2_BUCKET.put(obj.key, await full.arrayBuffer(), { httpMetadata: VIDEO_META, customMetadata: obj.customMetadata });
-      fixed.push(obj.key);
-    }
-    return json(request, { success: true, scanned: list.objects.length, fixed, cursor: list.truncated ? list.cursor : null });
-  }
-
-  throw new HttpError(404, 'Not found');
-}
-
 // ---------- Handlers ----------
 
 async function handleUpload(request, env) {
@@ -406,8 +347,6 @@ async function handleUpload(request, env) {
 
 async function handleApi(request, env, path, url) {
   const method = request.method;
-
-  if (path.startsWith('/api/maint/')) return handleMaint(request, env, path, url);
 
   // --- публичное ---
   if (method === 'GET' && (path === '/api/items' || path === '/api/items.tsv')) {
