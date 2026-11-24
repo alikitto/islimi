@@ -1,5 +1,6 @@
 // Islimi — каталог. Общий скрипт для всех страниц каталога.
 // Данные: Worker upload-to-r2 → /api/items (D1). Категория страницы берётся из адреса.
+// На catalog.islimi.az API на том же домене (маршрут Worker /api/*), в других местах — workers.dev.
 (() => {
   'use strict';
 
@@ -7,7 +8,7 @@
   const LOCAL_API = new URLSearchParams(location.search).get('localapi');
   const API_BASE = LOCAL_API !== null
     ? `http://localhost:${/^\d+$/.test(LOCAL_API) ? LOCAL_API : 8787}`
-    : 'https://upload-to-r2.ramizagayev122.workers.dev';
+    : location.hostname === 'catalog.islimi.az' ? '' : 'https://upload-to-r2.ramizagayev122.workers.dev';
   const API_URL = API_BASE + '/api/items';
   const WA_NUMBER = '994702920323';
   const SITE_URL = 'https://catalog.islimi.az';
@@ -96,7 +97,8 @@
   const fmtDate = (d) => (d && !isNaN(d) ? `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}` : '');
 
   const waLink = (code) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Salam! Kod ${code}`)}`;
-  const itemUrl = (item) => `${SITE_URL}/${slugOf(item.category)}#${encodeURIComponent(item.code)}`;
+  // Ссылка «Paylaş»: страница товара с его фото в превью (см. handleProductPage в Worker)
+  const itemUrl = (item) => `${SITE_URL}/p/${encodeURIComponent(item.code)}`;
   const slugOf = (category) => (CATS.find((c) => c.name === category) || CATS[0]).slug;
 
   const plural = (n) => `${n} məhsul`;
@@ -1151,6 +1153,15 @@
         <p>İnternet bağlantısını yoxlayıb yenidən cəhd edin.</p>
         <button class="btn btn--ghost" type="button" data-retry>Yenidən yüklə</button>`;
     }
+  }
+
+  // /p/<код> — страница товара от Worker (data-item-* на <html>). Дальше — как /<раздел>#<код>.
+  const productPath = location.pathname.match(/^\/p\/([^/]+)\/?$/);
+  if (productPath) {
+    const root = document.documentElement.dataset;
+    let code = root.itemCode;
+    if (!code) { try { code = decodeURIComponent(productPath[1]); } catch { code = productPath[1]; } }
+    history.replaceState(null, '', `/${root.itemCat || ''}${location.search}#${encodeURIComponent(code)}`);
   }
 
   setCategory(catFromPath(location.pathname));

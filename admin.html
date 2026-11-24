@@ -802,7 +802,10 @@
     } from 'https://cdn.jsdelivr.net/npm/mediabunny@1.65.2/dist/bundles/mediabunny.min.mjs';
 
     // ===== Настройки =====
-    const API = location.hostname === 'localhost' ? 'http://localhost:8787' : 'https://upload-to-r2.ramizagayev122.workers.dev';
+    // API: на catalog.islimi.az — тот же домен (маршрут Worker /api/*); локально — wrangler dev (?localapi=<порт>)
+    const API = location.hostname === 'localhost'
+      ? `http://localhost:${new URLSearchParams(location.search).get('localapi') || 8787}`
+      : location.hostname === 'catalog.islimi.az' ? '' : 'https://upload-to-r2.ramizagayev122.workers.dev';
     const CATEGORIES = ['Üzüklər', 'Sırgalar', 'Qolbaqlar', 'Boyunbağılar'];
     const CAT_COLORS = { 'Üzüklər': '#D4AF37', 'Sırgalar': '#C2410C', 'Qolbaqlar': '#0F766E', 'Boyunbağılar': '#6D28D9' };
     const OUTPUT_SIZE = 1080;
@@ -1676,7 +1679,7 @@
         form.append('category', tileValue($('catTiles')));
         if ($('pin').checked) form.append('pin', '1');
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', API + '/upload');
+        xhr.open('POST', API + '/api/upload');
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
         xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
         xhr.onload = () => {

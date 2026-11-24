@@ -18,10 +18,14 @@
 //   DELETE /api/items/:id       — удалить товар (видео в R2 остаётся) (сессия)
 //   PATCH  /api/items           — массово: {ids, patch:{category?, pin?}} (сессия)
 //   POST   /api/items/delete    — массово удалить: {ids}             (сессия)
-//   POST   /upload              — загрузить видео и добавить товар    (сессия)
+//   POST   /api/upload          — загрузить видео и добавить товар    (сессия); старый адрес /upload тоже работает
 //                                  поля: file (1080 px), file_sm (540 px для карточек, необязательно),
 //                                  file_poster (JPEG 640 px, первый кадр, необязательно), code, category, pin
 //
+//   GET    /p/<код>             — страница товара: сайт + превью ссылки (og:image = постер)
+//
+// На catalog.islimi.az Worker отвечает по маршрутам /api/* и /p/* (остальное — Cloudflare Pages);
+// адрес upload-to-r2.…workers.dev тоже работает.
 // Сессия передаётся заголовком "Authorization: Bearer <token>".
 // Пароль — секрет UPLOAD_KEY. Его смена завершает все сессии.
 
@@ -32,6 +36,8 @@ const ALLOWED_ORIGINS = [
 ];
 
 const PUBLIC_BASE = 'https://video.islimi.az';
+const SITE = 'https://catalog.islimi.az';
+const CAT_SLUGS = { 'Üzüklər': 'uzukler', 'Sırgalar': 'sirqalar', 'Qolbaqlar': 'qolbaqlar', 'Boyunbağılar': 'boyunbagilar' };
 const MAX_BYTES = 50 * 1024 * 1024; // после сжатия файл ~2–3 МБ
 const CATEGORIES = ['Üzüklər', 'Sırgalar', 'Qolbaqlar', 'Boyunbağılar'];
 const MEMORY_TTL_MS = 15_000; // кэш снимка каталога в памяти изолята
@@ -425,6 +431,8 @@ async function handleApi(request, env, path, url) {
     return new Response(null, { status: 204, headers: corsHeaders(request) });
   }
 
+  if (method === 'POST' && path === '/api/upload') return handleUpload(request, env); // сессию проверяет сам
+
   if (method === 'POST' && path === '/api/login') {
     const { token, session } = await login(request, env);
     return json(request, { success: true, token, session: { ...session, current: true } });
@@ -527,6 +535,56 @@ async function handleApi(request, env, path, url) {
   throw new HttpError(404, 'Not found');
 }
 
+// ---------- Страница товара /p/<код> ----------
+// Берём страницу раздела с сайта и подставляем заголовок, описание и картинку товара —
+// так ссылка в WhatsApp/Telegram показывает фото модели. Скрипт сайта по data-item-*
+// открывает окно товара (адрес в браузере станет /<раздел>#<код>).
+
+async function handleProductPage(request, env, path) {
+  const code = normalizeCode(decodeURIComponent(path.slice(3)));
+  const items = code ? JSON.parse((await getSnapshot(env)).json).items : [];
+  let item = null;
+  for (const it of items) if (it.code === code) item = it; // при одинаковых кодах — самый новый
+
+  if (!item) {
+    const nf = await fetch(`${SITE}/404.html`);
+    return new Response(nf.body, { status: 404, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+  }
+
+  const slug = CAT_SLUGS[item.category] || '';
+  const page = await fetch(`${SITE}/${slug}`);
+  if (!page.ok) return new Response('Səhifə yüklənmədi', { status: 502 });
+
+  const CODE = item.code.toUpperCase();
+  const url = `${SITE}/p/${encodeURIComponent(item.code)}`;
+  const title = `${CODE} — ${item.category} | Islimi Jewelry`;
+  const description = `Model ${CODE} · ${item.category} — Islimi Jewelry topdan kataloqu. Kodu WhatsApp-a göndərin, qiymət və mövcudluq barədə məlumat verək.`;
+  const attr = (name, value) => ({ element: (el) => el.setAttribute(name, value) });
+
+  let rw = new HTMLRewriter()
+    .on('html', { element: (el) => { el.setAttribute('data-item-code', item.code); el.setAttribute('data-item-cat', slug); } })
+    .on('title', { element: (el) => el.setInnerContent(title) })
+    .on('meta[name="description"]', attr('content', description))
+    .on('meta[property="og:title"]', attr('content', title))
+    .on('meta[property="og:description"]', attr('content', description))
+    .on('meta[property="og:url"]', attr('content', url))
+    .on('link[rel="canonical"]', attr('href', url));
+  if (item.poster) {
+    rw = rw
+      .on('meta[property="og:image"]', attr('content', item.poster))
+      .on('meta[property="og:image:width"]', attr('content', '640'))
+      .on('meta[property="og:image:height"]', attr('content', '640'))
+      .on('meta[name="twitter:card"]', attr('content', 'summary'));
+  }
+
+  const res = rw.transform(page);
+  const out = new Response(res.body, res);
+  out.headers.set('Content-Type', 'text/html; charset=utf-8');
+  out.headers.set('Cache-Control', 'public, max-age=300');
+  out.headers.delete('ETag');
+  return out;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -539,6 +597,9 @@ export default {
     try {
       if (path.startsWith('/api/')) return await handleApi(request, env, path, url);
       if (request.method === 'POST' && path === '/upload') return await handleUpload(request, env);
+      if ((request.method === 'GET' || request.method === 'HEAD') && /^\/p\/[^/]+$/.test(path)) {
+        return await handleProductPage(request, env, path);
+      }
       return new Response('Method not allowed', { status: 405, headers: corsHeaders(request) });
     } catch (err) {
       if (err instanceof HttpError) return fail(request, err.status, err.message);

@@ -9,6 +9,11 @@
   "main": "src/index.js",
   "compatibility_date": "2026-11-01",
   "workers_dev": true,
+  // На домене сайта Worker отвечает только за API и страницы товаров; остальное — Cloudflare Pages
+  "routes": [
+    { "pattern": "catalog.islimi.az/api/*", "zone_name": "islimi.az" },
+    { "pattern": "catalog.islimi.az/p/*", "zone_name": "islimi.az" }
+  ],
   "observability": { "enabled": true },
   "r2_buckets": [
     { "binding": "R2_BUCKET", "bucket_name": "islimi" }
