@@ -558,6 +558,27 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .badge--pin .diamond { background: var(--gold-2); }
 
 .card { cursor: pointer; }
+
+/* Отметка «в список» в углу карточки */
+.card__pick {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%;
+  background: rgba(255, 255, 255, .92); color: var(--ink);
+  box-shadow: 0 0 0 1px var(--line-2), 0 6px 14px -8px rgba(25, 23, 20, .4);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  transition: background-color .2s, color .2s, box-shadow .2s, transform .45s var(--ease);
+}
+.card__pick::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; } /* зона нажатия 48 px */
+.card__pick .icon { width: 18px; height: 18px; }
+.card__pick[aria-pressed="true"] { background: var(--gold-grad); color: var(--esp-2); box-shadow: 0 0 0 1px rgba(169, 130, 74, .5), 0 6px 14px -6px rgba(169, 130, 74, .7); }
+.card__pick:active { transform: scale(.9); }
+@media (hover: hover) {
+  .card:hover .card__pick { transform: translateY(-4px); }
+  .card__pick[aria-pressed="false"]:hover { background: var(--ink); color: #fff; }
+}
+.pick-icon--on { display: none; }
+[aria-pressed="true"] > .pick-icon--add { display: none; }
+[aria-pressed="true"] > .pick-icon--on { display: block; }
 .card__body { padding: 14px 4px 0; }
 .card__cat {
   display: flex; align-items: center; gap: 6px; margin-bottom: 5px;
@@ -833,16 +854,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .lb__actions { margin-top: auto; padding-top: 28px; display: grid; gap: 10px; }
 .lb__row .btn { padding: 0 12px; } /* «Tam ekranda bax» помещается в половину ширины на телефоне */
 /* «WhatsApp ilə sifariş et» — в стиле остальных кнопок: кофейная, золотая иконка и кольцо */
-.lb .btn--wa {
+.lb__pick[aria-pressed="true"] { background: var(--gold-soft); border-color: rgba(169, 130, 74, .45); color: var(--gold-ink); }
+.lb .btn--wa, .picks .btn--wa {
   background: radial-gradient(120% 160% at 30% 0%, #3a2f25, var(--esp-2));
   color: var(--cream-text);
   box-shadow: 0 0 0 1px rgba(216, 183, 127, .45), 0 14px 28px -16px rgba(28, 23, 19, .7);
   transition: background .3s, color .3s, transform .15s var(--ease);
 }
-.lb .btn--wa .icon { color: var(--champagne); transition: color .3s; }
+.lb .btn--wa .icon, .picks .btn--wa .icon { color: var(--champagne); transition: color .3s; }
 @media (hover: hover) {
-  .lb .btn--wa:hover { background: var(--gold-grad); color: var(--esp-2); }
-  .lb .btn--wa:hover .icon { color: var(--esp-2); }
+  .lb .btn--wa:hover, .picks .btn--wa:hover { background: var(--gold-grad); color: var(--esp-2); }
+  .lb .btn--wa:hover .icon, .picks .btn--wa:hover .icon { color: var(--esp-2); }
 }
 .lb__row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lb__hint { display: flex; gap: 10px; align-items: baseline; margin: 14px 0 0; font-size: 13px; line-height: 1.55; color: var(--muted); }
@@ -886,6 +908,106 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .lb__code { font-size: 40px; }
   .lb__actions { padding-top: 22px; }
 }
+
+/* ---------- Список отбора: плашка внизу и панель ---------- */
+
+.picks-bar {
+  position: fixed; z-index: 60;
+  left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  margin: 0 auto; max-width: 440px; height: 56px; padding: 0 8px 0 10px;
+  display: flex; align-items: center; gap: 12px; border: 0; border-radius: 999px;
+  background: radial-gradient(120% 160% at 20% 0%, #3a2f25, var(--esp-2)); color: var(--cream-text);
+  box-shadow: 0 0 0 1px rgba(216, 183, 127, .45), 0 18px 36px -14px rgba(28, 23, 19, .6);
+  text-align: left; animation: bar-in .35s var(--ease) both;
+  transition: transform .15s var(--ease);
+}
+.picks-bar:active { transform: scale(.98); }
+@keyframes bar-in { from { opacity: 0; transform: translateY(16px); } }
+.picks-bar__icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(216, 183, 127, .14); color: var(--champagne); flex: none; }
+.picks-bar__icon .icon { width: 18px; height: 18px; }
+.picks-bar__text { flex: 1; min-width: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.picks-bar__text b { font-family: var(--font-serif); font-size: 22px; font-weight: 600; color: var(--champagne); margin-right: 2px; font-variant-numeric: lining-nums; }
+.picks-bar__go {
+  display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 999px;
+  background: var(--gold-grad); color: var(--esp-2); font-size: 13px; font-weight: 600; flex: none;
+}
+.picks-bar__go .icon { width: 16px; height: 16px; }
+
+/* плавающие кнопки и тосты поднимаются над плашкой */
+.has-picks .floating { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 68px); }
+.has-picks .toast { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 72px); }
+.has-picks .footer { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+
+.picks { position: fixed; inset: 0; z-index: 210; }
+.picks__backdrop {
+  position: absolute; inset: 0; background: rgba(20, 18, 15, .55);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  animation: fade-in .25s ease both;
+}
+.picks__panel {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; max-height: min(86vh, 86dvh);
+  background: linear-gradient(180deg, #fff, #fcfaf7); border-radius: 26px 26px 0 0;
+  box-shadow: 0 -20px 60px -30px rgba(0, 0, 0, .5);
+  animation: sheet-in .36s var(--ease) both;
+}
+.picks__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 24px var(--gutter) 14px; border-bottom: 1px solid var(--line-2); }
+.picks__head .eyebrow { margin-bottom: 8px; }
+.picks__title { margin: 0; font-family: var(--font-serif); font-weight: 500; font-size: 32px; line-height: 1; }
+.picks__sub { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.picks__sub:empty { display: none; }
+.picks__close {
+  flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; display: grid; place-items: center;
+  background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line-2);
+}
+.picks__close:hover { box-shadow: 0 0 0 1px var(--ink-2); }
+
+.picks__list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; margin: 0; padding: 6px var(--gutter); }
+.picks__empty { padding: 28px 4px; color: var(--muted); text-align: center; }
+.pick { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--line-2); }
+.pick:last-child { border-bottom: 0; }
+.pick__open {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border: 0; background: none; text-align: left; border-radius: 14px;
+}
+.pick__open[disabled] { cursor: default; }
+.pick__num { width: 22px; flex: none; font-size: 12px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.pick__thumb {
+  width: 56px; height: 56px; flex: none; display: grid; place-items: center; overflow: hidden;
+  border-radius: 14px; background: linear-gradient(160deg, #fdfaf5, #efe4d3); box-shadow: inset 0 0 0 1px var(--line-2);
+}
+.pick__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.pick__text { display: flex; flex-direction: column; min-width: 0; }
+.pick__code { font-family: var(--font-serif); font-size: 22px; line-height: 1.1; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; font-variant-numeric: lining-nums; }
+.pick__cat { font-size: 10.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-ink); }
+@media (hover: hover) { .pick__open:not([disabled]):hover .pick__code { color: var(--gold-ink); } }
+.pick__remove {
+  flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; display: grid; place-items: center;
+  background: transparent; color: var(--muted); transition: background-color .2s, color .2s;
+}
+.pick__remove .icon { width: 18px; height: 18px; }
+.pick__remove:hover { background: var(--line-2); color: var(--ink); }
+
+.picks__foot { display: grid; gap: 10px; padding: 14px var(--gutter) calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line-2); }
+.picks__note { margin: 0; padding: 10px 14px; border-radius: 14px; background: var(--gold-soft); color: var(--gold-ink); font-size: 13px; line-height: 1.45; }
+.picks__send { display: grid; gap: 8px; }
+.picks__send:empty { display: none; }
+.picks__clear { height: 46px; }
+.picks__clear.is-confirm { border-color: #b4532a; color: #b4532a; }
+
+@media (min-width: 820px) {
+  .picks__panel {
+    left: auto; top: 0; width: 420px; max-height: none;
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    box-shadow: -30px 0 70px -30px rgba(0, 0, 0, .45);
+    animation: side-in .36s var(--ease) both;
+  }
+  .picks__head { padding: 30px 28px 18px; }
+  .picks__list { padding: 6px 28px; }
+  .picks__foot { padding: 18px 28px 26px; }
+}
+@keyframes side-in { from { transform: translateX(40px); opacity: 0; } }
 
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes pop-in { from { opacity: 0; transform: translateY(14px) scale(.98); } }

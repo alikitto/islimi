@@ -57,6 +57,15 @@
     lbPrev: $('#lbPrev'),
     lbNext: $('#lbNext'),
     lbCounter: $('#lbCounter'),
+    lbPick: $('#lbPick'),
+    picksBar: $('#picksBar'),
+    picksCount: $('#picksCount'),
+    picks: $('#picks'),
+    picksSub: $('#picksSub'),
+    picksList: $('#picksList'),
+    picksNote: $('#picksNote'),
+    picksSend: $('#picksSend'),
+    picksClear: $('#picksClear'),
   };
 
   const state = {
@@ -93,6 +102,9 @@
   const ICON = {
     wa: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.21 3.07.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.28-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>',
     play: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
+    add: '<svg class="icon pick-icon--add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+    on: '<svg class="icon pick-icon--on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+    close: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
     eye: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>',
   };
   const DIAMOND = '<span class="diamond" aria-hidden="true"></span>';
@@ -284,6 +296,7 @@
     return `
       <article class="card" data-index="${index}" data-id="${item.id}" style="animation-delay:${Math.min(index % PAGE_SIZE, 8) * 40}ms">
         ${badges ? `<div class="badges">${badges}</div>` : ''}
+        ${pickBtnHTML(item)}
         <button class="card__media media" type="button" aria-label="${code} — videoya bax">
           <video muted playsinline loop preload="none" data-src="${esc(item.videoSm)}"></video>
           <span class="card__view" aria-hidden="true">${ICON.play}Bax</span>
@@ -479,6 +492,8 @@
   pager.observe(el.sentinel);
 
   el.grid.addEventListener('click', (e) => {
+    const pick = e.target.closest('[data-pick]');
+    if (pick) { togglePick(pick.dataset.pick); return; }
     const card = e.target.closest('.card[data-index]');
     if (card) openLightbox(state.list, Number(card.dataset.index));
   });
@@ -689,6 +704,7 @@
     countView(item);
     showLightboxMeta(item);
     el.lbWa.href = waLink(item.code);
+    paintLbPick();
     el.lbPrev.disabled = state.lbIndex <= 0;
     el.lbNext.disabled = state.lbIndex >= state.lbList.length - 1;
     el.lbCounter.textContent = `${state.lbIndex + 1} / ${state.lbList.length}`;
@@ -778,7 +794,21 @@
     } else if (await copyText(url)) toast('Link kopyalandı');
   });
 
+  // Tab не выпускает фокус из открытого окна
+  function trapTab(root, e) {
+    const f = [...root.querySelectorAll('button:not([disabled]):not([hidden]), a[href], video[controls]')].filter((n) => n.offsetParent);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+
   document.addEventListener('keydown', (e) => {
+    if (!el.picks.hidden) {
+      if (e.key === 'Escape') closePicks();
+      else if (e.key === 'Tab') trapTab(el.picks, e);
+      return;
+    }
     if (el.lb.hidden) {
       if (e.key === '/' && document.activeElement !== el.search && !/input|textarea/i.test(document.activeElement.tagName)) {
         e.preventDefault(); el.search.focus();
@@ -788,13 +818,7 @@
     if (e.key === 'Escape') closeLightbox();
     else if (e.key === 'ArrowLeft') step(-1);
     else if (e.key === 'ArrowRight') step(1);
-    else if (e.key === 'Tab') { // фокус не уходит из окна
-      const f = [...el.lb.querySelectorAll('button:not([disabled]):not([hidden]), a[href], video[controls]')].filter((n) => n.offsetParent);
-      if (!f.length) return;
-      const first = f[0], last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
+    else if (e.key === 'Tab') trapTab(el.lb, e);
   });
 
   // свайп влево/вправо по видео в окне
@@ -808,6 +832,204 @@
     touchX = null;
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
   }, { passive: true });
+
+  // ---------- Список отбора ----------
+  // Покупатель отмечает модели и отправляет все коды одним сообщением в WhatsApp.
+  // Список хранится в браузере: массив кодов в порядке добавления.
+
+  const PICKS_KEY = 'islimi-picks';
+  const PICKS_HEAD = 'Salam! Bu modellərlə maraqlanıram:';
+  const WA_MAX = 1800; // длина текста в адресе wa.me, после которой делим на несколько сообщений
+
+  function readPicks() {
+    try {
+      const v = JSON.parse(localStorage.getItem(PICKS_KEY) || '[]');
+      return Array.isArray(v) ? [...new Set(v.filter((c) => typeof c === 'string' && c))] : [];
+    } catch { return []; }
+  }
+  let picks = readPicks();
+  const isPicked = (code) => picks.includes(code);
+
+  function savePicks() {
+    try { localStorage.setItem(PICKS_KEY, JSON.stringify(picks)); } catch { /* только до перезагрузки */ }
+    paintPicks();
+  }
+
+  function togglePick(code) {
+    const on = !isPicked(code);
+    picks = on ? [...picks, code] : picks.filter((c) => c !== code);
+    savePicks();
+    toast(on ? `Siyahıya əlavə olundu · ${picks.length}` : 'Siyahıdan çıxarıldı');
+  }
+
+  const pickLabel = (code, on) => `${code} — ${on ? 'siyahıdan çıxar' : 'siyahıya əlavə et'}`;
+  function pickBtnHTML(item) {
+    const on = isPicked(item.code);
+    return `<button class="card__pick" type="button" data-pick="${esc(item.code)}" aria-pressed="${on}" aria-label="${esc(pickLabel(item.code, on))}">${ICON.add}${ICON.on}</button>`;
+  }
+
+  function paintLbPick() {
+    const item = state.lbList[state.lbIndex];
+    if (!item) return;
+    const on = isPicked(item.code);
+    el.lbPick.setAttribute('aria-pressed', String(on));
+    el.lbPick.lastElementChild.textContent = on ? 'Siyahıdadır' : 'Siyahıya əlavə et';
+  }
+  el.lbPick.addEventListener('click', () => {
+    const item = state.lbList[state.lbIndex];
+    if (item) togglePick(item.code);
+  });
+
+  // Все места, где видно состояние списка
+  function paintPicks() {
+    el.grid.querySelectorAll('[data-pick]').forEach((b) => {
+      const on = isPicked(b.dataset.pick);
+      b.setAttribute('aria-pressed', String(on));
+      b.setAttribute('aria-label', pickLabel(b.dataset.pick, on));
+    });
+    paintLbPick();
+    const n = picks.length;
+    el.picksCount.textContent = n;
+    el.picksBar.hidden = !n;
+    document.body.classList.toggle('has-picks', n > 0);
+    if (!el.picks.hidden) renderPicks();
+  }
+
+  // Сообщения для WhatsApp: нумерованный список кодов; длинный список делится на части
+  function picksMessages(codes) {
+    const chunks = [];
+    let lines = [];
+    codes.forEach((code, i) => {
+      const line = `${i + 1}. ${code}`;
+      const next = [...lines, line];
+      if (lines.length && encodeURIComponent(`${PICKS_HEAD}\n${next.join('\n')}`).length > WA_MAX) {
+        chunks.push(lines); lines = [line];
+      } else lines = next;
+    });
+    if (lines.length) chunks.push(lines);
+    return chunks.map((ls, k) => `${PICKS_HEAD.replace(/:$/, chunks.length > 1 ? ` (${k + 1}/${chunks.length}):` : ':')}\n${ls.join('\n')}`);
+  }
+  const waText = (text) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+
+  function renderPicks() {
+    const n = picks.length;
+    const msgs = picksMessages(picks);
+    el.picksSub.textContent = !n ? '' : msgs.length > 1 ? `${n} model` : `${n} model · kodlar bir mesajla göndəriləcək`;
+    if (!n) {
+      el.picksList.innerHTML = '<li class="picks__empty">Siyahı boşdur. Modelin üzərindəki <b>+</b> düyməsi ilə əlavə edin.</li>';
+      el.picksNote.hidden = true;
+      el.picksSend.innerHTML = '';
+      el.picksClear.hidden = true;
+      return;
+    }
+    const byCode = new Map(state.items.map((i) => [i.code, i]));
+    el.picksList.innerHTML = picks.map((code, i) => {
+      const item = byCode.get(code);
+      const thumb = item && item.poster
+        ? `<img src="${esc(item.poster)}" alt="" width="56" height="56" loading="lazy" decoding="async">`
+        : DIAMOND;
+      return `
+        <li class="pick">
+          <button class="pick__open" type="button" data-pick-open="${esc(code)}"${item ? '' : ' disabled'}>
+            <span class="pick__num">${i + 1}</span>
+            <span class="pick__thumb">${thumb}</span>
+            <span class="pick__text"><span class="pick__code">${esc(code)}</span>${item ? `<span class="pick__cat">${esc(item.category)}</span>` : ''}</span>
+          </button>
+          <button class="pick__remove" type="button" data-pick-remove="${esc(code)}" aria-label="${esc(pickLabel(code, true))}">${ICON.close}</button>
+        </li>`;
+    }).join('');
+
+    el.picksNote.hidden = msgs.length < 2;
+    el.picksNote.textContent = `Siyahı uzundur — kodlar ${msgs.length} mesaja bölünüb. Hər birini növbə ilə göndərin.`;
+    el.picksSend.innerHTML = msgs.map((m, k) => `
+      <a class="btn btn--wa btn--block" href="${esc(waText(m))}" target="_blank" rel="noopener">${ICON.wa}${msgs.length > 1 ? `WhatsApp ilə göndər · ${k + 1}/${msgs.length}` : 'WhatsApp ilə göndər'}</a>`).join('');
+    el.picksClear.hidden = false;
+  }
+
+  let picksFocus = null;
+  function openPicks() {
+    if (!el.picks.hidden) return;
+    picksFocus = document.activeElement;
+    resetClear();
+    renderPicks();
+    el.picks.hidden = false;
+    document.body.classList.add('no-scroll');
+    document.querySelectorAll('main video').forEach((v) => v.pause());
+    $('.picks__close', el.picks).focus({ preventScroll: true });
+  }
+  function closePicks(restore = true) {
+    if (el.picks.hidden) return;
+    el.picks.hidden = true;
+    document.body.classList.remove('no-scroll');
+    if (restore) {
+      resumeVisible();
+      const back = picksFocus && picksFocus.isConnected && !picksFocus.hidden ? picksFocus : el.picksBar;
+      if (back && back.focus) back.focus({ preventScroll: true });
+    }
+  }
+
+  el.picksBar.addEventListener('click', openPicks);
+  el.picks.addEventListener('click', (e) => {
+    if (e.target.closest('[data-picks-close]')) { closePicks(); return; }
+    const rm = e.target.closest('[data-pick-remove]');
+    if (rm) {
+      const code = rm.dataset.pickRemove;
+      const row = rm.closest('.pick');
+      const next = row && (row.nextElementSibling || row.previousElementSibling);
+      const nextCode = next && next.querySelector('[data-pick-remove]')?.dataset.pickRemove;
+      picks = picks.filter((c) => c !== code);
+      savePicks();
+      // фокус — на соседнюю строку, а не в пустоту
+      const target = nextCode && el.picksList.querySelector(`[data-pick-remove="${CSS.escape(nextCode)}"]`);
+      (target || $('.picks__close', el.picks)).focus({ preventScroll: true });
+      return;
+    }
+    const open = e.target.closest('[data-pick-open]');
+    if (open) {
+      const list = picks.map((c) => state.items.find((i) => i.code === c)).filter(Boolean);
+      const idx = list.findIndex((i) => i.code === open.dataset.pickOpen);
+      if (idx < 0) return;
+      closePicks(false);
+      el.picksBar.focus({ preventScroll: true }); // сюда вернётся фокус после окна товара
+      openLightbox(list, idx);
+    }
+  });
+
+  // «Hamısını sil» — со второго нажатия, чтобы не стереть список случайно
+  let clearTimer = 0;
+  function resetClear() {
+    clearTimeout(clearTimer);
+    el.picksClear.classList.remove('is-confirm');
+    el.picksClear.textContent = 'Hamısını sil';
+  }
+  el.picksClear.addEventListener('click', () => {
+    if (!el.picksClear.classList.contains('is-confirm')) {
+      el.picksClear.classList.add('is-confirm');
+      el.picksClear.textContent = 'Təsdiq edin: hamısını sil';
+      clearTimer = setTimeout(resetClear, 3500);
+      return;
+    }
+    resetClear();
+    picks = [];
+    savePicks();
+    $('.picks__close', el.picks).focus({ preventScroll: true });
+  });
+
+  // Список изменили в другой вкладке
+  addEventListener('storage', (e) => {
+    if (e.key !== PICKS_KEY) return;
+    picks = readPicks();
+    paintPicks();
+  });
+
+  // Коды, которых больше нет в каталоге, убираем (только по свежим данным с сервера)
+  function prunePicks(data) {
+    const codes = new Set(data.items.map((i) => String(i.code || '').trim()));
+    const kept = picks.filter((c) => codes.has(c));
+    if (kept.length !== picks.length) { picks = kept; savePicks(); }
+  }
+
+  paintPicks();
 
   // ---------- Прокрутка: тень у категорий, кнопка «вверх» ----------
 
@@ -903,6 +1125,7 @@
       const data = JSON.parse(text);
       if (!Array.isArray(data.items)) throw new Error('Bad catalog');
       writeCache(text);
+      prunePicks(data);
       if (state.loaded && data.updated && data.updated === state.stamp) applyViews(data);
       else applyData(data);
     } catch (err) {
