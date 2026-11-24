@@ -59,6 +59,7 @@
   const state = {
     items: [],      // все товары, новые первыми
     updated: null,
+    stamp: '',      // метка версии каталога (data.updated), чтобы не перерисовывать тот же
     cat: null,
     list: [],       // товары текущего вида (категория + поиск)
     shown: 0,
@@ -404,7 +405,8 @@
     pager.observe(el.sentinel);
   }
 
-  function render() {
+  // keep — сколько карточек уже было показано: при обновлении данных сетка не укорачивается
+  function render(keep = 0) {
     el.grid.querySelectorAll('video').forEach(unwireVideo);
     el.grid.innerHTML = '';
     el.status.innerHTML = '';
@@ -426,6 +428,7 @@
       return;
     }
     appendPage();
+    while (state.shown < Math.min(keep, state.list.length)) appendPage();
   }
 
   el.status.addEventListener('click', (e) => {
@@ -635,6 +638,11 @@
     try { localStorage.setItem(VIEWED_KEY, JSON.stringify(seen)); } catch {}
     fetch(`${API_BASE}/api/items/${item.id}/view`, { method: 'POST', mode: 'no-cors', keepalive: true }).catch(() => {});
     item.views += 1;
+    paintViews(item);
+  }
+
+  // Обновить счётчик просмотров на уже нарисованных карточках товара
+  function paintViews(item) {
     el.grid.querySelectorAll(`.card[data-id="${item.id}"] .card__views`).forEach((n) => {
       n.hidden = false;
       n.title = viewsWord(item.views);
@@ -816,23 +824,60 @@
 
   // ---------- Старт ----------
 
+  // Последний ответ каталога хранится в браузере: при повторном заходе сетка рисуется
+  // сразу из него, а свежие данные подтягиваются в фоне.
+  const CACHE_KEY = 'islimi-catalog';
+  function readCache() {
+    try {
+      const data = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      return data && Array.isArray(data.items) && data.items.length ? data : null;
+    } catch { return null; }
+  }
+  function writeCache(text) {
+    try { localStorage.setItem(CACHE_KEY, text); } catch { /* хранилище недоступно или переполнено */ }
+  }
+
+  function applyData(data) {
+    const keep = state.loaded ? state.shown : 0;
+    state.items = normalize(data);
+    state.updated = data.updated ? new Date(data.updated) : null;
+    state.stamp = data.updated || '';
+    state.loaded = true;
+    updateCounts();
+    renderHome();
+    render(keep);
+    syncLightboxWithHash();
+  }
+
+  // Каталог тот же, что уже показан: меняются только просмотры — сетку не трогаем
+  function applyViews(data) {
+    const views = new Map(data.items.map((i) => [Number(i.id), Number(i.views) || 0]));
+    for (const item of state.items) {
+      const n = views.get(item.id);
+      if (n > item.views) { item.views = n; paintViews(item); }
+    }
+  }
+
   async function load() {
     el.status.innerHTML = '';
-    el.grid.innerHTML = skeletonHTML(8);
-    el.meta.textContent = '';
+    const cached = state.loaded ? null : readCache();
+    if (cached) applyData(cached);
+    else if (!state.loaded) {
+      el.grid.innerHTML = skeletonHTML(8);
+      el.meta.textContent = '';
+    }
     try {
       const res = await fetch(API_URL, { headers: { Accept: 'application/json' } });
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      state.items = normalize(data);
-      state.updated = data.updated ? new Date(data.updated) : null;
-      state.loaded = true;
-      updateCounts();
-      renderHome();
-      render();
-      syncLightboxWithHash();
+      const text = await res.text();
+      const data = JSON.parse(text);
+      if (!Array.isArray(data.items)) throw new Error('Bad catalog');
+      writeCache(text);
+      if (state.loaded && data.updated && data.updated === state.stamp) applyViews(data);
+      else applyData(data);
     } catch (err) {
       console.error(err);
+      if (state.loaded) return; // остаётся каталог из памяти браузера
       el.grid.innerHTML = '';
       if (!el.statTotal.textContent) el.statTotal.textContent = '—';
       if (!el.statUpdated.textContent) el.statUpdated.textContent = '—';

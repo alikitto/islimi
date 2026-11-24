@@ -1,5 +1,20 @@
 /* Islimi — каталог. Общие стили для всех страниц каталога. */
 
+/* Шрифты лежат на сайте (исходники Google Fonts, OFL), обрезаны до латиницы и азербайджанских
+   букв. Кэшируются «навсегда» (см. _headers): при замене файла меняйте и его имя (…-v5.woff2). */
+@font-face {
+  font-family: "Inter"; font-style: normal; font-weight: 400 600; font-display: swap;
+  src: url(/assets/fonts/inter-v4.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Cormorant Garamond"; font-style: normal; font-weight: 500 600; font-display: swap;
+  src: url(/assets/fonts/cormorant-garamond-v4.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Cormorant Garamond"; font-style: italic; font-weight: 500; font-display: swap;
+  src: url(/assets/fonts/cormorant-garamond-italic-v4.woff2) format("woff2");
+}
+
 :root {
   --bg: #f8f5f0;
   --bg-2: #f1ebe2;

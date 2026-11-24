@@ -1,0 +1,18 @@
+# Cloudflare Pages: заголовки ответов сайта catalog.islimi.az.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+
+# Шрифты: версия в имени файла (…-v4.woff2), поэтому кэш «навсегда».
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# CSS и JS подключаются с ?v=<хэш>: адрес меняется при каждой правке,
+# поэтому и их можно хранить «навсегда». Не забывайте менять ?v= на страницах.
+/assets/catalog.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/catalog.js
+  Cache-Control: public, max-age=31536000, immutable
