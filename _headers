@@ -16,3 +16,7 @@
 
 /assets/catalog.js
   Cache-Control: public, max-age=31536000, immutable
+
+# Служебные файлы сборки не индексируются
+/tools/*
+  X-Robots-Tag: noindex

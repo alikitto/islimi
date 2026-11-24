@@ -1,0 +1,37 @@
+[
+  {
+    "file": "index.html",
+    "slug": "",
+    "title": "Islimi Jewelry — topdan zinət əşyaları kataloqu",
+    "description": "Islimi Jewelry — topdan alıcılar üçün kataloq: üzüklər, sırgalar, qolbaqlar və boyunbağılar. Modelin kodunu WhatsApp-a göndərin.",
+    "heading": "Yeni gələnlər"
+  },
+  {
+    "file": "uzukler.html",
+    "slug": "uzukler",
+    "title": "Üzüklər | Kataloq — Islimi Jewelry",
+    "description": "Islimi Jewelry üzük kataloqu (topdan satış). Bəyəndiyiniz üzüyün kodunu WhatsApp-a göndərin.",
+    "heading": "Üzüklər"
+  },
+  {
+    "file": "sirqalar.html",
+    "slug": "sirqalar",
+    "title": "Sırgalar | Kataloq — Islimi Jewelry",
+    "description": "Islimi Jewelry sırğa kataloqu (topdan satış). Bəyəndiyiniz sırğanın kodunu WhatsApp-a göndərin.",
+    "heading": "Sırgalar"
+  },
+  {
+    "file": "qolbaqlar.html",
+    "slug": "qolbaqlar",
+    "title": "Qolbaqlar | Kataloq — Islimi Jewelry",
+    "description": "Islimi Jewelry qolbaq kataloqu (topdan satış). Bəyəndiyiniz qolbağın kodunu WhatsApp-a göndərin.",
+    "heading": "Qolbaqlar"
+  },
+  {
+    "file": "boyunbagilar.html",
+    "slug": "boyunbagilar",
+    "title": "Boyunbağılar | Kataloq — Islimi Jewelry",
+    "description": "Islimi Jewelry boyunbağı kataloqu (topdan satış). Bəyəndiyiniz boyunbağının kodunu WhatsApp-a göndərin.",
+    "heading": "Boyunbağılar"
+  }
+]

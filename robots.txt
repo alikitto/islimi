@@ -1,0 +1,2 @@
+# Правила для роботов добавляет Cloudflare (управляемый robots.txt) перед этим файлом.
+Sitemap: https://catalog.islimi.az/sitemap.xml
