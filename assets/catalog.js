@@ -39,11 +39,6 @@
     catalog: $('#catalog'),
     tiles: $('#tiles'),
     hero: $('#hero'),
-    heroShots: $('#heroShots'),
-    heroTag: $('#heroTag'),
-    heroCode: $('#heroCode'),
-    heroCat: $('#heroCat'),
-    heroWa: $('#heroWa'),
     statTotal: $('#statTotal'),
     statUpdated: $('#statUpdated'),
     toTop: $('#toTop'),
@@ -369,44 +364,8 @@
 
   // ---------- Главная: первый экран, плитки категорий, цифры ----------
 
-  // Коллаж: закреплённый товар (или самый новый) + два новых из других категорий
-  function pickShowcase(items) {
-    const main = items.find((i) => i.pin) || items[0];
-    if (!main) return [];
-    const picked = [main];
-    const used = new Set([main.category]);
-    for (const i of items) {
-      if (picked.length === 3) break;
-      if (i !== main && !used.has(i.category)) { picked.push(i); used.add(i.category); }
-    }
-    for (const i of items) { if (picked.length === 3) break; if (!picked.includes(i)) picked.push(i); }
-    return picked;
-  }
-
   function renderHome() {
     const { items } = state;
-    const shots = pickShowcase(items);
-    el.heroShots.querySelectorAll('.shot').forEach((btn, n) => {
-      const item = shots[n];
-      if (!item) return;
-      const v = btn.querySelector('video');
-      v.dataset.src = n === 0 ? item.video : item.videoSm; // большой кадр — в полном качестве
-      wireVideo(v);
-      btn.setAttribute('aria-label', `${item.code} — videoya bax`);
-      const code = btn.querySelector('.shot__code');
-      if (code) code.textContent = item.code;
-      const badge = btn.querySelector('.shot__badge');
-      if (badge) badge.hidden = !item.pin;
-      btn.onclick = () => openLightbox(shots, n);
-    });
-    if (shots[0]) {
-      el.heroCode.textContent = shots[0].code;
-      el.heroCat.textContent = shots[0].category;
-      el.heroWa.href = waLink(shots[0].code);
-      el.heroWa.setAttribute('aria-label', `${shots[0].code} — WhatsApp ilə sifariş et`);
-      el.heroTag.hidden = false;
-    }
-
     el.tiles.querySelectorAll('.tile').forEach((tile) => {
       const cat = CATS.find((c) => c.slug === tile.dataset.slug);
       const inCat = items.filter((i) => i.category === cat.name);

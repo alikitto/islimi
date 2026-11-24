@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-200 -200 400 400" fill="none">
+  <!-- Медальон в духе ислими: восьмиконечная звезда, лепестки-руми и завитки. Кольца медленно вращаются навстречу друг другу. -->
+  <style>
+    .spin { transform-origin: 0px 0px; animation: spin 160s linear infinite; }
+    .spin-back { transform-origin: 0px 0px; animation: spin 220s linear infinite reverse; }
+    .breathe { transform-origin: 0px 0px; animation: breathe 7s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes breathe { 50% { transform: scale(1.06); opacity: .85; } }
+    @media (prefers-reduced-motion: reduce) { .spin, .spin-back, .breathe { animation: none; } }
+  </style>
+  <defs>
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="-200" y1="-200" x2="200" y2="200">
+      <stop offset="0" stop-color="#f1dcae"/>
+      <stop offset=".38" stop-color="#c99b5c"/>
+      <stop offset=".62" stop-color="#e9cd96"/>
+      <stop offset="1" stop-color="#b78a4f"/>
+    </linearGradient>
+    <!-- лист-руми наружного пояса -->
+    <g id="leaf">
+      <path d="M0-128C15-140 21-159 0-183C-21-159-15-140 0-128Z"/>
+      <path d="M0-138C8-147 10-161 0-172C-10-161-8-147 0-138Z" fill="url(#g)" fill-opacity=".28"/>
+    </g>
+    <!-- завиток между листьями -->
+    <g id="curl">
+      <path d="M0-127C0-141 11-149 9-160C7-170-4-169-3-161C-2-156 4-156 4-160"/>
+      <circle cx="0" cy="-178" r="1.8" fill="url(#g)" stroke="none"/>
+    </g>
+    <!-- лепесток внутри звезды -->
+    <path id="petal" d="M0-76C11-85 11-97 0-106C-11-97-11-85 0-76Z"/>
+    <!-- лепесток центральной розетки -->
+    <path id="core" d="M0-9C10-19 10-31 0-42C-10-31-10-19 0-9Z"/>
+  </defs>
+
+  <g stroke="url(#g)" stroke-width="1.1">
+    <circle r="196" stroke-width=".8"/>
+    <circle r="189" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="0 7.42"/>
+
+    <g class="spin">
+      <use href="#leaf" xlink:href="#leaf"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(22.5)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(45)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(67.5)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(90)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(112.5)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(135)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(157.5)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(180)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(202.5)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(225)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(247.5)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(270)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(292.5)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(315)"/>
+      <use href="#leaf" xlink:href="#leaf" transform="rotate(337.5)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(11.25)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(33.75)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(56.25)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(78.75)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(101.25)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(123.75)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(146.25)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(168.75)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(191.25)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(213.75)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(236.25)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(258.75)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(281.25)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(303.75)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(326.25)"/>
+      <use href="#curl" xlink:href="#curl" transform="rotate(348.75)"/>
+    </g>
+
+    <circle r="124"/>
+    <circle r="118" stroke-width=".6"/>
+
+    <g class="spin-back">
+      <!-- восьмиконечная звезда из двух квадратов -->
+      <path d="M0-114L114 0 0 114-114 0Z"/>
+      <path d="M80.6-80.6L80.6 80.6-80.6 80.6-80.6-80.6Z"/>
+      <use href="#petal" xlink:href="#petal"/>
+      <use href="#petal" xlink:href="#petal" transform="rotate(45)"/>
+      <use href="#petal" xlink:href="#petal" transform="rotate(90)"/>
+      <use href="#petal" xlink:href="#petal" transform="rotate(135)"/>
+      <use href="#petal" xlink:href="#petal" transform="rotate(180)"/>
+      <use href="#petal" xlink:href="#petal" transform="rotate(225)"/>
+      <use href="#petal" xlink:href="#petal" transform="rotate(270)"/>
+      <use href="#petal" xlink:href="#petal" transform="rotate(315)"/>
+    </g>
+
+    <circle r="68"/>
+    <circle r="60" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="0 7.85"/>
+
+    <g class="breathe" fill="url(#g)" fill-opacity=".9" stroke="none">
+      <use href="#core" xlink:href="#core"/>
+      <use href="#core" xlink:href="#core" transform="rotate(45)"/>
+      <use href="#core" xlink:href="#core" transform="rotate(90)"/>
+      <use href="#core" xlink:href="#core" transform="rotate(135)"/>
+      <use href="#core" xlink:href="#core" transform="rotate(180)"/>
+      <use href="#core" xlink:href="#core" transform="rotate(225)"/>
+      <use href="#core" xlink:href="#core" transform="rotate(270)"/>
+      <use href="#core" xlink:href="#core" transform="rotate(315)"/>
+      <circle r="5"/>
+    </g>
+  </g>
+</svg>
