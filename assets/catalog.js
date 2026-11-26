@@ -559,6 +559,40 @@
     else lbLoading.classList.remove('is-on');
   }
 
+  // Системные кнопки плеера выключены: iPhone затемняет под ними всё видео.
+  // Пауза и пуск — нажатием на видео; значок виден, только пока видео стоит.
+  const lbPlayIcon = document.createElement('span');
+  lbPlayIcon.className = 'lb__play';
+  lbPlayIcon.setAttribute('aria-hidden', 'true');
+  lbPlayIcon.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>';
+  lbLoading.after(lbPlayIcon);
+  let lbPaused = false; // остановил покупатель или браузер не дал автозапуск
+
+  function setPaused(on) {
+    lbPaused = on;
+    lbPlayIcon.classList.toggle('is-on', on);
+  }
+
+  // Автозапуск запрещён (например, режим энергосбережения) — показываем значок пуска
+  function tryPlay(v) {
+    const token = lbToken;
+    v.play().catch((e) => { if (e.name === 'NotAllowedError' && token === lbToken) setPaused(true); });
+  }
+
+  function playLb() {
+    setPaused(false);
+    tryPlay(el.lbVideo);
+    if (lbLow.classList.contains('is-on')) tryPlay(lbLow);
+  }
+
+  function togglePlay() {
+    const shown = lbLow.classList.contains('is-on') ? lbLow : el.lbVideo;
+    if (shown.paused) { playLb(); return; }
+    setPaused(true);
+    el.lbVideo.pause();
+    lbLow.pause();
+  }
+
   let lbAbort = null; // снимает обработчики прошлого товара
 
   function clearLow() {
@@ -584,6 +618,7 @@
     const token = ++lbToken;
     clearLow();
     stopWarm();
+    setPaused(false);
     const v = el.lbVideo;
     const mine = () => token === lbToken;
     setLoading(true);
@@ -591,7 +626,7 @@
     if (item.poster) { v.poster = item.poster; lbLow.poster = item.poster; }
     else { v.removeAttribute('poster'); lbLow.removeAttribute('poster'); }
     v.src = item.video;
-    v.play().catch(() => {});
+    tryPlay(v);
 
     if (item.videoSm === item.video) { // лёгкой копии нет — просто ждём само видео
       v.addEventListener('playing', () => { if (mine()) setLoading(false); }, { once: true });
@@ -606,7 +641,7 @@
 
     lbLow.src = item.videoSm;
     lbLow.classList.add('is-on');
-    lbLow.play().catch(() => {});
+    tryPlay(lbLow);
 
     const showFull = () => {
       if (!mine() || full || swapping || v.readyState < 4) return;
@@ -615,7 +650,7 @@
         swapping = false;
         if (!mine()) return;
         full = true;
-        v.play().catch(() => {});
+        if (!lbPaused) tryPlay(v);
         setLoading(false);
         lbLow.classList.remove('is-on');
         setTimeout(() => { if (mine() && full) lbLow.pause(); }, 400); // после затухания
@@ -629,7 +664,7 @@
     };
 
     const showLow = () => {
-      if (!mine() || !full || v.seeking) return;
+      if (!mine() || !full || v.seeking || lbPaused) return;
       full = false;
       lbLow.currentTime = v.currentTime;
       lbLow.play().catch(() => {});
@@ -739,6 +774,7 @@
     lbToken++;
     clearLow();
     setLoading(false);
+    setPaused(false);
     el.lbVideo.pause();
     el.lbVideo.removeAttribute('src');
     el.lbVideo.removeAttribute('poster');
@@ -792,12 +828,35 @@
   el.lbPrev.addEventListener('click', () => step(-1));
   el.lbNext.addEventListener('click', () => step(1));
   // Видео на весь экран. На iPhone requestFullscreen для видео нет — там встроенный плеер webkitEnterFullscreen.
+  // Системные кнопки плеера включаются только на весь экран.
+  const isFull = () => (document.fullscreenElement || document.webkitFullscreenElement) === el.lbVideo;
   el.lbFull.addEventListener('click', () => {
     const v = el.lbVideo;
-    v.play().catch(() => {});
+    playLb();
     if (v.requestFullscreen) v.requestFullscreen().catch(() => { if (v.webkitEnterFullscreen) v.webkitEnterFullscreen(); });
     else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
     else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
+  });
+  function leftFullscreen() {
+    el.lbVideo.controls = false;
+    if (!el.lb.hidden) playLb(); // iPhone при выходе из своего плеера ставит видео на паузу
+  }
+  ['fullscreenchange', 'webkitfullscreenchange'].forEach((type) => {
+    document.addEventListener(type, () => {
+      if (isFull()) el.lbVideo.controls = true;
+      else if (el.lbVideo.controls) leftFullscreen();
+    });
+  });
+  el.lbVideo.addEventListener('webkitendfullscreen', () => setTimeout(leftFullscreen, 300));
+  el.lbVideo.addEventListener('click', () => { if (!el.lbVideo.controls) togglePlay(); });
+  el.lbVideo.addEventListener('keydown', (e) => {
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    e.preventDefault();
+    if (!el.lbVideo.controls) togglePlay();
+  });
+  // После возврата на вкладку видео само продолжает играть
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !el.lb.hidden && !lbPaused) playLb();
   });
   el.lbShare.addEventListener('click', async () => {
     const item = state.lbList[state.lbIndex];
@@ -810,7 +869,7 @@
 
   // Tab не выпускает фокус из открытого окна
   function trapTab(root, e) {
-    const f = [...root.querySelectorAll('button:not([disabled]):not([hidden]), a[href], video[controls]')].filter((n) => n.offsetParent);
+    const f = [...root.querySelectorAll('button:not([disabled]):not([hidden]), a[href], video[tabindex]')].filter((n) => n.offsetParent);
     if (!f.length) return;
     const first = f[0], last = f[f.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
